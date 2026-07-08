@@ -22,35 +22,122 @@
             position: relative;
         }
 
-        /* --- BACK ARROW STYLING (MINIMALIST) --- */
+        /* --- COOL FLOATING BLURRED BACKGROUND --- */
+        .bg-animation-wrapper {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            z-index: 1; /* Sits beneath forms and back button */
+            filter: blur(20px); /* Creates the ambient blur cloud effect */
+            pointer-events: none;
+        }
+
+        .bg-shape {
+            position: absolute;
+            opacity: 0.4;
+            animation: floatAround 20s infinite linear;
+        }
+
+        /* Shape 1: Emerald Circle */
+        .bg-shape.circle-1 {
+            width: 180px;
+            height: 180px;
+            background-color: #2ecc71;
+            border-radius: 50%;
+            top: 15%;
+            left: 10%;
+            animation-duration: 25s;
+        }
+
+        /* Shape 2: Dark Green Square */
+        .bg-shape.square-1 {
+            width: 220px;
+            height: 220px;
+            background-color: #27ae60;
+            bottom: 10%;
+            right: 15%;
+            border-radius: 20px;
+            animation-duration: 30s;
+        }
+
+        /* Shape 3: Mint Green Triangle */
+        .bg-shape.triangle-1 {
+            width: 0;
+            height: 0;
+            border-left: 100px solid transparent;
+            border-right: 100px solid transparent;
+            border-bottom: 180px solid #a3e4d7;
+            top: 50%;
+            left: 70%;
+            animation-duration: 22s;
+        }
+
+        /* Shape 4: Soft Gray-Green Circle */
+        .bg-shape.circle-2 {
+            width: 250px;
+            height: 250px;
+            background-color: #bdc3c7;
+            border-radius: 50%;
+            bottom: 40%;
+            left: 25%;
+            animation-duration: 35s;
+        }
+
+        @keyframes floatAround {
+            0% {
+                transform: translate(0, 0) rotate(0deg);
+            }
+            50% {
+                transform: translate(80px, 60px) rotate(180deg);
+            }
+            100% {
+                transform: translate(0, 0) rotate(360deg);
+            }
+        }
+
+
+        /* --- BACK ARROW BUTTON STYLING --- */
         .back-btn-container {
             position: absolute;
             top: 25px;
             left: 25px;
-            z-index: 999;
+            z-index: 999; /* Higher than background and main card */
         }
 
         .back-arrow {
-            display: inline-block;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 50px;
+            height: 50px;
+            background-color: #ffffff;
+            border: 2px solid #2ecc71;
+            border-radius: 50%;
             cursor: pointer;
             text-decoration: none;
-            /* Using the green theme color directly on the arrow symbol text */
             color: #2ecc71; 
-            font-size: 32px; /* Made slightly larger since the circle wrapper is gone */
+            font-size: 26px; 
             font-weight: bold;
-            transition: all 0.2s ease;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            transition: all 0.25s ease;
             user-select: none;
         }
 
-        /* Hover animation: Glows darker green and shifts slightly left */
+        /* Hover animation: Solid filled color swap */
         .back-arrow:hover {
-            color: #27ae60;
-            transform: translateX(-3px);
+            color: #ffffff;
+            background-color: #2ecc71;
+            box-shadow: 0 6px 20px rgba(46, 204, 113, 0.3);
+            transform: translateY(-2px);
         }
 
         /* Pressed down click animation */
         .back-arrow:active {
-            transform: scale(0.85) translateX(-3px);
+            transform: scale(0.90) translateY(0);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
         }
 
 
@@ -64,6 +151,7 @@
             width: 900px;
             max-width: 100%;
             min-height: 580px;
+            z-index: 10; /* Elevated above floating background layer */
         }
 
         .form-container {
@@ -272,6 +360,13 @@
     </style>
 </head>
 <body>
+
+    <div class="bg-animation-wrapper">
+        <div class="bg-shape circle-1"></div>
+        <div class="bg-shape square-1"></div>
+        <div class="bg-shape triangle-1"></div>
+        <div class="bg-shape circle-2"></div>
+    </div>
 
     <div class="back-btn-container">
         <a href="dashboard.html" class="back-arrow" title="Go back to Dashboard">&#8592;</a>
