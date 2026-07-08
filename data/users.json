@@ -4,5 +4,11 @@
     "email": "ryanjulian2005@gmail.com",
     "password": "hashed_72697269@Rj",
     "role": "Job Seeker"
+  },
+  {
+    "id": 1783489528289,
+    "email": "ryanjr-sm23@student.tarc.edu.my",
+    "password": "hashed_72697269@Rj",
+    "role": "Employer"
   }
 ]
