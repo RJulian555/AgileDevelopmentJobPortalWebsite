@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Job Portal - Create Account</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: #f4f7f6;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* --- BACK ARROW STYLING (MINIMALIST) --- */
+        .back-btn-container {
+            position: absolute;
+            top: 25px;
+            left: 25px;
+            z-index: 999;
+        }
+
+        .back-arrow {
+            display: inline-block;
+            cursor: pointer;
+            text-decoration: none;
+            /* Using the green theme color directly on the arrow symbol text */
+            color: #2ecc71; 
+            font-size: 32px; /* Made slightly larger since the circle wrapper is gone */
+            font-weight: bold;
+            transition: all 0.2s ease;
+            user-select: none;
+        }
+
+        /* Hover animation: Glows darker green and shifts slightly left */
+        .back-arrow:hover {
+            color: #27ae60;
+            transform: translateX(-3px);
+        }
+
+        /* Pressed down click animation */
+        .back-arrow:active {
+            transform: scale(0.85) translateX(-3px);
+        }
+
+
+        /* --- MAIN REGISTRATION CONTAINER --- */
+        .container {
+            background-color: #fff;
+            border-radius: 16px;
+            box-shadow: 0 14px 28px rgba(0,0,0,0.08), 0 10px 10px rgba(0,0,0,0.06);
+            position: relative;
+            overflow: hidden;
+            width: 900px;
+            max-width: 100%;
+            min-height: 580px;
+        }
+
+        .form-container {
+            position: absolute;
+            top: 0;
+            height: 100%;
+            transition: all 0.6s ease-in-out;
+        }
+
+        /* Left Side: Job Seeker View */
+        .jobseeker-container {
+            left: 0;
+            width: 50%;
+            z-index: 2;
+            background: #ffffff;
+            padding: 60px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        /* Right Side: Employer View */
+        .employer-container {
+            left: 0;
+            width: 50%;
+            opacity: 0;
+            z-index: 1;
+            background: #ffffff;
+            padding: 60px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        /* --- THE SLIDING OVERLAY CONTAINER --- */
+        .overlay-container {
+            position: absolute;
+            top: 0;
+            left: 50%;
+            width: 50%;
+            height: 100%;
+            overflow: hidden;
+            transition: transform 0.6s ease-in-out;
+            z-index: 100;
+        }
+
+        .overlay {
+            background: linear-gradient(135deg, #2ecc71 0%, #27ae60 100%);
+            color: #ffffff;
+            position: relative;
+            left: -100%;
+            height: 100%;
+            width: 200%;
+            transform: translateX(0);
+            transition: transform 0.6s ease-in-out;
+        }
+
+        /* --- SHADES OF GREEN BLURRED CIRCLES BACKGROUND --- */
+        .overlay::before, .overlay::after {
+            content: '';
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(50px);
+            opacity: 0.6;
+            mix-blend-mode: screen;
+            pointer-events: none;
+        }
+
+        .overlay::before {
+            width: 300px;
+            height: 300px;
+            background: #a3e4d7;
+            top: -50px;
+            left: 10%;
+        }
+
+        .overlay::after {
+            width: 250px;
+            height: 250px;
+            background: #58d68d;
+            bottom: -30px;
+            right: 15%;
+        }
+
+        .overlay-panel {
+            position: absolute;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 0 50px;
+            text-align: center;
+            top: 0;
+            height: 100%;
+            width: 50%;
+            transition: transform 0.6s ease-in-out;
+            left: 0; 
+            box-sizing: border-box;
+        }
+
+        .overlay-left {
+            transform: translateX(-20%);
+            left: 75px;
+        }
+
+        .overlay-right {
+            right: 0;
+            left: auto;
+            transform: translateX(0);
+        }
+
+        /* --- SWOOSH ACTION STATE MODIFIERS --- */
+        .container.right-panel-active .jobseeker-container {
+            transform: translateX(100%);
+            opacity: 0;
+            z-index: 1;
+        }
+
+        .container.right-panel-active .employer-container {
+            transform: translateX(100%);
+            opacity: 1;
+            z-index: 5;
+        }
+
+        .container.right-panel-active .overlay-container {
+            transform: translateX(-100%);
+        }
+
+        .container.right-panel-active .overlay {
+            transform: translateX(50%);
+        }
+
+        /* --- STRUCTURAL TYPOGRAPHY & INTERACTIVE FORM UI --- */
+        h1 {
+            font-size: 32px;
+            margin-bottom: 12px;
+            color: #2c3e50;
+            font-weight: 700;
+        }
+        
+        .overlay-panel h1 {
+            color: #ffffff;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+
+        p {
+            font-size: 15px;
+            margin: 10px 0 25px;
+            line-height: 24px;
+        }
+
+        input {
+            background-color: #f2f5f3;
+            border: 1px solid transparent;
+            padding: 14px 16px;
+            margin: 10px 0;
+            width: 100%;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: all 0.2s;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: #2ecc71;
+            background-color: #ffffff;
+            box-shadow: 0 4px 12px rgba(46, 204, 113, 0.1);
+        }
+
+        button {
+            border-radius: 25px;
+            border: 1px solid #2ecc71;
+            background-color: #2ecc71;
+            color: #ffffff;
+            font-size: 13px;
+            font-weight: bold;
+            padding: 14px 50px;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            cursor: pointer;
+            margin-top: 15px;
+            transition: transform 80ms ease-in, box-shadow 0.2s;
+            box-shadow: 0 4px 10px rgba(46, 204, 113, 0.2);
+        }
+
+        button:hover {
+            box-shadow: 0 6px 15px rgba(46, 204, 113, 0.3);
+        }
+
+        button:active {
+            transform: scale(0.96);
+        }
+
+        button.ghost {
+            background-color: transparent;
+            border-color: #ffffff;
+            color: #ffffff;
+            box-shadow: none;
+            backdrop-filter: blur(5px);
+        }
+
+        button.ghost:hover {
+            background-color: rgba(255, 255, 255, 0.15);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        }
+    </style>
+</head>
+<body>
+
+    <div class="back-btn-container">
+        <a href="dashboard.html" class="back-arrow" title="Go back to Dashboard">&#8592;</a>
+    </div>
+
+    <div class="container" id="mainContainer">
+        
+        <div class="form-container jobseeker-container">
+            <form action="/api/register" method="POST">
+                <h1>Job Seeker</h1>
+                <p style="color: #7f8c8d;">Create an account to browse jobs and track applications.</p>
+                
+                <input type="hidden" name="role" value="Job Seeker">
+                <input type="email" name="email" placeholder="Email Address" required />
+                <input type="password" name="password" placeholder="Password" required />
+                <button type="submit">Sign Up</button>
+            </form>
+        </div>
+
+        <div class="form-container employer-container">
+            <form action="/api/register" method="POST">
+                <h1>Employer Account</h1>
+                <p style="color: #7f8c8d;">Register your company to post vacancies and hire talent.</p>
+                
+                <input type="hidden" name="role" value="Employer">
+                <input type="email" name="email" placeholder="Corporate Email" required />
+                <input type="password" name="password" placeholder="Password" required />
+                <button type="submit">Register Company</button>
+            </form>
+        </div>
+
+        <div class="overlay-container">
+            <div class="overlay">
+                
+                <div class="overlay-panel overlay-left">
+                    <h1>Looking for a Job?</h1>
+                    <p>Switch over to the job seeker portal to submit your resume applications immediately.</p>
+                    <button class="ghost" id="toJobSeeker">I am a Job Seeker</button>
+                </div>
+                
+                <div class="overlay-panel overlay-right">
+                    <h1>Hiring Talent?</h1>
+                    <p>Switch over to the employer panel to publish corporate openings and track candidates.</p>
+                    <button class="ghost" id="toEmployer">Are you an Employer?</button>
+                </div>
+                
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const toEmployerBtn = document.getElementById('toEmployer');
+        const toJobSeekerBtn = document.getElementById('toJobSeeker');
+        const mainContainer = document.getElementById('mainContainer');
+
+        toEmployerBtn.addEventListener('click', () => {
+            mainContainer.classList.add("right-panel-active");
+        });
+
+        toJobSeekerBtn.addEventListener('click', () => {
+            mainContainer.classList.remove("right-panel-active");
+        });
+    </script>
+</body>
+</html>
