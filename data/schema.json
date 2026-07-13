@@ -1,0 +1,39 @@
+{
+  "version": 1,
+  "collections": {
+    "users": {
+      "primaryKey": "id",
+      "fields": {
+        "id": "number|required|unique",
+        "email": "string|required|unique",
+        "password": "string|required",
+        "role": "enum:Job Seeker,Employer|required",
+        "companyId": "string|null|foreignKey:companies.id"
+      }
+    },
+    "companies": {
+      "primaryKey": "id",
+      "fields": {
+        "id": "string|required|unique",
+        "name": "string|required",
+        "description": "string",
+        "industry": "string|required",
+        "address": "string|required",
+        "email": "string|required|unique",
+        "phone": "string|required",
+        "website": "string",
+        "createdAt": "ISO-8601|required",
+        "updatedAt": "ISO-8601|required"
+      }
+    }
+  },
+  "relationships": [
+    {
+      "from": "users.companyId",
+      "to": "companies.id",
+      "name": "Company has many Employers; Employer belongs to zero or one Company",
+      "appliesWhen": "users.role equals Employer",
+      "onDelete": "restrict"
+    }
+  ]
+}

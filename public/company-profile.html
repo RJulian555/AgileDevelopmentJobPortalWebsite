@@ -178,7 +178,8 @@
         </div>
 
         <div class="form-body">
-            <form>
+            <form action="/api/companies" method="POST">
+                <input id="employerId" name="employerId" type="hidden">
                 <div class="form-grid">
                     <div class="full-width">
                         <label for="companyName" class="required">Company Name</label>
@@ -238,12 +239,16 @@
                     </div>
 
                     <div class="full-width actions">
-                        <button class="secondary-btn" type="button">Cancel</button>
+                        <button class="secondary-btn" type="button" onclick="window.location.href='/dashboard.html'">Cancel</button>
                         <button class="primary-btn" type="submit">Save Profile</button>
                     </div>
                 </div>
             </form>
         </div>
     </div>
+    <script>
+        const employerId = new URLSearchParams(window.location.search).get('employerId');
+        document.getElementById('employerId').value = employerId || '';
+    </script>
 </body>
 </html>

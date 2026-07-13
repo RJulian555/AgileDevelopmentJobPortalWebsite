@@ -9,6 +9,7 @@
     "id": 1783489528289,
     "email": "ryanjr-sm23@student.tarc.edu.my",
     "password": "hashed_72697269@Rj",
-    "role": "Employer"
+    "role": "Employer",
+    "companyId": "company-001"
   }
 ]

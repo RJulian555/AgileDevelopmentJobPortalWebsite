@@ -1,6 +1,7 @@
 const express = require('express');
 const fs = require('fs');
 const path = require('path');
+const companyRoutes = require('./routes/companyRoutes');
 
 const app = express();
 const PORT = 3000;
@@ -11,6 +12,7 @@ const USERS_FILE = path.join(__dirname, 'data', 'users.json');
 // Middleware to read form submissions and serve HTML files automatically
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static('public'));
+app.use(companyRoutes);
 
 // Task 2: Ensure database "schema" exists (initialize an empty array text file if it's missing)
 if (!fs.existsSync(USERS_FILE)) {
