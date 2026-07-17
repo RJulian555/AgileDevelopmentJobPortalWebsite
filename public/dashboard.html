@@ -609,15 +609,14 @@
             if (e.key === 'Enter') triggerSearch();
         });
 
-        /* ── Native clear (×) resets to default ── */
+        /* ── Native clear (×) shows all jobs ── */
         searchInput.addEventListener('search', function () {
-            if (searchInput.value === '') resetToDefault();
+            if (searchInput.value === '') loadAllJobs();
         });
 
         /* ── Main search trigger ── */
         function triggerSearch() {
             var query = searchInput.value.trim();
-            if (!query) { searchInput.focus(); return; }
 
             showState('searching');
             resultsStatus.textContent = '';
@@ -724,14 +723,36 @@
             }
         }
 
-        /* ── Reset to default browse state ── */
-        function resetToDefault() {
-            showState('empty');
+        /* ── Load all jobs (used on page load and when search is cleared) ── */
+        function loadAllJobs() {
+            showState('searching');
             resultsStatus.textContent = '';
-            emptyTitle.textContent = 'Search for your next opportunity';
-            emptyBody.innerHTML =
-                'Type a job title above \u2014 try <strong>\u201CSoftware Engineer\u201D</strong> or a chip above \u2014 and hit <strong>Search</strong>.';
+
+            fetch('/api/jobs?q=')
+                .then(function (res) {
+                    if (!res.ok) throw new Error('Server error: ' + res.status);
+                    return res.json();
+                })
+                .then(function (jobs) {
+                    renderResults(jobs, '');
+                    resultsStatus.innerHTML =
+                        '<strong>' + jobs.length + '</strong> job' + (jobs.length === 1 ? '' : 's') + ' available';
+                })
+                .catch(function (err) {
+                    showState('empty-search');
+                    resultsStatus.textContent = 'Could not load job listings. Please refresh.';
+                    emptyTitle.textContent    = 'Error';
+                    emptyBody.textContent     = err.message;
+                });
         }
+
+        /* ── Reset to default browse state (kept for fallback) ── */
+        function resetToDefault() {
+            loadAllJobs();
+        }
+
+        /* ── Load all jobs on page load ── */
+        document.addEventListener('DOMContentLoaded', loadAllJobs);
     </script>
 
 </body>

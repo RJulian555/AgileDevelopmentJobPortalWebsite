@@ -60,10 +60,11 @@ app.get('/api/jobs', (req, res) => {
     // Read the jobs data file
     const jobs = JSON.parse(fs.readFileSync(JOBS_FILE, 'utf8'));
 
-    // Filter by title — partial, case-insensitive match
+    // Filter by title — partial, case-insensitive match.
+    // If no query is provided, return all jobs.
     const results = query
         ? jobs.filter(job => job.title.toLowerCase().includes(query))
-        : [];
+        : jobs;
 
     res.json(results);
 });
