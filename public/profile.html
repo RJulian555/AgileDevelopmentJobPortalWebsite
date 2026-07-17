@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Profile Edit - Function Confirmation</title>
+    <!-- No CSS, only keeping browser default styles -->
+</head>
+<body>
+
+    <h2>Edit Profile</h2>
+    <form id="profileForm" onsubmit="return handleSubmit(event)">
+
+        <!-- Avatar Upload -->
+        <div>
+            <label for="avatar">Avatar:</label>
+            <input type="file" id="avatar" accept="image/*">
+        </div>
+
+        <!-- Basic Information -->
+        <div>
+            <label for="fullName">Full Name:</label>
+            <input type="text" id="fullName" value="Zhang Ming" required>
+        </div>
+
+        <div>
+            <label for="jobTitle">Job Title:</label>
+            <input type="text" id="jobTitle" value="Senior Full-Stack Engineer">
+        </div>
+
+        <div>
+            <label for="location">Location:</label>
+            <input type="text" id="location" value="Beijing · Chaoyang">
+        </div>
+
+        <!-- Contact Information -->
+        <div>
+            <label for="email">Email:</label>
+            <input type="email" id="email" value="ming.zhang@email.com" required>
+        </div>
+
+        <div>
+            <label for="phone">Phone:</label>
+            <input type="tel" id="phone" value="+86 138 0000 8888">
+        </div>
+
+        <div>
+            <label for="birthday">Birthday:</label>
+            <input type="date" id="birthday" value="1992-03-15">
+        </div>
+
+        <div>
+            <label for="website">Personal Website:</label>
+            <input type="url" id="website" value="https://ming.dev">
+        </div>
+
+        <!-- About Me -->
+        <div>
+            <label for="about">About Me:</label><br>
+            <textarea id="about" rows="4" cols="50">拥有 8 年全栈开发经验，专注于高并发系统设计与微服务架构。热爱技术分享，曾多次担任技术大会讲师。善于团队协作，追求代码质量与工程效率。</textarea>
+        </div>
+
+        <!-- Skills (comma-separated) -->
+        <div>
+            <label for="skills">Skills (comma-separated):</label>
+            <input type="text" id="skills" value="JavaScript, TypeScript, React, Vue, Node.js, Python, Docker, Kubernetes, AWS, MySQL, MongoDB">
+        </div>
+
+        <!-- Languages (comma-separated) -->
+        <div>
+            <label for="languages">Languages (comma-separated):</label>
+            <input type="text" id="languages" value="Chinese (Native), English (Professional), Japanese (Conversational)">
+        </div>
+
+        <!-- Work Experience (simple multiple groups, here for demonstration purposes providing two groups, using static input) -->
+        <fieldset>
+            <legend>Work Experience 1</legend>
+            <div>
+                <label>Company：<input type="text" name="company1" value="ByteDance · Feishu Team"></label>
+            </div>
+            <div>
+                <label>Position：<input type="text" name="position1" value="Senior Full-Stack Engineer"></label>
+            </div>
+            <div>
+                <label>Start Date：<input type="date" name="start1" value="2021-04-01"></label>
+            </div>
+            <div>
+                <label>End Date：<input type="date" name="end1" value="2026-07-17"></label>
+            </div>
+            <div>
+                <label>Description：<br><textarea name="desc1" rows="3" cols="50">负责飞书审批模块的架构升级，主导微服务拆分与性能优化，日活用户超 500 万。推动前端工程化建设，引入 TypeScript 及自动化测试，代码缺陷率降低 40%。</textarea></label>
+            </div>
+        </fieldset>
+
+        <fieldset>
+            <legend>Work Experience 2</legend>
+            <div>
+                <label>Company：<input type="text" name="company2" value="Alibaba · Local Life"></label>
+            </div>
+            <div>
+                <label>Position：<input type="text" name="position2" value="Full-Stack Developer"></label>
+            </div>
+            <div>
+                <label>Start Date：<input type="date" name="start2" value="2018-07-01"></label>
+            </div>
+            <div>
+                <label>End Date：<input type="date" name="end2" value="2021-02-01"></label>
+            </div>
+            <div>
+                <label>Description：<br><textarea name="desc2" rows="3" cols="50">参与饿了么商家平台开发，负责订单调度系统重构，采用 Node.js + React 技术栈。实现订单实时推送与数据可视化，系统响应时间缩短 60%。</textarea></label>
+            </div>
+        </fieldset>
+
+        <!-- 教育背景（类似） -->
+        <fieldset>
+            <legend>Education Background 1</legend>
+            <div>
+                <label>School：<input type="text" name="school1" value="Peking University"></label>
+            </div>
+            <div>
+                <label>Major：<input type="text" name="major1" value="Computer Science and Technology Master"></label>
+            </div>
+            <div>
+                <label>Start Date：<input type="date" name="eduStart1" value="2015-09-01"></label>
+            </div>
+            <div>
+                <label>End Date：<input type="date" name="eduEnd1" value="2018-06-01"></label>
+                <label>专业：<input type="text" name="major1" value="计算机科学与技术 硕士"></label>
+            </div>
+            <div>
+                <label>开始日期：<input type="date" name="eduStart1" value="2015-09-01"></label>
+            </div>
+            <div>
+                <label>结束日期：<input type="date" name="eduEnd1" value="2018-06-01"></label>
+            </div>
+            <div>
+                <label>描述：<br><textarea name="eduDesc1" rows="2" cols="50">研究方向：分布式系统、云计算。获国家奖学金，发表 SCI 论文 2 篇。</textarea></label>
+            </div>
+        </fieldset>
+
+        <!-- 提交与重置 -->
+        <div>
+            <button type="submit">保存资料</button>
+            <button type="reset">重置</button>
+        </div>
+
+    </form>
+
+    <!-- 简单的交互确认功能 -->
+    <script>
+        function handleSubmit(e) {
+            e.preventDefault(); // 阻止默认提交
+
+            // 收集表单数据（仅演示）
+            const form = document.getElementById('profileForm');
+            const formData = new FormData(form);
+
+            // 将数据转为对象展示（非空值）
+            const data = {};
+            for (let [key, value] of formData.entries()) {
+                // 因为 input 没有 name 的会忽略，我们给部分字段加 name
+                // 但这里只是演示，我们直接 alert 提示
+            }
+
+            // 简单提示
+            alert('表单已提交（演示功能）！\n您可以在此处添加 AJAX 请求发送数据。');
+
+            // 如果需要，可以打印 FormData 内容
+            console.log('提交的数据：');
+            for (let [key, value] of formData.entries()) {
+                console.log(key, value);
+            }
+
+            return false; // 防止页面刷新
+        }
+
+        // 为有 name 的字段增加 name 属性，以便 FormData 捕获
+        // 但上面已经通过 name 属性设置，无需额外操作
+        // 为了保证所有输入都能被捕获，确保每个输入都有 name
+        // 可以动态添加，但这里已在 HTML 中手动设置了 name
+        // 注意：头像 file 没有 name，可以加上
+        document.getElementById('avatar').setAttribute('name', 'avatar');
+
+        // 确保所有输入有 name，但上面的已经都有了，除了基本信息的，我们添加 name
+        document.getElementById('fullName').setAttribute('name', 'fullName');
+        document.getElementById('jobTitle').setAttribute('name', 'jobTitle');
+        document.getElementById('location').setAttribute('name', 'location');
+        document.getElementById('email').setAttribute('name', 'email');
+        document.getElementById('phone').setAttribute('name', 'phone');
+        document.getElementById('birthday').setAttribute('name', 'birthday');
+        document.getElementById('website').setAttribute('name', 'website');
+        document.getElementById('about').setAttribute('name', 'about');
+        document.getElementById('skills').setAttribute('name', 'skills');
+        document.getElementById('languages').setAttribute('name', 'languages');
+        // 工作经历和教育的输入已经有了 name，不需要重复
+
+        console.log('✅ 所有输入字段已就绪，功能测试可用。');
+    </script>
+
+</body>
+</html>
