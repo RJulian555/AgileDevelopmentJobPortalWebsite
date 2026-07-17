@@ -315,6 +315,118 @@
             gap: 12px;
         }
 
+        /* ===== JOB CARD ===== */
+        .job-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-light);
+            border-radius: var(--radius-md);
+            padding: 18px 20px;
+            display: flex;
+            align-items: flex-start;
+            gap: 16px;
+            transition: box-shadow 0.2s, border-color 0.2s, transform 0.15s;
+            cursor: default;
+            animation: fadeIn 0.3s ease forwards;
+        }
+
+        .job-card:hover {
+            box-shadow: var(--shadow-md);
+            border-color: var(--green-primary);
+            transform: translateY(-2px);
+        }
+
+        /* Company logo placeholder */
+        .job-card-logo {
+            flex-shrink: 0;
+            width: 44px;
+            height: 44px;
+            border-radius: var(--radius-sm);
+            background: var(--green-light);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--green-dark);
+            text-transform: uppercase;
+        }
+
+        .job-card-body {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .job-card-title {
+            font-size: 15px;
+            font-weight: 700;
+            color: var(--text-dark);
+            margin-bottom: 2px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .job-card-company {
+            font-size: 13px;
+            color: var(--text-mid);
+            margin-bottom: 8px;
+        }
+
+        .job-card-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+
+        .tag {
+            font-size: 11px;
+            font-weight: 500;
+            padding: 3px 10px;
+            border-radius: var(--radius-pill);
+            border: 1px solid;
+        }
+
+        /* Tag colour variants */
+        .tag-type {
+            color: #2563eb;
+            border-color: #bfdbfe;
+            background: #eff6ff;
+        }
+
+        .tag-workplace {
+            color: #7c3aed;
+            border-color: #ddd6fe;
+            background: #f5f3ff;
+        }
+
+        .tag-industry {
+            color: var(--text-mid);
+            border-color: var(--border-light);
+            background: var(--bg-page);
+        }
+
+        /* Salary & date on the right */
+        .job-card-right {
+            flex-shrink: 0;
+            text-align: right;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 4px;
+        }
+
+        .job-card-salary {
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--green-dark);
+            white-space: nowrap;
+        }
+
+        .job-card-date {
+            font-size: 11px;
+            color: var(--text-muted);
+        }
+
         /* ===== FADE IN ===== */
         .fade-in {
             opacity: 0;
@@ -417,17 +529,17 @@
 
     </div>
 
-    <!-- ===== JAVASCRIPT (UI only — no backend calls yet) ===== -->
+    <!-- ===== JAVASCRIPT ===== -->
     <script>
-        const searchInput = document.getElementById('job-search-input');
-        const searchBtn = document.getElementById('search-btn');
-        const chips = document.querySelectorAll('.chip');
-        const emptyState = document.getElementById('empty-state');
-        const emptyTitle = document.getElementById('empty-title');
-        const emptyBody = document.getElementById('empty-body');
+        const searchInput    = document.getElementById('job-search-input');
+        const searchBtn      = document.getElementById('search-btn');
+        const chips          = document.querySelectorAll('.chip');
+        const emptyState     = document.getElementById('empty-state');
+        const emptyTitle     = document.getElementById('empty-title');
+        const emptyBody      = document.getElementById('empty-body');
         const searchingState = document.getElementById('searching-state');
-        const resultsGrid = document.getElementById('results-grid');
-        const resultsStatus = document.getElementById('results-status');
+        const resultsGrid    = document.getElementById('results-grid');
+        const resultsStatus  = document.getElementById('results-status');
 
         /* ── Chip → fill input + search ── */
         chips.forEach(function (chip) {
@@ -451,7 +563,7 @@
             if (searchInput.value === '') resetToDefault();
         });
 
-        /* ── Main search trigger (frontend only; backend wired in next sub-task) ── */
+        /* ── Main search trigger ── */
         function triggerSearch() {
             var query = searchInput.value.trim();
             if (!query) { searchInput.focus(); return; }
@@ -459,27 +571,103 @@
             showState('searching');
             resultsStatus.textContent = '';
 
-            setTimeout(function () {
-                /*
-                 * TODO (next sub-task): replace with real API call:
-                 *   fetch('/api/jobs?q=' + encodeURIComponent(query))
-                 *       .then(r => r.json())
-                 *       .then(data => renderResults(data))
-                 *       .catch(err => showError(err));
-                 */
+            // Fetch matching jobs from the backend
+            fetch('/api/jobs?q=' + encodeURIComponent(query))
+                .then(function (res) {
+                    if (!res.ok) throw new Error('Server error: ' + res.status);
+                    return res.json();
+                })
+                .then(function (jobs) {
+                    if (jobs.length === 0) {
+                        // No matches found
+                        showState('empty-search');
+                        resultsStatus.innerHTML =
+                            'No jobs found for <strong>&ldquo;' + query + '&rdquo;</strong>';
+                        emptyTitle.textContent = 'No results for \u201C' + query + '\u201D';
+                        emptyBody.innerHTML    =
+                            'Try a different job title or use one of the suggestion chips above.';
+                    } else {
+                        // Render job cards
+                        renderResults(jobs, query);
+                    }
+                })
+                .catch(function (err) {
+                    showState('empty-search');
+                    resultsStatus.textContent = 'Something went wrong. Please try again.';
+                    emptyTitle.textContent    = 'Error';
+                    emptyBody.textContent     = err.message;
+                });
+        }
 
-                showState('empty-search');
-                resultsStatus.innerHTML = 'Showing results for <strong>&ldquo;' + query + '&rdquo;</strong>';
-                emptyTitle.textContent = 'No results yet for \u201C' + query + '\u201D';
-                emptyBody.innerHTML = 'Backend not yet connected. Your query is captured and ready.';
-            }, 600);
+        /* ── Render job cards into the results grid ── */
+        function renderResults(jobs, query) {
+            // Clear previous cards
+            resultsGrid.innerHTML = '';
+
+            jobs.forEach(function (job) {
+                var card = document.createElement('div');
+                card.className = 'job-card';
+
+                // Logo: first letter of company name
+                var initial = job.company.charAt(0);
+
+                // Relative posted date label
+                var postedLabel = formatDate(job.postedAt);
+
+                card.innerHTML =
+                    '<div class="job-card-logo" aria-hidden="true">' + initial + '</div>' +
+                    '<div class="job-card-body">' +
+                        '<div class="job-card-title">' + escHtml(job.title) + '</div>' +
+                        '<div class="job-card-company">' + escHtml(job.company) + ' &middot; ' + escHtml(job.location) + '</div>' +
+                        '<div class="job-card-tags">' +
+                            '<span class="tag tag-type">' + escHtml(job.jobType) + '</span>' +
+                            '<span class="tag tag-workplace">' + escHtml(job.workplaceModel) + '</span>' +
+                            '<span class="tag tag-industry">' + escHtml(job.industry) + '</span>' +
+                        '</div>' +
+                    '</div>' +
+                    '<div class="job-card-right">' +
+                        '<div class="job-card-salary">' + escHtml(job.salary) + '</div>' +
+                        '<div class="job-card-date">Posted ' + postedLabel + '</div>' +
+                    '</div>';
+
+                resultsGrid.appendChild(card);
+            });
+
+            showState('results');
+            var count = jobs.length;
+            resultsStatus.innerHTML =
+                '<strong>' + count + '</strong> job' + (count === 1 ? '' : 's') +
+                ' found for <strong>&ldquo;' + escHtml(query) + '&rdquo;</strong>';
+        }
+
+        /* ── Escape HTML to prevent XSS ── */
+        function escHtml(str) {
+            return String(str)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;');
+        }
+
+        /* ── Format ISO date to a readable relative label ── */
+        function formatDate(isoDate) {
+            var posted  = new Date(isoDate);
+            var today   = new Date();
+            var diffMs  = today - posted;
+            var diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+
+            if (diffDays === 0) return 'today';
+            if (diffDays === 1) return 'yesterday';
+            if (diffDays < 7)  return diffDays + ' days ago';
+            if (diffDays < 30) return Math.floor(diffDays / 7) + ' week' + (Math.floor(diffDays / 7) > 1 ? 's' : '') + ' ago';
+            return posted.toLocaleDateString('en-MY', { day: 'numeric', month: 'short', year: 'numeric' });
         }
 
         /* ── State machine ── */
         function showState(state) {
-            emptyState.style.display = 'none';
+            emptyState.style.display     = 'none';
             searchingState.style.display = 'none';
-            resultsGrid.style.display = 'none';
+            resultsGrid.style.display    = 'none';
 
             if (state === 'empty' || state === 'empty-search') {
                 emptyState.style.display = 'flex';
@@ -495,7 +683,8 @@
             showState('empty');
             resultsStatus.textContent = '';
             emptyTitle.textContent = 'Search for your next opportunity';
-            emptyBody.innerHTML = 'Type a job title above \u2014 try <strong>\u201CSoftware Engineer\u201D</strong> or a chip below \u2014 and hit <strong>Search</strong>.';
+            emptyBody.innerHTML    =
+                'Type a job title above \u2014 try <strong>\u201CSoftware Engineer\u201D</strong> or a chip above \u2014 and hit <strong>Search</strong>.';
         }
     </script>
 
