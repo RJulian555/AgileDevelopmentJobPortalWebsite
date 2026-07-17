@@ -15,6 +15,7 @@
         body {
             background-color: #f4f7f6;
             display: flex;
+            flex-direction: column; /* Stack Title and Container vertically */
             justify-content: center;
             align-items: center;
             height: 100vh;
@@ -22,48 +23,144 @@
             position: relative;
         }
 
-        /* --- BACK ARROW STYLING (MINIMALIST) --- */
+        /* --- COOL FLOATING BLURRED BACKGROUND --- */
+        .bg-animation-wrapper {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            z-index: 1; 
+            filter: blur(60px); 
+            pointer-events: none;
+        }
+
+        .bg-shape {
+            position: absolute;
+            opacity: 0.4;
+            animation: floatAround 20s infinite linear;
+        }
+
+        .bg-shape.circle-1 {
+            width: 180px;
+            height: 180px;
+            background-color: #2ecc71;
+            border-radius: 50%;
+            top: 15%;
+            left: 10%;
+            animation-duration: 25s;
+        }
+
+        .bg-shape.square-1 {
+            width: 220px;
+            height: 220px;
+            background-color: #27ae60;
+            bottom: 10%;
+            right: 15%;
+            border-radius: 20px;
+            animation-duration: 30s;
+        }
+
+        .bg-shape.triangle-1 {
+            width: 0;
+            height: 0;
+            border-left: 100px solid transparent;
+            border-right: 100px solid transparent;
+            border-bottom: 180px solid #a3e4d7;
+            top: 50%;
+            left: 70%;
+            animation-duration: 22s;
+        }
+
+        .bg-shape.circle-2 {
+            width: 250px;
+            height: 250px;
+            background-color: #bdc3c7;
+            border-radius: 50%;
+            bottom: 40%;
+            left: 25%;
+            animation-duration: 35s;
+        }
+
+        @keyframes floatAround {
+            0% {
+                transform: translate(0, 0) rotate(0deg);
+            }
+            50% {
+                transform: translate(80px, 60px) rotate(180deg);
+            }
+            100% {
+                transform: translate(0, 0) rotate(360deg);
+            }
+        }
+
+
+        /* --- BACK ARROW BUTTON STYLING --- */
         .back-btn-container {
             position: absolute;
             top: 25px;
             left: 25px;
-            z-index: 999;
+            z-index: 999; 
         }
 
         .back-arrow {
-            display: inline-block;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 50px;
+            height: 50px;
+            background-color: #ffffff;
+            border: 2px solid #2ecc71;
+            border-radius: 50%;
             cursor: pointer;
             text-decoration: none;
-            /* Using the green theme color directly on the arrow symbol text */
             color: #2ecc71; 
-            font-size: 32px; /* Made slightly larger since the circle wrapper is gone */
+            font-size: 26px; 
             font-weight: bold;
-            transition: all 0.2s ease;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            transition: all 0.25s ease;
             user-select: none;
         }
 
-        /* Hover animation: Glows darker green and shifts slightly left */
         .back-arrow:hover {
-            color: #27ae60;
-            transform: translateX(-3px);
+            color: #ffffff;
+            background-color: #2ecc71;
+            box-shadow: 0 6px 20px rgba(46, 204, 113, 0.3);
+            transform: translateY(-2px);
         }
 
-        /* Pressed down click animation */
         .back-arrow:active {
-            transform: scale(0.85) translateX(-3px);
+            transform: scale(0.90) translateY(0);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
         }
 
 
-        /* --- MAIN REGISTRATION CONTAINER --- */
+        /* --- BRAND TITLE "JobWall" ABOVE THE BOX --- */
+        .brand-title {
+            font-size: 42px; /* Made bigger since it's a main title now */
+            font-weight: 900;
+            color: #2ecc71;
+            letter-spacing: -1px;
+            margin-bottom: 25px; /* Creates spacing between title and container */
+            text-shadow: 0 4px 10px rgba(46, 204, 113, 0.15);
+            z-index: 20;
+            user-select: none;
+        }
+
+
+        /* --- MAIN REGISTRATION CONTAINER (20% SMALLER) --- */
         .container {
             background-color: #fff;
             border-radius: 16px;
             box-shadow: 0 14px 28px rgba(0,0,0,0.08), 0 10px 10px rgba(0,0,0,0.06);
             position: relative;
             overflow: hidden;
-            width: 900px;
-            max-width: 100%;
-            min-height: 580px;
+            /* Dimensions adjusted downward by ~20% from 900px x 580px */
+            width: 720px; 
+            max-width: 95%;
+            min-height: 460px;
+            z-index: 10; 
         }
 
         .form-container {
@@ -79,7 +176,7 @@
             width: 50%;
             z-index: 2;
             background: #ffffff;
-            padding: 60px;
+            padding: 40px; /* Adjusted padding for better fit */
             display: flex;
             flex-direction: column;
             justify-content: center;
@@ -92,7 +189,7 @@
             opacity: 0;
             z-index: 1;
             background: #ffffff;
-            padding: 60px;
+            padding: 40px; /* Adjusted padding for better fit */
             display: flex;
             flex-direction: column;
             justify-content: center;
@@ -154,7 +251,7 @@
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            padding: 0 50px;
+            padding: 0 35px; /* Balanced spacing */
             text-align: center;
             top: 0;
             height: 100%;
@@ -198,8 +295,8 @@
 
         /* --- STRUCTURAL TYPOGRAPHY & INTERACTIVE FORM UI --- */
         h1 {
-            font-size: 32px;
-            margin-bottom: 12px;
+            font-size: 28px; /* Slightly scaled down text sizes to match container */
+            margin-bottom: 10px;
             color: #2c3e50;
             font-weight: 700;
         }
@@ -210,16 +307,16 @@
         }
 
         p {
-            font-size: 15px;
-            margin: 10px 0 25px;
-            line-height: 24px;
+            font-size: 14px;
+            margin: 8px 0 20px;
+            line-height: 22px;
         }
 
         input {
             background-color: #f2f5f3;
             border: 1px solid transparent;
-            padding: 14px 16px;
-            margin: 10px 0;
+            padding: 12px 14px;
+            margin: 8px 0;
             width: 100%;
             border-radius: 8px;
             font-size: 14px;
@@ -238,13 +335,13 @@
             border: 1px solid #2ecc71;
             background-color: #2ecc71;
             color: #ffffff;
-            font-size: 13px;
+            font-size: 12px;
             font-weight: bold;
-            padding: 14px 50px;
+            padding: 12px 45px;
             letter-spacing: 1px;
             text-transform: uppercase;
             cursor: pointer;
-            margin-top: 15px;
+            margin-top: 12px;
             transition: transform 80ms ease-in, box-shadow 0.2s;
             box-shadow: 0 4px 10px rgba(46, 204, 113, 0.2);
         }
@@ -273,9 +370,18 @@
 </head>
 <body>
 
+    <div class="bg-animation-wrapper">
+        <div class="bg-shape circle-1"></div>
+        <div class="bg-shape square-1"></div>
+        <div class="bg-shape triangle-1"></div>
+        <div class="bg-shape circle-2"></div>
+    </div>
+
     <div class="back-btn-container">
         <a href="dashboard.html" class="back-arrow" title="Go back to Dashboard">&#8592;</a>
     </div>
+
+    <div class="brand-title">JobWall</div>
 
     <div class="container" id="mainContainer">
         
