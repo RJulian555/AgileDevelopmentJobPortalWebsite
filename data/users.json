@@ -11,5 +11,12 @@
     "password": "hashed_72697269@Rj",
     "role": "Employer",
     "companyId": "company-001"
+  },
+  {
+    "id": 1784347560242,
+    "email": "test@gmail.com",
+    "password": "hashed_123",
+    "role": "Employer",
+    "companyId": "company-cb07e9ad-20cb-48ea-9632-358bb174a70d"
   }
 ]

@@ -1,8 +1,6 @@
 const express = require('express');
-const { randomUUID } = require('crypto');
-const Company = require('../models/Company');
-const Employer = require('../models/Employer');
-const { ensureCollection, readCollection, writeCollection } = require('../services/jsonDatabase');
+const { ensureCollection, readCollection } = require('../services/jsonDatabase');
+const { createCompanyProfile } = require('../services/companyProfileService');
 
 const router = express.Router();
 
@@ -32,47 +30,30 @@ router.get('/api/companies/:id', (request, response) => {
 
 router.post('/api/companies', (request, response) => {
     try {
-        const users = readCollection('users');
-        const employerRecord = users.find(user => String(user.id) === String(request.body.employerId));
+        const company = createCompanyProfile(request.body);
 
-        if (!employerRecord || employerRecord.role !== 'Employer') {
-            return response.status(400).send('<h2>Error: A valid employer account is required.</h2><a href="/register.html">Register an Employer</a>');
+        if (wantsJson(request)) {
+            return response.status(201).json({
+                message: 'Company profile created successfully.',
+                company,
+                redirectUrl: '/dashboard.html'
+            });
         }
 
-        const employer = Employer.fromUser(employerRecord);
-        if (employer.companyId) {
-            return response.status(409).send('<h2>Error: This employer already belongs to a company.</h2><a href="/dashboard.html">Dashboard</a>');
-        }
-
-        const companies = readCollection('companies');
-        const companyEmail = request.body.email?.trim().toLowerCase();
-        if (companies.some(company => company.email === companyEmail)) {
-            return response.status(409).send('<h2>Error: A company with this email already exists.</h2><a href="javascript:history.back()">Go Back</a>');
-        }
-
-        const company = new Company({
-            id: `company-${randomUUID()}`,
-            name: request.body.companyName,
-            description: request.body.description,
-            industry: request.body.industry,
-            address: request.body.address,
-            email: companyEmail,
-            phone: request.body.phone,
-            website: request.body.website
-        });
-
-        employer.joinCompany(company.id);
-        employerRecord.companyId = employer.companyId;
-        companies.push(company.toJSON());
-
-        writeCollection('companies', companies);
-        writeCollection('users', users);
-
-        return response.redirect('/dashboard.html');
+        return response.redirect(303, '/dashboard.html');
     } catch (error) {
-        return response.status(400).send(`<h2>Error: ${escapeHtml(error.message)}</h2><a href="javascript:history.back()">Go Back</a>`);
+        const statusCode = error.statusCode || 400;
+        if (wantsJson(request)) {
+            return response.status(statusCode).json({ error: error.message });
+        }
+
+        return response.status(statusCode).send(`<h2>Error: ${escapeHtml(error.message)}</h2><a href="javascript:history.back()">Go Back</a>`);
     }
 });
+
+function wantsJson(request) {
+    return request.is('application/json') || request.get('accept')?.includes('application/json');
+}
 
 function escapeHtml(value) {
     return String(value)

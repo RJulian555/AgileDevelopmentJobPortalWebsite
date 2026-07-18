@@ -128,6 +128,26 @@
             justify-content: flex-end;
         }
 
+        .form-message {
+            display: none;
+            margin-bottom: 18px;
+            padding: 12px 14px;
+            border-radius: 10px;
+            font-size: 14px;
+        }
+
+        .form-message.error {
+            display: block;
+            color: #922b21;
+            background: #fdecea;
+        }
+
+        .form-message.success {
+            display: block;
+            color: #196f3d;
+            background: #eafaf1;
+        }
+
         button {
             border: none;
             border-radius: 999px;
@@ -178,7 +198,8 @@
         </div>
 
         <div class="form-body">
-            <form action="/api/companies" method="POST">
+            <div id="formMessage" class="form-message" role="alert" aria-live="polite"></div>
+            <form id="companyProfileForm" action="/api/companies" method="POST">
                 <input id="employerId" name="employerId" type="hidden">
                 <div class="form-grid">
                     <div class="full-width">
@@ -248,7 +269,48 @@
     </div>
     <script>
         const employerId = new URLSearchParams(window.location.search).get('employerId');
+        const form = document.getElementById('companyProfileForm');
+        const formMessage = document.getElementById('formMessage');
+        const submitButton = form.querySelector('[type="submit"]');
+
         document.getElementById('employerId').value = employerId || '';
+
+        if (!employerId) {
+            showMessage('Please register or sign in as an employer before creating a company profile.', 'error');
+            submitButton.disabled = true;
+        }
+
+        form.addEventListener('submit', async event => {
+            event.preventDefault();
+            submitButton.disabled = true;
+            submitButton.textContent = 'Saving...';
+
+            try {
+                const response = await fetch(form.action, {
+                    method: 'POST',
+                    headers: {
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(Object.fromEntries(new FormData(form)))
+                });
+                const result = await response.json();
+
+                if (!response.ok) throw new Error(result.error || 'Unable to create the company profile.');
+
+                showMessage(result.message, 'success');
+                window.setTimeout(() => window.location.href = result.redirectUrl, 600);
+            } catch (error) {
+                showMessage(error.message, 'error');
+                submitButton.disabled = false;
+                submitButton.textContent = 'Save Profile';
+            }
+        });
+
+        function showMessage(message, type) {
+            formMessage.textContent = message;
+            formMessage.className = `form-message ${type}`;
+        }
     </script>
 </body>
 </html>

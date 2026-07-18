@@ -6,15 +6,19 @@ const companies = require('../data/companies.json');
 const users = require('../data/users.json');
 
 test('all seeded company records satisfy the Company schema', () => {
-    assert.equal(companies.length, 5);
+    assert.ok(companies.length >= 5, 'Expected at least the five seeded companies.');
     companies.forEach(record => assert.doesNotThrow(() => new Company(record)));
 });
 
-test('an Employer can be linked to an existing Company', () => {
-    const employerRecord = users.find(user => user.role === 'Employer');
-    const employer = Employer.fromUser(employerRecord);
+test('every linked Employer references an existing Company', () => {
+    const linkedEmployers = users
+        .filter(user => user.role === 'Employer' && user.companyId)
+        .map(user => Employer.fromUser(user));
 
-    assert.ok(companies.some(company => company.id === employer.companyId));
+    assert.ok(linkedEmployers.length > 0);
+    linkedEmployers.forEach(employer => {
+        assert.ok(companies.some(company => company.id === employer.companyId));
+    });
 });
 
 test('a non-employer user cannot be converted to an Employer entity', () => {

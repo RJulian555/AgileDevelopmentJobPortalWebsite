@@ -58,5 +58,17 @@
     "website": "https://greenroute.example",
     "createdAt": "2026-07-05T04:20:00.000Z",
     "updatedAt": "2026-07-05T04:20:00.000Z"
+  },
+  {
+    "id": "company-cb07e9ad-20cb-48ea-9632-358bb174a70d",
+    "name": "Test Company",
+    "description": "I love this company",
+    "industry": "healthcare",
+    "address": "test address",
+    "email": "marcus12112005@gmail.com",
+    "phone": "+60122321536",
+    "website": "https://github.com/dashboard",
+    "createdAt": "2026-07-18T04:06:15.910Z",
+    "updatedAt": "2026-07-18T04:06:15.910Z"
   }
 ]

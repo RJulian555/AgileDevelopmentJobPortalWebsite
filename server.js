@@ -44,12 +44,19 @@ app.post('/api/register', (encodeData, response) => {
         role: role
     };
 
+    if (role === 'Employer') {
+        newUser.companyId = null;
+    }
+
     // 5. Save back to the JSON file
     users.push(newUser);
     fs.writeFileSync(USERS_FILE, JSON.stringify(users, null, 2));
 
-    // 6. Success! Send them to their dashboard
-    response.redirect('/dashboard.html');
+    // 6. Employers create their company profile before continuing to the dashboard
+    const nextPage = role === 'Employer'
+        ? `/company-profile.html?employerId=${newUser.id}`
+        : '/dashboard.html';
+    response.redirect(nextPage);
 });
 
 // Start our web server
