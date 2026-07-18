@@ -1,11 +1,11 @@
 const express = require('express');
 const { ensureCollection, readCollection } = require('../services/jsonDatabase');
-const { createCompanyProfile } = require('../services/companyProfileService');
+const { createCompanyProfile, updateCompanyLogo } = require('../services/companyProfileService');
 
 const router = express.Router();
 
 ensureCollection('companies');
-router.use(express.json());
+router.use(express.json({ limit: '3mb' }));
 
 router.get('/api/companies', (request, response) => {
     const companies = readCollection('companies');
@@ -48,6 +48,20 @@ router.post('/api/companies', (request, response) => {
         }
 
         return response.status(statusCode).send(`<h2>Error: ${escapeHtml(error.message)}</h2><a href="javascript:history.back()">Go Back</a>`);
+    }
+});
+
+router.patch('/api/companies/:id/logo', (request, response) => {
+    try {
+        const company = updateCompanyLogo({
+            companyId: request.params.id,
+            employerId: request.body.employerId,
+            logoData: request.body.logoData
+        });
+
+        return response.json({ message: 'Company logo saved successfully.', company });
+    } catch (error) {
+        return response.status(error.statusCode || 400).json({ error: error.message });
     }
 });
 

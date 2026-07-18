@@ -1,1 +1,3 @@
 node_modules/
+public/uploads/company-logos/*
+!public/uploads/company-logos/.gitkeep

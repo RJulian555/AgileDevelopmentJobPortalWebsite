@@ -8,6 +8,7 @@ class Company {
         email,
         phone,
         website = '',
+        logoUrl = '',
         createdAt = new Date().toISOString(),
         updatedAt = createdAt
     }) {
@@ -19,6 +20,7 @@ class Company {
         this.email = email?.trim().toLowerCase();
         this.phone = phone?.trim();
         this.website = website?.trim() || '';
+        this.logoUrl = logoUrl?.trim() || '';
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
 
