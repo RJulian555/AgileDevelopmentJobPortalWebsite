@@ -5,11 +5,13 @@ const path = require('path');
 const app = express();
 const PORT = 3000;
 
-// Path to our JSON text file database
+// Paths to our JSON text file databases
 const USERS_FILE = path.join(__dirname, 'data', 'users.json');
+const JOBS_FILE  = path.join(__dirname, 'data', 'jobs.json');
 
 // Middleware to read form submissions and serve HTML files automatically
 app.use(express.urlencoded({ extended: true }));
+app.use(express.json());
 app.use(express.static('public'));
 
 // Task 2: Ensure database "schema" exists (initialize an empty array text file if it's missing)
@@ -48,6 +50,23 @@ app.post('/api/register', (encodeData, response) => {
 
     // 6. Success! Send them to their dashboard
     response.redirect('/dashboard.html');
+});
+
+// Job Search API: GET /api/jobs?q=<title query>
+// Returns all jobs whose title contains the query string (case-insensitive)
+app.get('/api/jobs', (req, res) => {
+    const query = (req.query.q || '').trim().toLowerCase();
+
+    // Read the jobs data file
+    const jobs = JSON.parse(fs.readFileSync(JOBS_FILE, 'utf8'));
+
+    // Filter by title — partial, case-insensitive match.
+    // If no query is provided, return all jobs.
+    const results = query
+        ? jobs.filter(job => job.title.toLowerCase().includes(query))
+        : jobs;
+
+    res.json(results);
 });
 
 // Start our web server
