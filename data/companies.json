@@ -1,0 +1,74 @@
+[
+  {
+    "id": "company-001",
+    "name": "NexaByte Solutions",
+    "description": "A Kuala Lumpur software company building cloud platforms and business automation tools.",
+    "industry": "technology",
+    "address": "Level 18, Menara Sentral Vista, Kuala Lumpur, Malaysia",
+    "email": "careers@nexabyte.example",
+    "phone": "+60 3-2201 8801",
+    "website": "https://nexabyte.example",
+    "createdAt": "2026-07-01T02:00:00.000Z",
+    "updatedAt": "2026-07-01T02:00:00.000Z"
+  },
+  {
+    "id": "company-002",
+    "name": "CareBridge Health",
+    "description": "A digital healthcare provider connecting patients with clinics and wellness services.",
+    "industry": "healthcare",
+    "address": "12 Jalan Universiti, Petaling Jaya, Selangor, Malaysia",
+    "email": "people@carebridge.example",
+    "phone": "+60 3-7956 4420",
+    "website": "https://carebridge.example",
+    "createdAt": "2026-07-02T03:30:00.000Z",
+    "updatedAt": "2026-07-02T03:30:00.000Z"
+  },
+  {
+    "id": "company-003",
+    "name": "Meridian Fintech",
+    "description": "A financial technology startup creating accessible payment and budgeting products.",
+    "industry": "finance",
+    "address": "Bangsar South, Kuala Lumpur, Malaysia",
+    "email": "talent@meridianfintech.example",
+    "phone": "+60 3-2242 7710",
+    "website": "https://meridianfintech.example",
+    "createdAt": "2026-07-03T01:15:00.000Z",
+    "updatedAt": "2026-07-03T01:15:00.000Z"
+  },
+  {
+    "id": "company-004",
+    "name": "BrightPath Learning",
+    "description": "An education company delivering career-focused online courses and corporate training.",
+    "industry": "education",
+    "address": "George Town, Penang, Malaysia",
+    "email": "hello@brightpath.example",
+    "phone": "+60 4-226 1988",
+    "website": "https://brightpath.example",
+    "createdAt": "2026-07-04T06:45:00.000Z",
+    "updatedAt": "2026-07-04T06:45:00.000Z"
+  },
+  {
+    "id": "company-005",
+    "name": "GreenRoute Logistics",
+    "description": "A logistics operator using route optimisation to provide lower-emission deliveries.",
+    "industry": "transportation",
+    "address": "Shah Alam, Selangor, Malaysia",
+    "email": "jobs@greenroute.example",
+    "phone": "+60 3-5519 3050",
+    "website": "https://greenroute.example",
+    "createdAt": "2026-07-05T04:20:00.000Z",
+    "updatedAt": "2026-07-05T04:20:00.000Z"
+  },
+  {
+    "id": "company-cb07e9ad-20cb-48ea-9632-358bb174a70d",
+    "name": "Test Company",
+    "description": "I love this company",
+    "industry": "healthcare",
+    "address": "test address",
+    "email": "marcus12112005@gmail.com",
+    "phone": "+60122321536",
+    "website": "https://github.com/dashboard",
+    "createdAt": "2026-07-18T04:06:15.910Z",
+    "updatedAt": "2026-07-18T04:06:15.910Z"
+  }
+]
