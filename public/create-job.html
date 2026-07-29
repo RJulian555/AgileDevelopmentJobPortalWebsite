@@ -279,7 +279,7 @@
 
         .clear-selection:hover {
             color: #196f3d;
-            background: var(--green-soft);
+            background: transparent;
             box-shadow: none;
             transform: none;
         }
@@ -319,6 +319,43 @@
             border-color: var(--green-primary);
             background: #fff;
             box-shadow: 0 0 0 3px rgba(46, 204, 113, 0.15);
+        }
+
+        .search-select.invalid input {
+            border-color: #e74c3c;
+            background: #fff8f7;
+            box-shadow: 0 0 0 3px rgba(231, 76, 60, 0.12);
+        }
+
+        .search-select.invalid .dropdown-toggle,
+        .search-select.invalid .clear-selection {
+            color: #c0392b;
+            background: transparent;
+        }
+
+        .search-select.invalid .dropdown-toggle:hover,
+        .search-select.invalid .clear-selection:hover {
+            color: #922b21;
+            background: transparent;
+        }
+
+        .search-select.invalid .dropdown-toggle:focus-visible,
+        .search-select.invalid .clear-selection:focus-visible {
+            outline: 2px solid rgba(192, 57, 43, 0.45);
+            outline-offset: -7px;
+        }
+
+        .field-error {
+            display: none;
+            margin-top: 7px;
+            color: #c0392b;
+            font-size: 12px;
+            font-weight: 600;
+            line-height: 1.4;
+        }
+
+        .field-error.visible {
+            display: block;
         }
 
         .options-dropdown {
@@ -435,13 +472,169 @@
             background: var(--green-soft);
         }
 
+        .company-context {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            margin-bottom: 24px;
+            padding: 14px 16px;
+            border: 1px solid #d8eee1;
+            border-radius: 12px;
+            background: linear-gradient(135deg, #f5fcf8, #edf9f2);
+        }
+
+        .company-context-logo,
+        .preview-logo {
+            display: grid;
+            flex-shrink: 0;
+            place-items: center;
+            object-fit: contain;
+            color: #196f3d;
+            background: #d5f5e3;
+            font-weight: 800;
+        }
+
+        .company-context-logo {
+            width: 48px;
+            height: 48px;
+            border-radius: 11px;
+            font-size: 18px;
+        }
+
+        img.company-context-logo,
+        img.preview-logo {
+            padding: 4px;
+            background: #fff;
+        }
+
+        .company-context-copy {
+            min-width: 0;
+        }
+
+        .company-context-label {
+            margin-bottom: 3px;
+            color: var(--text-muted);
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 0.8px;
+            text-transform: uppercase;
+        }
+
+        .company-context-name {
+            font-size: 15px;
+            font-weight: 800;
+        }
+
+        .company-context-meta {
+            margin-top: 2px;
+            color: var(--text-mid);
+            font-size: 12px;
+        }
+
+        .field-meta {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 16px;
+        }
+
+        .character-count {
+            flex-shrink: 0;
+            margin-top: 6px;
+            color: var(--text-muted);
+            font-size: 12px;
+        }
+
+        .preview-section {
+            padding-top: 6px;
+        }
+
+        .preview-heading {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+
+        .preview-heading h2 {
+            font-size: 14px;
+        }
+
+        .preview-heading span {
+            color: var(--text-muted);
+            font-size: 11px;
+        }
+
+        .job-preview {
+            display: flex;
+            align-items: flex-start;
+            gap: 15px;
+            padding: 18px;
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            background: #fff;
+            box-shadow: 0 6px 18px rgba(26, 35, 50, 0.06);
+        }
+
+        .preview-logo {
+            width: 44px;
+            height: 44px;
+            border-radius: 9px;
+            font-size: 18px;
+        }
+
+        .preview-body {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .preview-title {
+            margin-bottom: 3px;
+            font-size: 15px;
+            font-weight: 800;
+        }
+
+        .preview-company {
+            margin-bottom: 9px;
+            color: var(--text-mid);
+            font-size: 12px;
+        }
+
+        .preview-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+
+        .preview-tag {
+            padding: 4px 9px;
+            border-radius: 999px;
+            color: #196f3d;
+            background: var(--green-soft);
+            font-size: 10px;
+            font-weight: 600;
+        }
+
+        .preview-right {
+            flex-shrink: 0;
+            color: var(--green-dark);
+            font-size: 12px;
+            font-weight: 800;
+            text-align: right;
+        }
+
         .actions {
             display: flex;
             justify-content: flex-end;
             gap: 12px;
-            margin-top: 12px;
-            padding-top: 22px;
+            position: sticky;
+            z-index: 25;
+            bottom: 0;
+            margin: 12px -4px -20px;
+            padding: 18px 4px 20px;
             border-top: 1px solid #edf1ee;
+            background: rgba(255, 255, 255, 0.94);
+            backdrop-filter: blur(10px);
         }
 
         button,
@@ -551,6 +744,16 @@
                 width: 100%;
                 text-align: center;
             }
+
+            .job-preview {
+                flex-wrap: wrap;
+            }
+
+            .preview-right {
+                width: 100%;
+                padding-left: 59px;
+                text-align: left;
+            }
         }
     </style>
 </head>
@@ -571,6 +774,16 @@
             <div class="form-body">
                 <div id="formMessage" class="form-message" role="alert" aria-live="polite"></div>
 
+                <section id="companyContext" class="company-context" aria-live="polite">
+                    <span id="companyContextInitial" class="company-context-logo" aria-hidden="true">...</span>
+                    <img id="companyContextLogo" class="company-context-logo" alt="" hidden>
+                    <div class="company-context-copy">
+                        <div class="company-context-label">Publishing for</div>
+                        <div id="companyContextName" class="company-context-name">Loading company...</div>
+                        <div id="companyContextMeta" class="company-context-meta">Confirming employer access</div>
+                    </div>
+                </section>
+
                 <form id="jobForm" action="/api/jobs" method="POST">
                     <input id="employerId" name="employerId" type="hidden">
                     <div class="form-grid">
@@ -583,14 +796,19 @@
                                 <div id="jobTitleOptions" class="options-dropdown" role="listbox"></div>
                             </div>
                             <p class="field-help">Start typing to filter the available job titles.</p>
+                            <p id="titleError" class="field-error" role="alert" aria-live="polite"></p>
                         </div>
 
                         <div class="full-width">
                             <label class="required" for="description">Job Description</label>
                             <textarea id="description" name="description" maxlength="5000" placeholder="Describe the responsibilities, impact, and day-to-day work for this role." required></textarea>
+                            <div class="field-meta">
+                                <p class="field-help">Include key responsibilities, requirements, benefits, and what success looks like.</p>
+                                <span id="descriptionCount" class="character-count">0 / 5,000</span>
+                            </div>
                         </div>
 
-                        <div class="full-width">
+                        <div>
                             <label class="required" for="salary">Monthly Salary</label>
                             <div class="salary-input">
                                 <span class="salary-prefix">RM</span>
@@ -608,13 +826,22 @@
                             </div>
                         </div>
 
-                        <div class="full-width">
+                        <div>
                             <label class="required" for="location">State / Federal Territory</label>
                             <div id="locationSelect" class="search-select single-search-select">
                                 <input id="location" name="location" type="search" autocomplete="off" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="locationOptions" placeholder="Search and select a state" required>
                                 <button class="clear-selection" type="button" aria-label="Clear selected state" hidden>&times;</button>
                                 <button class="dropdown-toggle" type="button" aria-label="Toggle state options"></button>
                                 <div id="locationOptions" class="options-dropdown" role="listbox"></div>
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="required" for="experienceRequired">Experience Required</label>
+                            <div id="experienceSelect" class="search-select">
+                                <input id="experienceRequired" name="experienceRequired" type="hidden">
+                                <button class="select-display placeholder" type="button" aria-expanded="false" aria-controls="experienceOptions">Select experience level</button>
+                                <div id="experienceOptions" class="options-dropdown" role="listbox"></div>
                             </div>
                         </div>
 
@@ -631,15 +858,6 @@
                         </div>
 
                         <div>
-                            <label class="required" for="experienceRequired">Experience Required</label>
-                            <div id="experienceSelect" class="search-select">
-                                <input id="experienceRequired" name="experienceRequired" type="hidden">
-                                <button class="select-display placeholder" type="button" aria-expanded="false" aria-controls="experienceOptions">Select experience level</button>
-                                <div id="experienceOptions" class="options-dropdown" role="listbox"></div>
-                            </div>
-                        </div>
-
-                        <div>
                             <label class="required" for="educationLevel">Education Level</label>
                             <div id="educationSelect" class="search-select">
                                 <input id="educationLevel" name="educationLevel" type="hidden">
@@ -653,6 +871,26 @@
                             <input id="closingDate" name="closingDate" type="date" required>
                             <p class="field-help">The closing date must be after today.</p>
                         </div>
+
+                        <section class="full-width preview-section" aria-labelledby="previewHeading">
+                            <div class="preview-heading">
+                                <h2 id="previewHeading">Job listing preview</h2>
+                                <span>Updates as you complete the form</span>
+                            </div>
+                            <div class="job-preview">
+                                <span id="previewInitial" class="preview-logo" aria-hidden="true">C</span>
+                                <img id="previewLogo" class="preview-logo" alt="" hidden>
+                                <div class="preview-body">
+                                    <div id="previewTitle" class="preview-title">Job title</div>
+                                    <div id="previewCompany" class="preview-company">Your company · State, Malaysia</div>
+                                    <div id="previewTags" class="preview-tags">
+                                        <span class="preview-tag">Employment type</span>
+                                        <span class="preview-tag">Selected skills</span>
+                                    </div>
+                                </div>
+                                <div id="previewSalary" class="preview-right">Monthly salary</div>
+                            </div>
+                        </section>
 
                         <div class="full-width actions">
                             <a class="button secondary" href="/dashboard.html">Cancel</a>
@@ -681,7 +919,10 @@
         const message = document.getElementById('formMessage');
         const submitButton = document.getElementById('submitButton');
         const closingDate = document.getElementById('closingDate');
+        const descriptionInput = document.getElementById('description');
+        const salaryInput = document.getElementById('salary');
         const titleInput = document.getElementById('title');
+        const titleError = document.getElementById('titleError');
         const locationInput = document.getElementById('location');
         const skillSearch = document.getElementById('skillSearch');
         const skillsInput = document.getElementById('skillsRequired');
@@ -702,6 +943,11 @@
         ];
         let availableOptions;
         let selectedSkills = [];
+        let activeCompany;
+        let optionsLoaded = false;
+        let contextLoaded = false;
+        let existingJobTitles = [];
+        let hasDuplicateTitle = false;
 
         document.getElementById('employerId').value = employerId || '';
         closingDate.min = dateAfterToday();
@@ -710,9 +956,18 @@
         if (employerId) {
             sessionStorage.setItem('jobwallEmployerId', employerId);
             loadJobOptions();
+            loadCompanyContext();
         } else {
             showMessage('An employer account is required. Open this page from your company profile or sign in first.', 'error');
         }
+
+        [titleInput, locationInput, salaryInput].forEach(input => {
+            input.addEventListener('input', updatePreview);
+        });
+        titleInput.addEventListener('input', validateDuplicateTitle);
+        descriptionInput.addEventListener('input', updateDescriptionCount);
+        updateDescriptionCount();
+        updatePreview();
 
         document.addEventListener('click', event => {
             dropdownWrappers.forEach(select => {
@@ -732,6 +987,11 @@
                 return;
             }
             titleInput.value = selectedTitle;
+            if (!validateDuplicateTitle()) {
+                showMessage(titleError.textContent, 'error');
+                titleInput.focus();
+                return;
+            }
 
             const selectedLocation = findOption(locationInput.value, availableOptions?.locations || []);
             if (!selectedLocation) {
@@ -782,13 +1042,14 @@
 
                 document.getElementById('successText').textContent =
                     `${result.job.title} at ${result.job.company} is now visible to job seekers.`;
+                existingJobTitles.push(result.job.title);
                 form.hidden = true;
                 message.className = 'form-message';
                 document.getElementById('successPanel').classList.add('visible');
             } catch (error) {
                 showMessage(error.message, 'error');
             } finally {
-                submitButton.disabled = false;
+                updateSubmitAvailability();
                 submitButton.textContent = 'Create Job Opening';
             }
         });
@@ -802,6 +1063,9 @@
             dropdownWrappers.forEach(closeDropdown);
             document.getElementById('employerId').value = employerId;
             closingDate.min = dateAfterToday();
+            updateDescriptionCount();
+            validateDuplicateTitle();
+            updatePreview();
             document.getElementById('successPanel').classList.remove('visible');
             form.hidden = false;
             document.getElementById('title').focus();
@@ -841,9 +1105,44 @@
                     'educationLevel',
                     availableOptions.educationLevels
                 );
-                submitButton.disabled = false;
+                optionsLoaded = true;
+                updateSubmitAvailability();
             } catch (error) {
                 showMessage(`${error.message} Please refresh the page and try again.`, 'error');
+            }
+        }
+
+        async function loadCompanyContext() {
+            try {
+                const response = await fetch(
+                    `/api/employers/${encodeURIComponent(employerId)}/job-context`
+                );
+                const result = await response.json();
+                if (!response.ok) throw new Error(result.error || 'Unable to load the employer company.');
+
+                activeCompany = result.company;
+                existingJobTitles = result.existingJobTitles || [];
+                document.getElementById('companyContextName').textContent = result.company.name;
+                document.getElementById('companyContextMeta').textContent =
+                    `${formatLabel(result.company.industry)} · ${result.employer.email}`;
+
+                const contextLogo = document.getElementById('companyContextLogo');
+                const contextInitial = document.getElementById('companyContextInitial');
+                contextInitial.textContent = result.company.name.charAt(0).toUpperCase();
+                contextInitial.hidden = Boolean(result.company.logoUrl);
+                contextLogo.hidden = !result.company.logoUrl;
+                if (result.company.logoUrl) {
+                    contextLogo.src = result.company.logoUrl;
+                    contextLogo.alt = `${result.company.name} logo`;
+                }
+
+                contextLoaded = true;
+                validateDuplicateTitle();
+                updatePreview();
+                updateSubmitAvailability();
+            } catch (error) {
+                document.getElementById('companyContext').hidden = true;
+                showMessage(error.message, 'error');
             }
         }
 
@@ -863,6 +1162,8 @@
                     input.value = option;
                     updateClearButton();
                     closeDropdown(wrapper);
+                    if (input === titleInput) validateDuplicateTitle();
+                    updatePreview();
                 }
             );
 
@@ -893,6 +1194,8 @@
                 input.value = '';
                 updateClearButton();
                 input.focus();
+                if (input === titleInput) validateDuplicateTitle();
+                updatePreview();
             });
             updateClearButton();
         }
@@ -939,6 +1242,7 @@
                     display.classList.remove('placeholder');
                     closeDropdown(wrapper);
                     display.focus();
+                    updatePreview();
                 },
                 input.value ? [input.value] : [],
                 formatter
@@ -1082,11 +1386,87 @@
                     return chip;
                 })
             );
+            updatePreview();
         }
 
         function findOption(value, options) {
             const wanted = String(value || '').trim().toLowerCase();
             return options.find(option => option.toLowerCase() === wanted);
+        }
+
+        function updateDescriptionCount() {
+            document.getElementById('descriptionCount').textContent =
+                `${descriptionInput.value.length.toLocaleString('en-MY')} / 5,000`;
+        }
+
+        function updatePreview() {
+            const companyName = activeCompany?.name || 'Your company';
+            const location = locationInput.value.trim() || 'State, Malaysia';
+            const employmentType = document.getElementById('employmentType').value;
+            const salary = Number(salaryInput.value);
+            const previewInitial = document.getElementById('previewInitial');
+            const previewLogo = document.getElementById('previewLogo');
+
+            document.getElementById('previewTitle').textContent =
+                titleInput.value.trim() || 'Job title';
+            document.getElementById('previewCompany').textContent =
+                `${companyName} · ${location}`;
+            document.getElementById('previewSalary').textContent =
+                salaryInput.value && Number.isFinite(salary)
+                    ? `RM ${salary.toLocaleString('en-MY')} / month`
+                    : 'Monthly salary';
+
+            previewInitial.textContent = companyName.charAt(0).toUpperCase();
+            previewInitial.hidden = Boolean(activeCompany?.logoUrl);
+            previewLogo.hidden = !activeCompany?.logoUrl;
+            if (activeCompany?.logoUrl) {
+                previewLogo.src = activeCompany.logoUrl;
+                previewLogo.alt = `${companyName} logo`;
+            }
+
+            const tags = [];
+            if (employmentType) tags.push(employmentType);
+            tags.push(...selectedSkills.slice(0, 3));
+            if (selectedSkills.length > 3) tags.push(`+${selectedSkills.length - 3} more`);
+            if (tags.length === 0) tags.push('Employment type', 'Selected skills');
+
+            document.getElementById('previewTags').replaceChildren(
+                ...tags.map(value => {
+                    const tag = document.createElement('span');
+                    tag.className = 'preview-tag';
+                    tag.textContent = value;
+                    return tag;
+                })
+            );
+        }
+
+        function updateSubmitAvailability() {
+            submitButton.disabled = !(optionsLoaded && contextLoaded) || hasDuplicateTitle;
+        }
+
+        function validateDuplicateTitle() {
+            const normalisedTitle = normaliseTitle(titleInput.value);
+            hasDuplicateTitle = Boolean(normalisedTitle)
+                && existingJobTitles.some(title => normaliseTitle(title) === normalisedTitle);
+
+            titleSelect.classList.toggle('invalid', hasDuplicateTitle);
+            titleInput.setAttribute('aria-invalid', String(hasDuplicateTitle));
+            titleError.classList.toggle('visible', hasDuplicateTitle);
+            titleError.textContent = hasDuplicateTitle
+                ? `${activeCompany?.name || 'Your company'} already has a ${titleInput.value.trim()} job opening. Choose another title.`
+                : '';
+            updateSubmitAvailability();
+            return !hasDuplicateTitle;
+        }
+
+        function normaliseTitle(value) {
+            return String(value || '').trim().toLowerCase().replace(/\s+/g, ' ');
+        }
+
+        function formatLabel(value) {
+            return String(value || 'Company')
+                .replace(/([a-z])([A-Z])/g, '$1 $2')
+                .replace(/\b\w/g, character => character.toUpperCase());
         }
 
         function dateAfterToday() {

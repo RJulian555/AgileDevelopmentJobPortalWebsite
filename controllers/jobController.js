@@ -31,4 +31,43 @@ function getJobOptions(request, response) {
     return response.json(jobOptions);
 }
 
-module.exports = { getJobOptions, listJobs, storeJob };
+function getEmployerJobContext(request, response) {
+    const employer = readCollection('users').find(user =>
+        String(user.id) === String(request.params.employerId)
+        && user.role === 'Employer'
+    );
+
+    if (!employer) {
+        return response.status(404).json({ error: 'Employer account not found.' });
+    }
+
+    if (!employer.companyId) {
+        return response.status(404).json({ error: 'This employer is not linked to a company.' });
+    }
+
+    const company = readCollection('companies').find(record => record.id === employer.companyId);
+    if (!company) {
+        return response.status(404).json({ error: 'Employer company not found.' });
+    }
+
+    const existingJobTitles = readCollection('jobs')
+        .filter(job =>
+            job.companyId === company.id
+            || (!job.companyId && job.company === company.name)
+        )
+        .map(job => job.title)
+        .filter(Boolean);
+
+    return response.json({
+        employer: { id: employer.id, email: employer.email },
+        company: {
+            id: company.id,
+            name: company.name,
+            industry: company.industry,
+            logoUrl: company.logoUrl || ''
+        },
+        existingJobTitles
+    });
+}
+
+module.exports = { getEmployerJobContext, getJobOptions, listJobs, storeJob };
