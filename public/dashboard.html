@@ -101,6 +101,22 @@
             transform: scale(0.97);
         }
 
+        .nav-actions {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .nav-post-job {
+            color: var(--green-dark);
+            background: var(--green-light);
+            box-shadow: none;
+        }
+
+        .nav-post-job:hover {
+            box-shadow: 0 4px 12px var(--green-glow);
+        }
+
         /* ===== HERO / SEARCH PANEL ===== */
         .hero {
             background: linear-gradient(135deg, #1a2c1e 0%, #1e3a28 50%, #22462e 100%);
@@ -508,7 +524,10 @@
     <!-- ===== NAV BAR ===== -->
     <nav class="navbar">
         <span class="nav-brand">JobWall</span>
-        <a href="register.html" class="nav-cta" id="nav-get-started">Get Started &rarr;</a>
+        <div class="nav-actions">
+            <a href="/create-job.html" class="nav-cta nav-post-job" id="nav-post-job">Post a Job</a>
+            <a href="register.html" class="nav-cta" id="nav-get-started">Get Started &rarr;</a>
+        </div>
     </nav>
 
     <!-- ===== HERO / SEARCH PANEL ===== -->
@@ -591,6 +610,12 @@
         const searchingState = document.getElementById('searching-state');
         const resultsGrid = document.getElementById('results-grid');
         const resultsStatus = document.getElementById('results-status');
+        const storedEmployerId = sessionStorage.getItem('jobwallEmployerId');
+
+        if (storedEmployerId) {
+            document.getElementById('nav-post-job').href =
+                '/create-job.html?employerId=' + encodeURIComponent(storedEmployerId);
+        }
 
         /* ── Chip → fill input + search ── */
         chips.forEach(function (chip) {
@@ -654,22 +679,28 @@
                 var card = document.createElement('div');
                 card.className = 'job-card';
 
-                var initial = job.company.charAt(0);
+                var companyName = job.company || 'Company';
+                var initial = companyName.charAt(0);
                 var postedLabel = formatDate(job.postedAt);
+                var employmentType = job.employmentType || job.jobType || 'Employment';
+                var workplaceModel = job.workplaceModel || '';
+                var salary = typeof job.salary === 'number'
+                    ? 'RM ' + job.salary.toLocaleString('en-MY') + ' / month'
+                    : job.salary;
 
                 card.innerHTML =
                     '<div class="job-card-logo" aria-hidden="true">' + initial + '</div>' +
                     '<div class="job-card-body">' +
                     '<div class="job-card-title">' + escHtml(job.title) + '</div>' +
-                    '<div class="job-card-company">' + escHtml(job.company) + ' &middot; ' + escHtml(job.location) + '</div>' +
+                    '<div class="job-card-company">' + escHtml(companyName) + ' &middot; ' + escHtml(job.location) + '</div>' +
                     '<div class="job-card-tags">' +
-                    '<span class="tag tag-type">' + escHtml(job.jobType) + '</span>' +
-                    '<span class="tag tag-workplace">' + escHtml(job.workplaceModel) + '</span>' +
+                    '<span class="tag tag-type">' + escHtml(employmentType) + '</span>' +
+                    (workplaceModel ? '<span class="tag tag-workplace">' + escHtml(workplaceModel) + '</span>' : '') +
                     '<span class="tag tag-industry">' + escHtml(job.industry) + '</span>' +
                     '</div>' +
                     '</div>' +
                     '<div class="job-card-right">' +
-                    '<div class="job-card-salary">' + escHtml(job.salary) + '</div>' +
+                    '<div class="job-card-salary">' + escHtml(salary) + '</div>' +
                     '<div class="job-card-date">Posted ' + postedLabel + '</div>' +
                     '</div>';
 

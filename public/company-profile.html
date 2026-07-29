@@ -269,7 +269,8 @@
                     <input id="replacementLogo" class="file-input" type="file" accept="image/png,image/jpeg,image/webp">
                     <button id="uploadLogoButton" type="button">Save Logo</button>
                 </div>
-                <a class="dashboard-link" href="/dashboard.html">Continue to Dashboard</a>
+                <a id="createJobLink" class="dashboard-link" href="/create-job.html">Create a Job Opening</a>
+                <a class="dashboard-link secondary-btn" href="/dashboard.html">Continue to Dashboard</a>
             </section>
             <form id="companyProfileForm" action="/api/companies" method="POST">
                 <input id="employerId" name="employerId" type="hidden">
@@ -363,6 +364,7 @@
         let activeEmployerId = employerId;
 
         document.getElementById('employerId').value = employerId || '';
+        if (employerId) sessionStorage.setItem('jobwallEmployerId', employerId);
 
         if (companyId) {
             loadCompanyProfile(companyId);
@@ -492,6 +494,11 @@
             form.hidden = true;
             activeCompanyId = company.id;
             activeEmployerId = activeEmployerId || company.employers?.[0]?.id;
+            if (activeEmployerId) {
+                sessionStorage.setItem('jobwallEmployerId', activeEmployerId);
+                document.getElementById('createJobLink').href =
+                    `/create-job.html?employerId=${encodeURIComponent(activeEmployerId)}`;
+            }
             document.getElementById('savedCompanyName').textContent = company.name;
             savedLogo.hidden = !company.logoUrl;
             if (company.logoUrl) {
