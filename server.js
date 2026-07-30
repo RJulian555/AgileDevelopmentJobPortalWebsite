@@ -1,7 +1,8 @@
 const express = require('express');
 const fs = require('fs');
 const path = require('path');
-const companyRoutes = require('./routes/companyRoutes');
+const companyRoutes      = require('./routes/companyRoutes');
+const applicationRoutes  = require('./routes/applicationRoutes');
 
 const app = express();
 const PORT = 3000;
@@ -12,9 +13,10 @@ const JOBS_FILE  = path.join(__dirname, 'data', 'jobs.json');
 
 // Middleware to read form submissions and serve HTML files automatically
 app.use(express.urlencoded({ extended: true }));
-app.use(express.json());
+app.use(express.json({ limit: '5mb' }));
 app.use(express.static('public'));
 app.use(companyRoutes);
+app.use(applicationRoutes);
 
 // Task 2: Ensure database "schema" exists (initialize an empty array text file if it's missing)
 if (!fs.existsSync(USERS_FILE)) {
@@ -54,11 +56,13 @@ app.post('/api/register', (encodeData, response) => {
     users.push(newUser);
     fs.writeFileSync(USERS_FILE, JSON.stringify(users, null, 2));
 
-    // 6. Employers create their company profile before continuing to the dashboard
-    const nextPage = role === 'Employer'
-        ? `/company-profile.html?employerId=${newUser.id}`
-        : '/dashboard.html';
-    response.redirect(nextPage);
+    // 6. Redirect to appropriate page, passing userId so the client can store it
+    if (role === 'Employer') {
+        response.redirect(`/company-profile.html?employerId=${newUser.id}`);
+    } else {
+        // Job Seeker: pass userId in URL so dashboard.html stores it in localStorage
+        response.redirect(`/dashboard.html?userId=${newUser.id}`);
+    }
 });
 
 // Job Search API: GET /api/jobs?q=<title query>

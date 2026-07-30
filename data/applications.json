@@ -1,0 +1,23 @@
+[
+  {
+    "id": "app-1785056536390",
+    "jobId": "1",
+    "seekerId": "1785053640961",
+    "appliedAt": "2026-07-26T09:02:16.390Z",
+    "resumeUrl": "uploads/resume_1785053640961.pdf"
+  },
+  {
+    "id": "app-1785056668678",
+    "jobId": "2",
+    "seekerId": "1785053640961",
+    "appliedAt": "2026-07-26T09:04:28.678Z",
+    "resumeUrl": "uploads/resume_1785053640961.pdf"
+  },
+  {
+    "id": "app-1785056765211",
+    "jobId": "5",
+    "seekerId": "1785053640961",
+    "appliedAt": "2026-07-26T09:06:05.211Z",
+    "resumeUrl": "uploads/resume_1785053640961.pdf"
+  }
+]

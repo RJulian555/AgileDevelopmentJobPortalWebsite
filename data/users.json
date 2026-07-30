@@ -18,5 +18,17 @@
     "password": "hashed_123",
     "role": "Employer",
     "companyId": "company-cb07e9ad-20cb-48ea-9632-358bb174a70d"
+  },
+  {
+    "id": 1785053640961,
+    "email": "amandaxyw-wm23@student.tarc.edu.my",
+    "password": "hashed_123456",
+    "role": "Job Seeker"
+  },
+  {
+    "id": 1785056049550,
+    "email": "amandawong098@gmail.com",
+    "password": "hashed_123456",
+    "role": "Job Seeker"
   }
 ]

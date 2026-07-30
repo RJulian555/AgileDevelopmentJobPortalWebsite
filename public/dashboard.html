@@ -482,6 +482,75 @@
             }
         }
 
+        /* ===== APPLY BUTTON ===== */
+        .apply-btn {
+            background: linear-gradient(135deg, var(--green-primary), var(--green-dark));
+            color: #fff;
+            border: none;
+            border-radius: var(--radius-pill);
+            padding: 7px 18px;
+            font-size: 12px;
+            font-weight: 600;
+            font-family: 'Inter', sans-serif;
+            cursor: pointer;
+            transition: box-shadow 0.2s, transform 0.15s, opacity 0.2s;
+            box-shadow: 0 3px 10px var(--green-glow);
+            white-space: nowrap;
+            margin-top: 4px;
+        }
+
+        .apply-btn:hover:not(:disabled) {
+            box-shadow: 0 5px 16px rgba(46, 204, 113, 0.4);
+            transform: translateY(-1px);
+        }
+
+        .apply-btn:disabled {
+            background: linear-gradient(135deg, #a8f0c8, #6fcf97);
+            cursor: default;
+            opacity: 0.85;
+            box-shadow: none;
+        }
+
+        /* ===== CARD MESSAGE AREA ===== */
+        .job-card-msg {
+            font-size: 12px;
+            margin-top: 8px;
+            line-height: 1.5;
+            min-height: 0;
+            transition: opacity 0.3s;
+        }
+
+        .job-card-msg--success {
+            color: var(--green-dark);
+            font-weight: 600;
+        }
+
+        .job-card-msg--error {
+            color: #c0392b;
+        }
+
+        .job-card-msg--error a {
+            color: #c0392b;
+            font-weight: 600;
+            text-decoration: underline;
+        }
+
+        /* ===== NAV PROFILE LINK ===== */
+        .nav-profile {
+            text-decoration: none;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--green-dark);
+            border: 1.5px solid var(--green-primary);
+            padding: 8px 16px;
+            border-radius: var(--radius-pill);
+            transition: background 0.2s, color 0.2s;
+        }
+
+        .nav-profile:hover {
+            background: var(--green-light);
+        }
+
         /* ===== RESPONSIVE ===== */
         @media (max-width: 640px) {
             .navbar {
@@ -508,7 +577,9 @@
     <!-- ===== NAV BAR ===== -->
     <nav class="navbar">
         <span class="nav-brand">JobWall</span>
-        <a href="register.html" class="nav-cta" id="nav-get-started">Get Started &rarr;</a>
+        <div id="nav-actions" style="display:flex;align-items:center;gap:10px;">
+            <a href="register.html" class="nav-cta" id="nav-get-started">Get Started &rarr;</a>
+        </div>
     </nav>
 
     <!-- ===== HERO / SEARCH PANEL ===== -->
@@ -582,15 +653,29 @@
 
     <!-- ===== JAVASCRIPT ===== -->
     <script>
-        const searchInput = document.getElementById('job-search-input');
-        const searchBtn = document.getElementById('search-btn');
-        const chips = document.querySelectorAll('.chip');
-        const emptyState = document.getElementById('empty-state');
-        const emptyTitle = document.getElementById('empty-title');
-        const emptyBody = document.getElementById('empty-body');
+        /* ── Seeker identity: read from URL param (after registration) or localStorage ── */
+        (function () {
+            var params = new URLSearchParams(window.location.search);
+            var userId = params.get('userId');
+            if (userId) {
+                localStorage.setItem('currentSeeker', userId);
+                // Remove userId from URL bar (clean up)
+                var url = new URL(window.location.href);
+                url.searchParams.delete('userId');
+                window.history.replaceState({}, '', url.toString());
+            }
+        })();
+        var currentSeeker = localStorage.getItem('currentSeeker');
+
+        const searchInput    = document.getElementById('job-search-input');
+        const searchBtn      = document.getElementById('search-btn');
+        const chips          = document.querySelectorAll('.chip');
+        const emptyState     = document.getElementById('empty-state');
+        const emptyTitle     = document.getElementById('empty-title');
+        const emptyBody      = document.getElementById('empty-body');
         const searchingState = document.getElementById('searching-state');
-        const resultsGrid = document.getElementById('results-grid');
-        const resultsStatus = document.getElementById('results-status');
+        const resultsGrid    = document.getElementById('results-grid');
+        const resultsStatus  = document.getElementById('results-status');
 
         /* ── Chip → fill input + search ── */
         chips.forEach(function (chip) {
@@ -653,24 +738,27 @@
             jobs.forEach(function (job) {
                 var card = document.createElement('div');
                 card.className = 'job-card';
+                card.setAttribute('data-job-id', job.id);
 
-                var initial = job.company.charAt(0);
+                var initial     = job.company.charAt(0);
                 var postedLabel = formatDate(job.postedAt);
 
                 card.innerHTML =
                     '<div class="job-card-logo" aria-hidden="true">' + initial + '</div>' +
                     '<div class="job-card-body">' +
-                    '<div class="job-card-title">' + escHtml(job.title) + '</div>' +
-                    '<div class="job-card-company">' + escHtml(job.company) + ' &middot; ' + escHtml(job.location) + '</div>' +
-                    '<div class="job-card-tags">' +
-                    '<span class="tag tag-type">' + escHtml(job.jobType) + '</span>' +
-                    '<span class="tag tag-workplace">' + escHtml(job.workplaceModel) + '</span>' +
-                    '<span class="tag tag-industry">' + escHtml(job.industry) + '</span>' +
-                    '</div>' +
+                        '<div class="job-card-title">' + escHtml(job.title) + '</div>' +
+                        '<div class="job-card-company">' + escHtml(job.company) + ' &middot; ' + escHtml(job.location) + '</div>' +
+                        '<div class="job-card-tags">' +
+                            '<span class="tag tag-type">'      + escHtml(job.jobType)        + '</span>' +
+                            '<span class="tag tag-workplace">' + escHtml(job.workplaceModel) + '</span>' +
+                            '<span class="tag tag-industry">'  + escHtml(job.industry)       + '</span>' +
+                        '</div>' +
+                        '<div class="job-card-msg" id="msg-' + job.id + '"></div>' +
                     '</div>' +
                     '<div class="job-card-right">' +
-                    '<div class="job-card-salary">' + escHtml(job.salary) + '</div>' +
-                    '<div class="job-card-date">Posted ' + postedLabel + '</div>' +
+                        '<div class="job-card-salary">' + escHtml(job.salary)       + '</div>' +
+                        '<div class="job-card-date">Posted ' + postedLabel           + '</div>' +
+                        '<button class="apply-btn" id="apply-btn-' + job.id + '" data-job-id="' + job.id + '" type="button">Apply</button>' +
                     '</div>';
 
                 resultsGrid.appendChild(card);
@@ -680,7 +768,10 @@
             var count = jobs.length;
             resultsStatus.innerHTML =
                 '<strong>' + count + '</strong> job' + (count === 1 ? '' : 's') +
-                ' found for <strong>&ldquo;' + escHtml(query) + '&rdquo;</strong>';
+                (query ? ' found for <strong>&ldquo;' + escHtml(query) + '&rdquo;</strong>' : ' available');
+
+            // Batch-check which jobs this seeker has already applied to
+            refreshAppliedStatus();
         }
 
         /* ── Escape HTML (XSS safety) ── */
@@ -751,8 +842,106 @@
             loadAllJobs();
         }
 
-        /* ── Load all jobs on page load ── */
-        document.addEventListener('DOMContentLoaded', loadAllJobs);
+        /* ── Apply helpers ── */
+        function markApplied(btn) {
+            btn.textContent = '\u2713 Applied';
+            btn.disabled = true;
+        }
+
+        function showCardMsg(jobId, type, html) {
+            var el = document.getElementById('msg-' + jobId);
+            if (!el) return;
+            el.innerHTML = html;
+            el.className = 'job-card-msg job-card-msg--' + type;
+            if (type === 'success') {
+                setTimeout(function () {
+                    el.innerHTML = '';
+                    el.className = 'job-card-msg';
+                }, 6000);
+            }
+        }
+
+        /* ── Batch-check applied status after rendering ── */
+        function refreshAppliedStatus() {
+            if (!currentSeeker) return;
+            fetch('/api/applications?seekerId=' + encodeURIComponent(currentSeeker))
+                .then(function (r) { return r.json(); })
+                .then(function (appliedJobIds) {
+                    appliedJobIds.forEach(function (jobId) {
+                        var btn = document.getElementById('apply-btn-' + jobId);
+                        if (btn) markApplied(btn);
+                    });
+                })
+                .catch(function () { /* silent — non-critical */ });
+        }
+
+        /* ── Apply button click (event delegation on grid) ── */
+        resultsGrid.addEventListener('click', function (e) {
+            var btn = e.target.closest('.apply-btn');
+            if (!btn || btn.disabled) return;
+
+            var jobId = btn.dataset.jobId;
+
+            if (!currentSeeker) {
+                showCardMsg(jobId, 'error',
+                    '\u26A0 Please <a href="register.html">register as a Job Seeker</a> to apply.');
+                return;
+            }
+
+            btn.textContent = '\u2026';
+            btn.disabled    = true;
+
+            fetch('/api/applications', {
+                method:  'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body:    JSON.stringify({ seekerId: currentSeeker, jobId: jobId })
+            })
+            .then(function (r) {
+                return r.json().then(function (data) { return { status: r.status, data: data }; });
+            })
+            .then(function (res) {
+                if (res.status === 201) {
+                    markApplied(btn);
+                    showCardMsg(jobId, 'success', '\u2713 Application submitted successfully!');
+                } else if (res.data.error === 'no_profile') {
+                    btn.textContent = 'Apply';
+                    btn.disabled    = false;
+                    showCardMsg(jobId, 'error',
+                        '\u26A0 Please complete your profile first. <a href="profile.html">Go to Profile \u2192</a>');
+                } else if (res.data.error === 'no_resume') {
+                    btn.textContent = 'Apply';
+                    btn.disabled    = false;
+                    showCardMsg(jobId, 'error',
+                        '\u26A0 Please upload a resume in your profile. <a href="profile.html">Go to Profile \u2192</a>');
+                } else if (res.data.error === 'duplicate') {
+                    markApplied(btn);
+                } else {
+                    btn.textContent = 'Apply';
+                    btn.disabled    = false;
+                    showCardMsg(jobId, 'error', '\u26A0 Something went wrong. Please try again.');
+                }
+            })
+            .catch(function () {
+                btn.textContent = 'Apply';
+                btn.disabled    = false;
+                showCardMsg(jobId, 'error', '\u26A0 Network error. Please try again.');
+            });
+        });
+
+        /* ── Load all jobs on page load + update nav ── */
+        document.addEventListener('DOMContentLoaded', function () {
+            loadAllJobs();
+
+            // Update nav: show My Profile link when seeker is known
+            if (currentSeeker) {
+                var navActions = document.getElementById('nav-actions');
+                if (navActions) {
+                    navActions.innerHTML =
+                        '<a href="profile.html" class="nav-profile" id="nav-my-profile">My Profile</a>' +
+                        '<a href="register.html" class="nav-cta" id="nav-get-started">Get Started &rarr;</a>';
+                }
+            }
+        });
     </script>
 
 </body>
