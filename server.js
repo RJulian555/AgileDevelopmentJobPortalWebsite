@@ -80,6 +80,25 @@ app.post('/api/register', (request, response) => {
     return response.redirect(nextPage);
 });
 
+// API clients always expect JSON. Keep Express's default HTML 404/error pages
+// from being passed to fetch callers that will try to parse them as JSON.
+app.use('/api', (request, response) => {
+    return response.status(404).json({
+        error: `API route not found: ${request.method} ${request.originalUrl}`
+    });
+});
+
+app.use((error, request, response, next) => {
+    if (!request.path.startsWith('/api')) return next(error);
+
+    const statusCode = error.status || error.statusCode || 500;
+    const message = error instanceof SyntaxError && error.type === 'entity.parse.failed'
+        ? 'The request body contains invalid JSON.'
+        : 'The server could not process the API request.';
+
+    return response.status(statusCode).json({ error: message });
+});
+
 if (require.main === module) {
     app.listen(PORT, () => {
         console.log(`Server running! Open your browser and go to http://localhost:${PORT}/register.html`);

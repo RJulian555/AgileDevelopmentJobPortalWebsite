@@ -1037,7 +1037,10 @@
                     },
                     body: JSON.stringify(Object.fromEntries(new FormData(form)))
                 });
-                const result = await response.json();
+                const result = await readJsonResponse(
+                    response,
+                    'Unable to create the job opening.'
+                );
                 if (!response.ok) throw new Error(result.error || 'Unable to create the job opening.');
 
                 document.getElementById('successText').textContent =
@@ -1074,8 +1077,9 @@
         async function loadJobOptions() {
             try {
                 const response = await fetch('/api/job-options');
-                if (!response.ok) throw new Error('Unable to load job options.');
-                availableOptions = await response.json();
+                const result = await readJsonResponse(response, 'Unable to load job options.');
+                if (!response.ok) throw new Error(result.error || 'Unable to load job options.');
+                availableOptions = result;
 
                 setupSingleSelect(
                     titleSelect,
@@ -1117,7 +1121,10 @@
                 const response = await fetch(
                     `/api/employers/${encodeURIComponent(employerId)}/job-context`
                 );
-                const result = await response.json();
+                const result = await readJsonResponse(
+                    response,
+                    'Unable to load the employer company.'
+                );
                 if (!response.ok) throw new Error(result.error || 'Unable to load the employer company.');
 
                 activeCompany = result.company;
@@ -1143,6 +1150,23 @@
             } catch (error) {
                 document.getElementById('companyContext').hidden = true;
                 showMessage(error.message, 'error');
+            }
+        }
+
+        async function readJsonResponse(response, fallbackMessage) {
+            const contentType = response.headers.get('content-type') || '';
+            if (!contentType.toLowerCase().includes('application/json')) {
+                await response.text();
+                throw new Error(
+                    `${fallbackMessage} The website API returned an HTML page instead of JSON. ` +
+                    'Run the website through the Node server with "npm start" and use http://localhost:3000.'
+                );
+            }
+
+            try {
+                return await response.json();
+            } catch {
+                throw new Error(`${fallbackMessage} The server returned invalid JSON.`);
             }
         }
 
