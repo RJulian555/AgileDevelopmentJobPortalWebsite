@@ -1,4 +1,4 @@
-name: Tests
+name: Website CI
 
 on:
   push:
@@ -12,9 +12,15 @@ on:
 permissions:
   contents: read
 
+concurrency:
+  group: website-ci-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   test:
+    name: Unit and website smoke tests
     runs-on: ubuntu-latest
+    timeout-minutes: 10
 
     steps:
       - name: Check out repository
