@@ -20,3 +20,8 @@ localStorage.setItem('currentSeeker', '1785053640961');
 location.reload();
 
 then you should see the applied job posting has the apply button disabled
+
+## logout simulation
+localStorage.removeItem('currentSeeker'); 
+sessionStorage.removeItem('jobwallEmployerId'); 
+location.reload();
