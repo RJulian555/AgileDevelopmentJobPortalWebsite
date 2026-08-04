@@ -526,20 +526,6 @@
         }
         .nav-profile-link:hover { background: var(--green-light); }
 
-        .nav-logout {
-            background: none;
-            border: none;
-            font-size: 13px;
-            font-weight: 600;
-            font-family: 'Inter', sans-serif;
-            color: var(--text-muted);
-            cursor: pointer;
-            padding: 8px 12px;
-            border-radius: var(--radius-pill);
-            transition: color 0.2s, background 0.2s;
-        }
-        .nav-logout:hover { color: #c0392b; background: #fff0f0; }
-
         /* ===== APPLY BUTTON ===== */
         .apply-btn {
             background: linear-gradient(135deg, var(--green-primary), var(--green-dark));
@@ -600,7 +586,6 @@
         <span class="nav-brand">JobWall</span>
         <div class="nav-actions" id="nav-actions">
             <a href="login.html" class="nav-login" id="nav-login-btn">Login</a>
-            <a href="/create-job.html" class="nav-cta nav-post-job" id="nav-post-job">Post a Job</a>
             <a href="register.html" class="nav-cta" id="nav-get-started">Get Started &rarr;</a>
         </div>
     </nav>
@@ -677,7 +662,7 @@
     <!-- ===== JAVASCRIPT ===== -->
     <script src="/js/jobDate.js"></script>
     <script>
-        /* ── Seeker identity: from URL param (post-registration/login) or localStorage ── */
+        /* ── Seeker / Employer identity from URL param or storage ── */
         (function () {
             var params = new URLSearchParams(window.location.search);
             var userId = params.get('userId');
@@ -687,8 +672,16 @@
                 url.searchParams.delete('userId');
                 window.history.replaceState({}, '', url.toString());
             }
+            var empId = params.get('employerId');
+            if (empId) {
+                sessionStorage.setItem('jobwallEmployerId', empId);
+                var url = new URL(window.location.href);
+                url.searchParams.delete('employerId');
+                window.history.replaceState({}, '', url.toString());
+            }
         })();
         var currentSeeker = localStorage.getItem('currentSeeker');
+        var storedEmployerId = sessionStorage.getItem('jobwallEmployerId');
 
         const searchInput    = document.getElementById('job-search-input');
         const searchBtn      = document.getElementById('search-btn');
@@ -699,12 +692,6 @@
         const searchingState = document.getElementById('searching-state');
         const resultsGrid    = document.getElementById('results-grid');
         const resultsStatus  = document.getElementById('results-status');
-        const storedEmployerId = sessionStorage.getItem('jobwallEmployerId');
-
-        if (storedEmployerId) {
-            document.getElementById('nav-post-job').href =
-                '/create-job.html?employerId=' + encodeURIComponent(storedEmployerId);
-        }
 
         /* ── Chip → fill input + search ── */
         chips.forEach(function (chip) {
@@ -943,26 +930,16 @@
             if (!navActions) return;
             if (currentSeeker) {
                 navActions.innerHTML =
-                    '<a href="profile.html" class="nav-profile-link" id="nav-my-profile">My Profile</a>' +
-                    '<button class="nav-logout" id="nav-logout-btn" type="button" onclick="logoutUser()">Logout</button>';
+                    '<a href="profile.html" class="nav-profile-link" id="nav-my-profile">My Profile</a>';
             } else if (storedEmployerId) {
                 navActions.innerHTML =
                     '<a href="/create-job.html?employerId=' + encodeURIComponent(storedEmployerId) +
-                    '" class="nav-cta nav-post-job" id="nav-post-job">Post a Job</a>' +
-                    '<a href="register.html" class="nav-cta" id="nav-get-started">Get Started &rarr;</a>';
+                    '" class="nav-cta nav-post-job" id="nav-post-job">Post a Job</a>';
             } else {
                 navActions.innerHTML =
                     '<a href="login.html" class="nav-login" id="nav-login-btn">Login</a>' +
                     '<a href="register.html" class="nav-cta" id="nav-get-started">Get Started &rarr;</a>';
             }
-        }
-
-        /* ── Logout ── */
-        function logoutUser() {
-            localStorage.removeItem('currentSeeker');
-            currentSeeker = null;
-            updateNav();
-            loadAllJobs();
         }
 
         /* ── Reset to default browse state (kept for fallback) ── */

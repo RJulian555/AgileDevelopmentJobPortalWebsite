@@ -23,7 +23,7 @@ if (!fs.existsSync(USERS_FILE)) {
 // Login API: POST /api/login
 // Authenticates user and redirects based on role
 app.post('/api/login', (req, res) => {
-    const { email, password } = req.body;
+    const { email, password, role } = req.body;
 
     if (!email || !password) {
         return res.redirect('/login.html?error=' + encodeURIComponent('Email and password are required.'));
@@ -35,6 +35,11 @@ app.post('/api/login', (req, res) => {
     // Invalid email or wrong password
     if (!user || user.password !== 'hashed_' + password) {
         return res.redirect('/login.html?error=' + encodeURIComponent('Invalid email or password.'));
+    }
+
+    // Role mismatch: account exists but under a different role
+    if (role && user.role !== role) {
+        return res.redirect('/login.html?error=' + encodeURIComponent('Account exists under a different role.'));
     }
 
     // Redirect to the correct page based on the user's actual role
