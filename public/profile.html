@@ -15,9 +15,9 @@
         .bg-shape.triangle-1 { width: 0; height: 0; border-left: 100px solid transparent; border-right: 100px solid transparent; border-bottom: 180px solid #a3e4d7; top: 50%; left: 70%; animation-duration: 22s; }
         .bg-shape.circle-2 { width: 250px; height: 250px; background-color: #bdc3c7; border-radius: 50%; bottom: 40%; left: 25%; animation-duration: 35s; }
         @keyframes floatAround { 0% { transform: translate(0,0) rotate(0deg); } 50% { transform: translate(80px,60px) rotate(180deg); } 100% { transform: translate(0,0) rotate(360deg); } }
-        .top-bar { position: relative; z-index: 20; display: flex; align-items: center; justify-content: space-between; padding: 15px 30px; background: rgba(255,255,255,0.7); backdrop-filter: blur(8px); border-bottom: 1px solid rgba(46,204,113,0.2); flex-shrink: 0; }
+        .top-bar { position: relative; z-index: 20; display: flex; align-items: center; justify-content: space-between; padding: 15px 30px; background: rgba(255,255,255,0.7); backdrop-filter: blur(8px); border-bottom: 1px solid rgba(46,204,113,0.2); flex-shrink: 0; flex-wrap: wrap; gap: 10px; }
         .top-bar .brand { font-size: 28px; font-weight: 900; color: #2ecc71; letter-spacing: -1px; user-select: none; }
-        .top-bar .actions { display: flex; gap: 12px; }
+        .top-bar .actions { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; }
         .top-bar .actions button { border-radius: 30px; border: none; padding: 8px 24px; font-weight: 700; font-size: 0.9rem; cursor: pointer; transition: 0.2s; }
         .btn-save { background: #2ecc71; color: #fff; box-shadow: 0 4px 10px rgba(46,204,113,0.25); }
         .btn-save:hover { background: #27ae60; transform: translateY(-2px); box-shadow: 0 6px 16px rgba(46,204,113,0.35); }
@@ -38,7 +38,7 @@
         .profile-field .value input, .profile-field .value textarea { width: 100%; border: 1px solid transparent; background: transparent; padding: 4px 6px; border-radius: 6px; font-size: 0.95rem; transition: 0.2s; font-family: inherit; }
         .profile-field .value input:focus, .profile-field .value textarea:focus { outline: none; background: #fff; border-color: #2ecc71; box-shadow: 0 2px 8px rgba(46,204,113,0.1); }
         .profile-field .value textarea { resize: vertical; min-height: 50px; }
-        .profile-field.avatar-field .value { display: flex; align-items: center; gap: 12px; }
+        .profile-field.avatar-field .value { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
         .profile-field.avatar-field .value img { width: 50px; height: 50px; border-radius: 50%; object-fit: cover; background: #bdc3c7; border: 1px solid #ddd; }
         .profile-field.avatar-field input[type="file"] { font-size: 0.8rem; }
         .entry-card { background: rgba(255,255,255,0.6); border-radius: 12px; padding: 14px 16px; margin-bottom: 14px; border: 1px solid #e8eeec; position: relative; transition: 0.2s; flex-shrink: 0; }
@@ -54,13 +54,17 @@
         .column::-webkit-scrollbar-track { background: rgba(0,0,0,0.02); }
         .column::-webkit-scrollbar-thumb { background: #bdc3c7; border-radius: 10px; }
         .column::-webkit-scrollbar-thumb:hover { background: #95a5a6; }
-        @media (max-width: 820px) { .columns-container { flex-direction: column; overflow-y: auto; padding: 15px; gap: 16px; } .column { max-height: none; overflow-y: visible; flex: none; height: auto; } .top-bar { flex-wrap: wrap; gap: 10px; padding: 12px 20px; } .top-bar .brand { font-size: 22px; } }
-        .validation-error {border-color: #e74c3c !important;background-color: #fff5f5 !important;}
+        @media (max-width: 820px) { .columns-container { flex-direction: column; overflow-y: auto; padding: 15px; gap: 16px; } .column { max-height: none; overflow-y: visible; flex: none; height: auto; } .top-bar { padding: 12px 20px; } .top-bar .brand { font-size: 22px; } }
+        .validation-error { border-color: #e74c3c !important; background-color: #fff5f5 !important; }
+
+        /* 可选：技能标签入口按钮样式（如果你保留） */
+        .skill-tag-link { display: inline-block; margin-top: 6px; padding: 4px 16px; background: #3498db; color: #fff; border-radius: 20px; text-decoration: none; font-size: 0.8rem; font-weight: 600; transition: 0.2s; }
+        .skill-tag-link:hover { background: #2980b9; transform: translateY(-1px); }
     </style>
 </head>
 <body>
 
-    <!-- Bakcground animation -->
+    <!-- Background animation -->
     <div class="bg-animation-wrapper">
         <div class="bg-shape circle-1"></div>
         <div class="bg-shape square-1"></div>
@@ -71,7 +75,7 @@
     <!-- top bar -->
     <div class="top-bar">
         <div style="display:flex; align-items:center; gap:15px;">
-            <button class="back-btn" onclick="alert('Back');">←</button>
+            <button class="back-btn" onclick="window.history.back()">←</button>
             <span class="brand">JobWall</span>
         </div>
         <div class="actions">
@@ -90,12 +94,10 @@
                 <div class="profile-field avatar-field">
                     <span class="label">Avatar</span>
                     <div class="value">
-                        <!-- default avatar -->
                         <img id="avatarPreview" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='50' height='50' viewBox='0 0 50 50'%3E%3Ccircle cx='25' cy='25' r='25' fill='%23bdc3c7'/%3E%3Ccircle cx='25' cy='18' r='8' fill='%2395a5a6'/%3E%3Cpath d='M12 38 Q25 45 38 38' stroke='%2395a5a6' stroke-width='4' fill='none' stroke-linecap='round'/%3E%3C/svg%3E" alt="avatar">
                         <input type="file" id="avatarInput" name="avatar" accept="image/*" onchange="previewAvatar(event)">
                     </div>
                 </div>
-                <!-- All fields removed value, added placeholder -->
                 <div class="profile-field"><span class="label">Name</span><div class="value"><input type="text" name="fullName" placeholder="Please enter your name" maxlength="50" required></div></div>
                 <div class="profile-field"><span class="label">Position</span><div class="value"><input type="text" name="jobTitle" placeholder="Please enter your position" maxlength="50"></div></div>
                 <div class="profile-field"><span class="label">Location</span><div class="value"><input type="text" name="location" placeholder="City · Area" maxlength="50"></div></div>
@@ -106,15 +108,23 @@
                 <div class="profile-field"><span class="label">About Me</span><div class="value"><textarea name="about" rows="2" placeholder="Tell us a bit about yourself..." maxlength="100"></textarea></div></div>
                 <div class="profile-field"><span class="label">Skills</span><div class="value"><input type="text" name="skills" placeholder="Skills, separated by commas..." maxlength="50"></div></div>
                 <div class="profile-field"><span class="label">Languages</span><div class="value"><input type="text" name="languages" placeholder="Chinese (Native), English (Professional)..." maxlength="50"></div></div>
+
+                <!-- ===== 技能标签入口（仅链接，无显示区域） ===== -->
+                <div class="profile-field" style="border-bottom: none; padding-top: 12px; border-top: 2px solid #2ecc71; margin-top: 4px;">
+                    <span class="label">🏷️ Tags</span>
+                    <div class="value">
+                        <a href="#" class="skill-tag-link" id="skillTagLink" target="_blank">Manage Skill Tags</a>
+                    </div>
+                </div>
             </div>
 
-            <!-- mid：working experience -->
+            <!-- Mid：working experience -->
             <div class="column">
                 <h2>💼 working experience <button type="button" class="add-btn" onclick="addEntry('work')">+ add</button></h2>
                 <div id="workEntries"></div>
             </div>
 
-            <!-- right：education -->
+            <!-- Right：education -->
             <div class="column">
                 <h2>🎓 education <button type="button" class="add-btn" onclick="addEntry('edu')">+ add</button></h2>
                 <div id="eduEntries"></div>
@@ -124,19 +134,67 @@
     </form>
 
     <script>
+        // ================================================================
+        // 1. Get userId from URL
+        // ================================================================
+        function getUserIdFromURL() {
+            const params = new URLSearchParams(window.location.search);
+            const id = params.get('userId');
+            if (id) return parseInt(id);
+            return null;
+        }
+
+        const currentUserId = getUserIdFromURL();
+        if (!currentUserId) {
+            alert('Missing userId parameter. Please provide ?userId=xxx in the URL.');
+        }
+
+        // 设置技能标签链接的目标 URL（带上 userId）
+        document.addEventListener('DOMContentLoaded', function() {
+            const link = document.getElementById('skillTagLink');
+            if (link && currentUserId) {
+                link.href = `/profileTags.html?userId=${currentUserId}`;
+            }
+        });
+
+        // ================================================================
+        // 2. API calls (with userId in query)
+        // ================================================================
+        const API_BASE = '/api/profile';
+
+        async function fetchUserData() {
+            if (!currentUserId) return null;
+            const res = await fetch(`${API_BASE}?userId=${currentUserId}`);
+            if (!res.ok) throw new Error('Failed to load data');
+            return await res.json();
+        }
+
+        async function saveUserData(data) {
+            if (!currentUserId) throw new Error('No userId');
+            const res = await fetch(`${API_BASE}?userId=${currentUserId}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            });
+            if (!res.ok) throw new Error('Save failed');
+            return await res.json();
+        }
+
+        // ================================================================
+        // 3. Form fields mapping & helpers
+        // ================================================================
+        const defaultAvatar = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="50" height="50" viewBox="0 0 50 50"%3E%3Ccircle cx="25" cy="25" r="25" fill="%23bdc3c7"/%3E%3Ccircle cx="25" cy="18" r="8" fill="%2395a5a6"/%3E%3Cpath d="M12 38 Q25 45 38 38" stroke="%2395a5a6" stroke-width="4" fill="none" stroke-linecap="round"/%3E%3C/svg%3E';
+
         function previewAvatar(event) {
             const file = event.target.files[0];
             if (file) {
                 const reader = new FileReader();
-                reader.onload = function(e) {
-                    document.getElementById('avatarPreview').src = e.target.result;
-                };
+                reader.onload = e => document.getElementById('avatarPreview').src = e.target.result;
                 reader.readAsDataURL(file);
             }
         }
 
-        let workCounter = 0;
-        let eduCounter = 0;
+        let workCounter = 0, eduCounter = 0;
 
         function createWorkHTML(index) {
             return `
@@ -186,8 +244,8 @@
                 index = ++eduCounter;
                 container.insertAdjacentHTML('beforeend', createEduHTML(index));
             }
-            const lastCard = container.lastElementChild;
-            if (lastCard) lastCard.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+            const last = container.lastElementChild;
+            if (last) last.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
             clearValidationStyles();
         }
 
@@ -197,80 +255,45 @@
             clearValidationStyles();
         }
 
-        let lastSavedData = null; // 
-
-        function collectFormData() {
-            // personal information
-            const personal = {};
-            const personalNames = ['fullName', 'jobTitle', 'location', 'email', 'phone', 'birthday', 'website', 'about', 'skills', 'languages'];
-            for (const name of personalNames) {
-                const el = document.querySelector(`[name="${name}"]`);
-                if (el) personal[name] = el.value;
-            }
-
-            const avatarImg = document.getElementById('avatarPreview');
-            personal._avatarSrc = avatarImg.src; 
-
-            const workEntries = document.querySelectorAll('#workEntries .entry-card');
-            const work = [];
-            workEntries.forEach(card => {
-                const company = card.querySelector('[name^="work_company_"]')?.value || '';
-                const position = card.querySelector('[name^="work_position_"]')?.value || '';
-                const start = card.querySelector('[name^="work_start_"]')?.value || '';
-                const end = card.querySelector('[name^="work_end_"]')?.value || '';
-                const desc = card.querySelector('[name^="work_desc_"]')?.value || '';
-                work.push({ company, position, start, end, desc });
-            });
-
-            const eduEntries = document.querySelectorAll('#eduEntries .entry-card');
-            const edu = [];
-            eduEntries.forEach(card => {
-                const school = card.querySelector('[name^="edu_school_"]')?.value || '';
-                const major = card.querySelector('[name^="edu_major_"]')?.value || '';
-                const start = card.querySelector('[name^="edu_start_"]')?.value || '';
-                const end = card.querySelector('[name^="edu_end_"]')?.value || '';
-                const desc = card.querySelector('[name^="edu_desc_"]')?.value || '';
-                edu.push({ school, major, start, end, desc });
-            });
-
-            return { personal, work, edu };
+        function escapeHtml(str) {
+            if (!str) return '';
+            return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
         }
 
+        // ================================================================
+        // 4. Apply data to form
+        // ================================================================
         function applyFormData(data) {
             if (!data) {
-                const personalNames = ['fullName', 'jobTitle', 'location', 'email', 'phone', 'birthday', 'website', 'about', 'skills', 'languages'];
-                for (const name of personalNames) {
-                    const el = document.querySelector(`[name="${name}"]`);
-                    if (el) el.value = '';
-                }
-                document.getElementById('avatarPreview').src = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="50" height="50" viewBox="0 0 50 50"%3E%3Ccircle cx="25" cy="25" r="25" fill="%23bdc3c7"/%3E%3Ccircle cx="25" cy="18" r="8" fill="%2395a5a6"/%3E%3Cpath d="M12 38 Q25 45 38 38" stroke="%2395a5a6" stroke-width="4" fill="none" stroke-linecap="round"/%3E%3C/svg%3E';
+                // clear all
+                document.querySelectorAll('[name]').forEach(el => el.value = '');
+                document.getElementById('avatarPreview').src = defaultAvatar;
                 document.getElementById('avatarInput').value = '';
                 document.getElementById('workEntries').innerHTML = '';
                 document.getElementById('eduEntries').innerHTML = '';
-                workCounter = 0;
-                eduCounter = 0;
-                clearValidationStyles();
+                workCounter = 0; eduCounter = 0;
                 return;
             }
 
-            const personal = data.personal || {};
-            const personalNames = ['fullName', 'jobTitle', 'location', 'email', 'phone', 'birthday', 'website', 'about', 'skills', 'languages'];
-            for (const name of personalNames) {
+            const profile = data.profile || {};
+            const personalNames = ['fullName','jobTitle','location','phone','birthday','website','about','skills','languages'];
+            personalNames.forEach(name => {
                 const el = document.querySelector(`[name="${name}"]`);
-                if (el) el.value = personal[name] || '';
-            }
-            if (personal._avatarSrc) {
-                document.getElementById('avatarPreview').src = personal._avatarSrc;
-            } else {
-                document.getElementById('avatarPreview').src = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="50" height="50" viewBox="0 0 50 50"%3E%3Ccircle cx="25" cy="25" r="25" fill="%23bdc3c7"/%3E%3Ccircle cx="25" cy="18" r="8" fill="%2395a5a6"/%3E%3Cpath d="M12 38 Q25 45 38 38" stroke="%2395a5a6" stroke-width="4" fill="none" stroke-linecap="round"/%3E%3C/svg%3E';
-            }
+                if (el) el.value = profile[name] || '';
+            });
+            // email is at top level
+            const emailEl = document.querySelector('[name="email"]');
+            if (emailEl) emailEl.value = data.email || '';
+
+            // avatar
+            document.getElementById('avatarPreview').src = profile.avatarSrc || defaultAvatar;
             document.getElementById('avatarInput').value = '';
 
+            // work
             const workContainer = document.getElementById('workEntries');
             workContainer.innerHTML = '';
             workCounter = 0;
-            const workList = data.work || [];
-            workList.forEach(item => {
+            (data.work || []).forEach(item => {
                 const idx = ++workCounter;
                 workContainer.insertAdjacentHTML('beforeend', `
                     <div class="entry-card" data-type="work" data-index="${idx}">
@@ -290,11 +313,11 @@
                 `);
             });
 
+            // edu
             const eduContainer = document.getElementById('eduEntries');
             eduContainer.innerHTML = '';
             eduCounter = 0;
-            const eduList = data.edu || [];
-            eduList.forEach(item => {
+            (data.edu || []).forEach(item => {
                 const idx = ++eduCounter;
                 eduContainer.insertAdjacentHTML('beforeend', `
                     <div class="entry-card" data-type="edu" data-index="${idx}">
@@ -313,23 +336,66 @@
                     </div>
                 `);
             });
+
             clearValidationStyles();
         }
 
-        function escapeHtml(str) {
-            if (!str) return '';
-            return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
+        // ================================================================
+        // 5. Collect form data
+        // ================================================================
+        function collectFormData() {
+            const profile = {};
+            const personalNames = ['fullName','jobTitle','location','phone','birthday','website','about','skills','languages'];
+            personalNames.forEach(name => {
+                const el = document.querySelector(`[name="${name}"]`);
+                profile[name] = el ? el.value : '';
+            });
+            const emailEl = document.querySelector('[name="email"]');
+            const email = emailEl ? emailEl.value : '';
+
+            profile.avatarSrc = document.getElementById('avatarPreview').src;
+
+            // collect work
+            const work = [];
+            document.querySelectorAll('#workEntries .entry-card').forEach(card => {
+                work.push({
+                    company: card.querySelector('[name^="work_company_"]')?.value || '',
+                    position: card.querySelector('[name^="work_position_"]')?.value || '',
+                    start: card.querySelector('[name^="work_start_"]')?.value || '',
+                    end: card.querySelector('[name^="work_end_"]')?.value || '',
+                    desc: card.querySelector('[name^="work_desc_"]')?.value || ''
+                });
+            });
+
+            const edu = [];
+            document.querySelectorAll('#eduEntries .entry-card').forEach(card => {
+                edu.push({
+                    school: card.querySelector('[name^="edu_school_"]')?.value || '',
+                    major: card.querySelector('[name^="edu_major_"]')?.value || '',
+                    start: card.querySelector('[name^="edu_start_"]')?.value || '',
+                    end: card.querySelector('[name^="edu_end_"]')?.value || '',
+                    desc: card.querySelector('[name^="edu_desc_"]')?.value || ''
+                });
+            });
+
+            // 注意：不再包含 skills 数组（标签），只保留 profile 中的 skillsText
+            return {
+                email: email,
+                profile: profile,
+                work: work,
+                edu: edu
+            };
         }
 
-
-        //  Form Validation===================================================
+        // ================================================================
+        // 6. Validation (unchanged)
+        // ================================================================
         function checkLength(value, max, fieldName) {
             if (value.length > max) {
-                return `“${fieldName}”not exceed ${max} characters (currently ${value.length})`;
+                return `“${fieldName}” not exceed ${max} characters (currently ${value.length})`;
             }
             return null;
         }
-
         function markError(selector) {
             const el = typeof selector === 'string' ? document.querySelector(selector) : selector;
             if (el) {
@@ -340,157 +406,161 @@
                 });
             }
         }
-
         function clearValidationStyles() {
-            document.querySelectorAll('.validation-error').forEach(el => {
-                el.classList.remove('validation-error');
-            });
+            document.querySelectorAll('.validation-error').forEach(el => el.classList.remove('validation-error'));
         }
+
         function validateForm() {
-    const errors = [];
+            const errors = [];
+            const fullName = document.querySelector('[name="fullName"]')?.value.trim() || '';
+            if (!fullName) {
+                errors.push('name cannot be empty');
+                markError('[name="fullName"]');
+            } else {
+                const err = checkLength(fullName, 100, 'name');
+                if (err) { errors.push(err); markError('[name="fullName"]'); }
+            }
+            const email = document.querySelector('[name="email"]')?.value.trim() || '';
+            if (!email) { errors.push('email cannot be empty'); markError('[name="email"]'); }
+            else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+                errors.push('email format is invalid');
+                markError('[name="email"]');
+            }
+            const phone = document.querySelector('[name="phone"]')?.value.trim() || '';
+            if (phone && !/^\+?[\d\s\-()]{7,20}$/.test(phone)) {
+                errors.push('phone number format is invalid');
+                markError('[name="phone"]');
+            }
+            const website = document.querySelector('[name="website"]')?.value.trim() || '';
+            if (website) {
+                const urlPattern = /^(https?:\/\/)[^\s$.?#].[^\s]*$/i;
+                if (!urlPattern.test(website)) {
+                    errors.push('website format is invalid, please start with http:// or https://');
+                    markError('[name="website"]');
+                }
+                const err = checkLength(website, 255, 'personal website');
+                if (err) { errors.push(err); markError('[name="website"]'); }
+            }
+            const jobTitle = document.querySelector('[name="jobTitle"]')?.value.trim() || '';
+            if (jobTitle) {
+                const err = checkLength(jobTitle, 100, 'job title');
+                if (err) { errors.push(err); markError('[name="jobTitle"]'); }
+            }
+            const about = document.querySelector('[name="about"]')?.value || '';
+            const errAbout = checkLength(about, 500, 'about me');
+            if (errAbout) { errors.push(errAbout); markError('[name="about"]'); }
+            const skillsText = document.querySelector('[name="skills"]')?.value || '';
+            const errSkills = checkLength(skillsText, 500, 'skills');
+            if (errSkills) { errors.push(errSkills); markError('[name="skills"]'); }
+            const languages = document.querySelector('[name="languages"]')?.value || '';
+            const errLang = checkLength(languages, 200, 'languages');
+            if (errLang) { errors.push(errLang); markError('[name="languages"]'); }
 
-    // personal information validation
-    const fullName = document.querySelector('[name="fullName"]')?.value.trim() || '';
-    if (!fullName) {
-        errors.push('name cannot be empty');
-        markError('[name="fullName"]');
-    } else {
-        const err = checkLength(fullName, 100, 'name');
-        if (err) { errors.push(err); markError('[name="fullName"]'); }
-    }
+            const workCards = document.querySelectorAll('#workEntries .entry-card');
+            workCards.forEach((card, index) => {
+                const company = card.querySelector('[name^="work_company_"]')?.value.trim() || '';
+                const position = card.querySelector('[name^="work_position_"]')?.value.trim() || '';
+                const desc = card.querySelector('[name^="work_desc_"]')?.value || '';
+                if (!company) { errors.push(`work experience #${index+1}: company cannot be empty`); markError(card.querySelector('[name^="work_company_"]')); }
+                else {
+                    const err = checkLength(company, 200, `work experience #${index+1} company`);
+                    if (err) { errors.push(err); markError(card.querySelector('[name^="work_company_"]')); }
+                }
+                if (!position) { errors.push(`work experience #${index+1}: position cannot be empty`); markError(card.querySelector('[name^="work_position_"]')); }
+                else {
+                    const err = checkLength(position, 100, `work experience #${index+1} position`);
+                    if (err) { errors.push(err); markError(card.querySelector('[name^="work_position_"]')); }
+                }
+                const errDesc = checkLength(desc, 500, `work experience #${index+1} description`);
+                if (errDesc) { errors.push(errDesc); markError(card.querySelector('[name^="work_desc_"]')); }
+            });
 
-    // email (existing)
-    const email = document.querySelector('[name="email"]')?.value.trim() || '';
-    if (!email) { errors.push('email cannot be empty'); markError('[name="email"]'); }
-    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-        errors.push('email format is invalid');
-        markError('[name="email"]');
-    }
+            const eduCards = document.querySelectorAll('#eduEntries .entry-card');
+            eduCards.forEach((card, index) => {
+                const school = card.querySelector('[name^="edu_school_"]')?.value.trim() || '';
+                const major = card.querySelector('[name^="edu_major_"]')?.value.trim() || '';
+                const notes = card.querySelector('[name^="edu_desc_"]')?.value || '';
+                if (!school) { errors.push(`education background #${index+1}: school cannot be empty`); markError(card.querySelector('[name^="edu_school_"]')); }
+                else {
+                    const err = checkLength(school, 200, `education background #${index+1} school`);
+                    if (err) { errors.push(err); markError(card.querySelector('[name^="edu_school_"]')); }
+                }
+                if (!major) { errors.push(`education background #${index+1}: major cannot be empty`); markError(card.querySelector('[name^="edu_major_"]')); }
+                else {
+                    const err = checkLength(major, 200, `education background #${index+1} major`);
+                    if (err) { errors.push(err); markError(card.querySelector('[name^="edu_major_"]')); }
+                }
+                const errNotes = checkLength(notes, 500, `education background #${index+1} notes`);
+                if (errNotes) { errors.push(errNotes); markError(card.querySelector('[name^="edu_desc_"]')); }
+            });
 
-    // phone (existing)
-    const phone = document.querySelector('[name="phone"]')?.value.trim() || '';
-    if (phone && !/^\+?[\d\s\-()]{7,20}$/.test(phone)) {
-        errors.push('phone number format is invalid');
-        markError('[name="phone"]');
-    }
-
-    // website (new validation)
-    const website = document.querySelector('[name="website"]')?.value.trim() || '';
-    if (website) {
-        // regex: must start with http:// or https:// and follow URL format
-        const urlPattern = /^(https?:\/\/)[^\s$.?#].[^\s]*$/i;
-        if (!urlPattern.test(website)) {
-            errors.push('website format is invalid, please start with http:// or https://');
-            markError('[name="website"]');
+            return errors;
         }
-        // length check (255)
-        const err = checkLength(website, 255, 'personal website');
-        if (err) { errors.push(err); markError('[name="website"]'); }
-    }
 
-    // job title
-    const jobTitle = document.querySelector('[name="jobTitle"]')?.value.trim() || '';
-    if (jobTitle) {
-        const err = checkLength(jobTitle, 100, 'job title');
-        if (err) { errors.push(err); markError('[name="jobTitle"]'); }
-    }
+        // ================================================================
+        // 7. Save and Reset
+        // ================================================================
+        let lastSavedData = null;
 
-    // about me
-    const about = document.querySelector('[name="about"]')?.value || '';
-    const errAbout = checkLength(about, 500, 'about me');
-    if (errAbout) { errors.push(errAbout); markError('[name="about"]'); }
-
-    // skills
-    const skills = document.querySelector('[name="skills"]')?.value || '';
-    const errSkills = checkLength(skills, 500, 'skills');
-    if (errSkills) { errors.push(errSkills); markError('[name="skills"]'); }
-
-    // languages
-    const languages = document.querySelector('[name="languages"]')?.value || '';
-    const errLang = checkLength(languages, 200, 'languages');
-    if (errLang) { errors.push(errLang); markError('[name="languages"]'); }
-
-    // work experience
-    const workCards = document.querySelectorAll('#workEntries .entry-card');
-    workCards.forEach((card, index) => {
-        const company = card.querySelector('[name^="work_company_"]')?.value.trim() || '';
-        const position = card.querySelector('[name^="work_position_"]')?.value.trim() || '';
-        const desc = card.querySelector('[name^="work_desc_"]')?.value || '';
-        if (!company) { errors.push(`work experience #${index+1}: company cannot be empty`); markError(card.querySelector('[name^="work_company_"]')); }
-        else {
-            const err = checkLength(company, 200, `work experience #${index+1} company`);
-            if (err) { errors.push(err); markError(card.querySelector('[name^="work_company_"]')); }
-        }
-        if (!position) { errors.push(`work experience #${index+1}: position cannot be empty`); markError(card.querySelector('[name^="work_position_"]')); }
-        else {
-            const err = checkLength(position, 100, `work experience #${index+1} position`);
-            if (err) { errors.push(err); markError(card.querySelector('[name^="work_position_"]')); }
-        }
-        const errDesc = checkLength(desc, 500, `work experience #${index+1} description`);
-        if (errDesc) { errors.push(errDesc); markError(card.querySelector('[name^="work_desc_"]')); }
-    });
-
-    // education background
-    const eduCards = document.querySelectorAll('#eduEntries .entry-card');
-    eduCards.forEach((card, index) => {
-        const school = card.querySelector('[name^="edu_school_"]')?.value.trim() || '';
-        const major = card.querySelector('[name^="edu_major_"]')?.value.trim() || '';
-        const notes = card.querySelector('[name^="edu_desc_"]')?.value || '';
-        if (!school) { errors.push(`education background #${index+1}: school cannot be empty`); markError(card.querySelector('[name^="edu_school_"]')); }
-        else {
-            const err = checkLength(school, 200, `education background #${index+1} school`);
-            if (err) { errors.push(err); markError(card.querySelector('[name^="edu_school_"]')); }
-        }
-        if (!major) { errors.push(`education background #${index+1}: major cannot be empty`); markError(card.querySelector('[name^="edu_major_"]')); }
-        else {
-            const err = checkLength(major, 200, `education background #${index+1} major`);
-            if (err) { errors.push(err); markError(card.querySelector('[name^="edu_major_"]')); }
-        }
-        const errNotes = checkLength(notes, 500, `education background #${index+1} notes`);
-        if (errNotes) { errors.push(errNotes); markError(card.querySelector('[name^="edu_desc_"]')); }
-    });
-
-    return errors;
-}
-
-        //  save and reset functions=========================================
-        function saveForm() {
-           console.log('saveForm called'); // debug log
+        async function saveForm() {
             clearValidationStyles();
-
-            // execute validation
             const errors = validateForm();
             if (errors.length > 0) {
-                // prompt the user with all errors
                 alert('❌ Validation failed:\n\n' + errors.join('\n'));
-                // scroll to the first error element (optional)
                 const firstError = document.querySelector('.validation-error');
-                if (firstError) {
-                    firstError.scrollIntoView({ block: 'center', behavior: 'smooth' });
-                }
-                return; // stop saving if there are validation errors
+                if (firstError) firstError.scrollIntoView({ block: 'center', behavior: 'smooth' });
+                return;
             }
 
-            // pass validation, collect data and save       
             const data = collectFormData();
-            lastSavedData = JSON.parse(JSON.stringify(data)); 
-            console.log('📋 saved data：', lastSavedData);
-            alert('✅ Changes saved！\nResetting will restore the currently saved state.');
+            try {
+                const result = await saveUserData(data);
+                lastSavedData = JSON.parse(JSON.stringify(data));
+                console.log('✅ Saved:', result);
+                alert('✅ Changes saved successfully!');
+            } catch (e) {
+                alert('❌ Save error: ' + e.message);
+            }
         }
 
         function resetForm() {
             if (lastSavedData) {
                 applyFormData(lastSavedData);
-                alert('🔄 Reset complete');
+                alert('🔄 Reset to last saved state');
             } else {
-                applyFormData(null);
-                alert('🔄 never saved before, all fields have been cleared');
+                // load from server or clear
+                fetchUserData().then(data => {
+                    if (data) {
+                        applyFormData(data);
+                        lastSavedData = JSON.parse(JSON.stringify(data));
+                    } else {
+                        applyFormData(null);
+                    }
+                }).catch(() => applyFormData(null));
             }
             clearValidationStyles();
         }
 
-        window.onload = function() {
-            applyFormData(null);
+        // ================================================================
+        // 8. Init
+        // ================================================================
+        window.onload = async function() {
+            if (!currentUserId) {
+                document.body.innerHTML = `<h2 style="text-align:center;margin-top:50px;">Missing userId in URL. Please use ?userId=xxx</h2>`;
+                return;
+            }
+            try {
+                const data = await fetchUserData();
+                if (data) {
+                    applyFormData(data);
+                    lastSavedData = JSON.parse(JSON.stringify(data));
+                } else {
+                    applyFormData(null);
+                }
+            } catch (e) {
+                console.warn('Load error:', e);
+                applyFormData(null);
+            }
         };
     </script>
 

@@ -39,12 +39,19 @@ app.post('/api/register', (encodeData, response) => {
     const simulatedHashedPassword = "hashed_" + password;
 
     // 4. Create new user object matching our structured "schema"
+    const defaultProfile = {
+    fullName: '',jobTitle: '',location: '',phone: '',birthday: '',website: '',about: '',skillsText: '',languages: '',avatarSrc: ''};
+
     const newUser = {
         id: Date.now(), // unique ID
         email: email,
         password: simulatedHashedPassword,
-        role: role
-    };
+        role: role,
+        profile: { ...defaultProfile },
+        skills: [],
+        work: [],
+        edu: []
+        };
 
     if (role === 'Employer') {
         newUser.companyId = null;
@@ -57,8 +64,30 @@ app.post('/api/register', (encodeData, response) => {
     // 6. Employers create their company profile before continuing to the dashboard
     const nextPage = role === 'Employer'
         ? `/company-profile.html?employerId=${newUser.id}`
-        : '/dashboard.html';
+        : `/dashboard.html?employerId=${newUser.id}`;
     response.redirect(nextPage);
+});
+
+app.put('/api/profile', (req, res) => {
+    const userId = parseInt(req.query.userId);
+    if (!userId) return res.status(400).json({ error: 'Missing userId parameter' });
+
+    const users = JSON.parse(fs.readFileSync(USERS_FILE, 'utf8'));
+    const index = users.findIndex(u => u.id === userId);
+    if (index === -1) return res.status(404).json({ error: 'User not found' });
+
+    const incoming = req.body;
+    const existing = users[index];
+    if (incoming.profile) {
+        existing.profile = { ...existing.profile, ...incoming.profile };
+    }
+    if (incoming.skills !== undefined) existing.skills = incoming.skills;
+    if (incoming.work) existing.work = incoming.work;
+    if (incoming.edu) existing.edu = incoming.edu;
+
+    users[index] = existing;
+    fs.writeFileSync(USERS_FILE, JSON.stringify(users, null, 2));
+    res.json({ success: true });
 });
 
 // Job Search API: GET /api/jobs?q=<title query>
@@ -76,6 +105,17 @@ app.get('/api/jobs', (req, res) => {
         : jobs;
 
     res.json(results);
+});
+
+app.get('/api/profile', (req, res) => {
+    const userId = parseInt(req.query.userId);
+    if (!userId) return res.status(400).json({ error: 'Missing userId parameter' });
+
+    const users = JSON.parse(fs.readFileSync(USERS_FILE, 'utf8'));
+    const user = users.find(u => u.id === userId);
+    if (!user) return res.status(404).json({ error: 'User not found' });
+    const { password, ...safeUser } = user;
+    res.json(safeUser);
 });
 
 // Start our web server
