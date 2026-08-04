@@ -64,7 +64,7 @@ router.post('/api/applications', (req, res) => {
         String(r.userId || r.user_id || r.seekerId) === String(seekerId)
     );
     const resumeUrl = resumeEntry
-        ? (resumeEntry.resumeUrl || resumeEntry.resume_url || null)
+        ? (resumeEntry.resumeUrl || resumeEntry.resume_url || resumeEntry.resume_id || resumeEntry.resumeFilename || null)
         : null;
 
     if (!resumeUrl) {
