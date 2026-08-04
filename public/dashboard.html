@@ -101,6 +101,22 @@
             transform: scale(0.97);
         }
 
+        .nav-actions {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .nav-post-job {
+            color: var(--green-dark);
+            background: var(--green-light);
+            box-shadow: none;
+        }
+
+        .nav-post-job:hover {
+            box-shadow: 0 4px 12px var(--green-glow);
+        }
+
         /* ===== HERO / SEARCH PANEL ===== */
         .hero {
             background: linear-gradient(135deg, #1a2c1e 0%, #1e3a28 50%, #22462e 100%);
@@ -582,8 +598,9 @@
     <!-- ===== NAV BAR ===== -->
     <nav class="navbar">
         <span class="nav-brand">JobWall</span>
-        <div id="nav-actions" style="display:flex;align-items:center;gap:10px;">
+        <div class="nav-actions" id="nav-actions">
             <a href="login.html" class="nav-login" id="nav-login-btn">Login</a>
+            <a href="/create-job.html" class="nav-cta nav-post-job" id="nav-post-job">Post a Job</a>
             <a href="register.html" class="nav-cta" id="nav-get-started">Get Started &rarr;</a>
         </div>
     </nav>
@@ -658,6 +675,7 @@
     </div>
 
     <!-- ===== JAVASCRIPT ===== -->
+    <script src="/js/jobDate.js"></script>
     <script>
         /* ── Seeker identity: from URL param (post-registration/login) or localStorage ── */
         (function () {
@@ -681,6 +699,12 @@
         const searchingState = document.getElementById('searching-state');
         const resultsGrid    = document.getElementById('results-grid');
         const resultsStatus  = document.getElementById('results-status');
+        const storedEmployerId = sessionStorage.getItem('jobwallEmployerId');
+
+        if (storedEmployerId) {
+            document.getElementById('nav-post-job').href =
+                '/create-job.html?employerId=' + encodeURIComponent(storedEmployerId);
+        }
 
         /* ── Chip → fill input + search ── */
         chips.forEach(function (chip) {
@@ -745,25 +769,30 @@
                 card.className = 'job-card';
                 card.setAttribute('data-job-id', job.id);
 
-                var initial     = job.company.charAt(0);
+                var companyName = job.company || 'Company';
+                var initial = companyName.charAt(0);
                 var postedLabel = formatDate(job.postedAt);
+                var employmentType = job.employmentType || job.jobType || 'Employment';
+                var workplaceModel = job.workplaceModel || '';
+                var salary = typeof job.salary === 'number'
+                    ? 'RM ' + job.salary.toLocaleString('en-MY') + ' / month'
+                    : job.salary;
 
                 card.innerHTML =
                     '<div class="job-card-logo" aria-hidden="true">' + initial + '</div>' +
                     '<div class="job-card-body">' +
-                        '<div class="job-card-title">'   + escHtml(job.title)   + '</div>' +
-                        '<div class="job-card-company">' + escHtml(job.company) + ' &middot; ' + escHtml(job.location) + '</div>' +
-                        '<div class="job-card-tags">' +
-                            '<span class="tag tag-type">'      + escHtml(job.jobType)        + '</span>' +
-                            '<span class="tag tag-workplace">' + escHtml(job.workplaceModel) + '</span>' +
-                            '<span class="tag tag-industry">'  + escHtml(job.industry)       + '</span>' +
-                        '</div>' +
-                        '<div class="job-card-msg" id="msg-' + job.id + '"></div>' +
+                    '<div class="job-card-title">' + escHtml(job.title) + '</div>' +
+                    '<div class="job-card-company">' + escHtml(companyName) + ' &middot; ' + escHtml(job.location) + '</div>' +
+                    '<div class="job-card-tags">' +
+                    '<span class="tag tag-type">' + escHtml(employmentType) + '</span>' +
+                    (workplaceModel ? '<span class="tag tag-workplace">' + escHtml(workplaceModel) + '</span>' : '') +
+                    '<span class="tag tag-industry">' + escHtml(job.industry) + '</span>' +
+                    '</div>' +
                     '</div>' +
                     '<div class="job-card-right">' +
-                        '<div class="job-card-salary">' + escHtml(job.salary) + '</div>' +
-                        '<div class="job-card-date">Posted ' + postedLabel + '</div>' +
-                        '<button class="apply-btn" id="apply-btn-' + job.id + '" data-job-id="' + job.id + '" type="button">Apply</button>' +
+                    '<div class="job-card-salary">' + escHtml(salary) + '</div>' +
+                    '<div class="job-card-date">Posted ' + postedLabel + '</div>' +
+                    '<button class="apply-btn" id="apply-btn-' + job.id + '" data-job-id="' + job.id + '" type="button">Apply</button>' +
                     '</div>';
 
                 resultsGrid.appendChild(card);
@@ -789,18 +818,7 @@
 
         /* ── Relative date label ── */
         function formatDate(isoDate) {
-            var posted = new Date(isoDate);
-            var today = new Date();
-            var diffDays = Math.floor((today - posted) / (1000 * 60 * 60 * 24));
-
-            if (diffDays === 0) return 'today';
-            if (diffDays === 1) return 'yesterday';
-            if (diffDays < 7) return diffDays + ' days ago';
-            if (diffDays < 30) {
-                var weeks = Math.floor(diffDays / 7);
-                return weeks + ' week' + (weeks > 1 ? 's' : '') + ' ago';
-            }
-            return posted.toLocaleDateString('en-MY', { day: 'numeric', month: 'short', year: 'numeric' });
+            return JobDate.formatRelativeDate(isoDate);
         }
 
         /* ── State machine ── */
@@ -926,6 +944,11 @@
                 navActions.innerHTML =
                     '<a href="profile.html" class="nav-profile-link" id="nav-my-profile">My Profile</a>' +
                     '<button class="nav-logout" id="nav-logout-btn" type="button" onclick="logoutUser()">Logout</button>';
+            } else if (storedEmployerId) {
+                navActions.innerHTML =
+                    '<a href="/create-job.html?employerId=' + encodeURIComponent(storedEmployerId) +
+                    '" class="nav-cta nav-post-job" id="nav-post-job">Post a Job</a>' +
+                    '<a href="register.html" class="nav-cta" id="nav-get-started">Get Started &rarr;</a>';
             } else {
                 navActions.innerHTML =
                     '<a href="login.html" class="nav-login" id="nav-login-btn">Login</a>' +
