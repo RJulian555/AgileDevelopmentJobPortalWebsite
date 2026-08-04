@@ -337,6 +337,18 @@
 
         <!-- Job Seeker Form -->
         <div class="form-section active" id="jobseekerForm">
+            <!-- Login error message (shown when redirected back with ?error=) -->
+            <div id="login-error-banner" style="
+                display:none;
+                background:#fff0f0;
+                color:#c0392b;
+                border:1px solid #f5c6cb;
+                border-radius:8px;
+                padding:10px 14px;
+                font-size:13px;
+                margin-bottom:14px;
+                font-weight:500;
+            "></div>
             <form action="/api/login" method="POST">
                 <input type="hidden" name="role" value="Job Seeker">
                 
@@ -416,6 +428,23 @@
             headerTitle.textContent = 'Employer Login';
             headerDesc.textContent = 'Manage company listings and track candidate applications';
         });
+
+        // Show error message from URL param (e.g. ?error=Invalid+email)
+        (function () {
+            var params = new URLSearchParams(window.location.search);
+            var errMsg = params.get('error');
+            if (errMsg) {
+                var banner = document.getElementById('login-error-banner');
+                if (banner) {
+                    banner.textContent = errMsg;
+                    banner.style.display = 'block';
+                }
+                // Remove ?error from URL without reload
+                var url = new URL(window.location.href);
+                url.searchParams.delete('error');
+                window.history.replaceState({}, '', url.toString());
+            }
+        })();
     </script>
 </body>
 </html>

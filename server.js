@@ -1,7 +1,8 @@
 const express = require('express');
 const fs = require('fs');
 const path = require('path');
-const companyRoutes = require('./routes/companyRoutes');
+const companyRoutes      = require('./routes/companyRoutes');
+const applicationRoutes  = require('./routes/applicationRoutes');
 
 const app = express();
 const PORT = 3000;
@@ -12,14 +13,45 @@ const JOBS_FILE  = path.join(__dirname, 'data', 'jobs.json');
 
 // Middleware to read form submissions and serve HTML files automatically
 app.use(express.urlencoded({ extended: true }));
-app.use(express.json());
+app.use(express.json({ limit: '5mb' }));
 app.use(express.static('public'));
 app.use(companyRoutes);
+app.use(applicationRoutes);
 
 // Task 2: Ensure database "schema" exists (initialize an empty array text file if it's missing)
 if (!fs.existsSync(USERS_FILE)) {
     fs.writeFileSync(USERS_FILE, JSON.stringify([]));
 }
+
+// Login API: POST /api/login
+// Authenticates user and redirects based on role
+app.post('/api/login', (req, res) => {
+    const { email, password } = req.body;
+
+    if (!email || !password) {
+        return res.redirect('/login.html?error=' + encodeURIComponent('Email and password are required.'));
+    }
+
+    const users = JSON.parse(fs.readFileSync(USERS_FILE, 'utf8'));
+    const user  = users.find(u => u.email === email);
+
+    // Invalid email or wrong password
+    if (!user || user.password !== 'hashed_' + password) {
+        return res.redirect('/login.html?error=' + encodeURIComponent('Invalid email or password.'));
+    }
+
+    // Redirect to the correct page based on the user's actual role
+    if (user.role === 'Job Seeker') {
+        return res.redirect(`/dashboard.html?userId=${user.id}`);
+    }
+
+    if (user.role === 'Employer') {
+        return res.redirect(`/company-profile.html?employerId=${user.id}`);
+    }
+
+    // Fallback
+    res.redirect('/dashboard.html');
+});
 
 // Task 3: Develop registration API route to validate fields and save data
 app.post('/api/register', (encodeData, response) => {
@@ -54,11 +86,13 @@ app.post('/api/register', (encodeData, response) => {
     users.push(newUser);
     fs.writeFileSync(USERS_FILE, JSON.stringify(users, null, 2));
 
-    // 6. Employers create their company profile before continuing to the dashboard
-    const nextPage = role === 'Employer'
-        ? `/company-profile.html?employerId=${newUser.id}`
-        : '/dashboard.html';
-    response.redirect(nextPage);
+    // 6. Redirect based on role
+    if (role === 'Employer') {
+        response.redirect(`/company-profile.html?employerId=${newUser.id}`);
+    } else {
+        // Job Seeker: pass userId in URL so dashboard.html stores it in localStorage
+        response.redirect(`/dashboard.html?userId=${newUser.id}`);
+    }
 });
 
 // Job Search API: GET /api/jobs?q=<title query>
