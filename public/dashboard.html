@@ -382,9 +382,8 @@
             border-radius: var(--radius-md);
             padding: 18px 20px;
             display: flex;
-            align-items: flex-start;
-            gap: 16px;
-            transition: box-shadow 0.2s, border-color 0.2s, transform 0.15s;
+            flex-direction: column;
+            transition: box-shadow 0.25s ease, border-color 0.25s ease, transform 0.2s ease;
             cursor: default;
             animation: fadeIn 0.3s ease forwards;
         }
@@ -393,6 +392,13 @@
             box-shadow: var(--shadow-md);
             border-color: var(--green-primary);
             transform: translateY(-2px);
+        }
+
+        .job-card-top {
+            display: flex;
+            align-items: flex-start;
+            gap: 16px;
+            width: 100%;
         }
 
         /* Company logo placeholder */
@@ -484,6 +490,84 @@
         .job-card-date {
             font-size: 11px;
             color: var(--text-muted);
+        }
+
+        /* ===== HOVER DETAILS (COLLAPSED BY DEFAULT, EXPANDS ON HOVER) ===== */
+        .job-card-details {
+            max-height: 0;
+            opacity: 0;
+            overflow: hidden;
+            transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s ease, margin-top 0.3s ease, padding-top 0.3s ease;
+            margin-top: 0;
+            padding-top: 0;
+            border-top: 1px solid transparent;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            font-size: 13px;
+        }
+
+        .job-card:hover .job-card-details {
+            max-height: 500px;
+            opacity: 1;
+            margin-top: 14px;
+            padding-top: 14px;
+            border-top-color: var(--border-light);
+        }
+
+        .detail-label {
+            font-weight: 700;
+            color: var(--text-dark);
+            margin-right: 4px;
+        }
+
+        .job-detail-desc {
+            color: var(--text-mid);
+            line-height: 1.55;
+        }
+
+        .job-detail-skills {
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+
+        .skills-list {
+            display: inline-flex;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+
+        .skill-chip-card {
+            font-size: 11px;
+            font-weight: 600;
+            padding: 3px 9px;
+            border-radius: var(--radius-pill);
+            background: var(--green-soft, #eafaf1);
+            color: var(--green-dark, #27ae60);
+            border: 1px solid #c8e6c9;
+        }
+
+        .job-detail-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 16px;
+            color: var(--text-mid);
+            font-size: 12px;
+            background: var(--bg-page);
+            padding: 8px 12px;
+            border-radius: var(--radius-sm);
+            margin-top: 2px;
+        }
+
+        .meta-item strong {
+            color: var(--text-dark);
+        }
+
+        .meta-closing strong {
+            color: #c0392b;
         }
 
         /* ===== FADE IN ===== */
@@ -765,22 +849,40 @@
                     ? 'RM ' + job.salary.toLocaleString('en-MY') + ' / month'
                     : job.salary;
 
+                var skillsList = Array.isArray(job.skillsRequired)
+                    ? job.skillsRequired
+                    : (Array.isArray(job.skills) ? job.skills : []);
+                var skillsHtml = skillsList.map(function(s) {
+                    return '<span class="skill-chip-card">' + escHtml(s) + '</span>';
+                }).join('');
+
                 card.innerHTML =
-                    '<div class="job-card-logo" aria-hidden="true">' + initial + '</div>' +
-                    '<div class="job-card-body">' +
-                    '<div class="job-card-title">' + escHtml(job.title) + '</div>' +
-                    '<div class="job-card-company">' + escHtml(companyName) + ' &middot; ' + escHtml(job.location) + '</div>' +
-                    '<div class="job-card-tags">' +
-                    '<span class="tag tag-type">' + escHtml(employmentType) + '</span>' +
-                    (workplaceModel ? '<span class="tag tag-workplace">' + escHtml(workplaceModel) + '</span>' : '') +
-                    '<span class="tag tag-industry">' + escHtml(job.industry) + '</span>' +
+                    '<div class="job-card-top">' +
+                        '<div class="job-card-logo" aria-hidden="true">' + initial + '</div>' +
+                        '<div class="job-card-body">' +
+                            '<div class="job-card-title">' + escHtml(job.title) + '</div>' +
+                            '<div class="job-card-company">' + escHtml(companyName) + ' &middot; ' + escHtml(job.location) + '</div>' +
+                            '<div class="job-card-tags">' +
+                                '<span class="tag tag-type">' + escHtml(employmentType) + '</span>' +
+                                (workplaceModel ? '<span class="tag tag-workplace">' + escHtml(workplaceModel) + '</span>' : '') +
+                            '</div>' +
+                            '<div class="job-card-msg" id="msg-' + job.id + '"></div>' +
+                        '</div>' +
+                        '<div class="job-card-right">' +
+                            '<div class="job-card-salary">' + escHtml(salary) + '</div>' +
+                            '<div class="job-card-date">Posted ' + postedLabel + '</div>' +
+                            '<button class="apply-btn" id="apply-btn-' + job.id + '" data-job-id="' + job.id + '" type="button">Apply</button>' +
+                        '</div>' +
                     '</div>' +
-                    '<div class="job-card-msg" id="msg-' + job.id + '"></div>' +
-                    '</div>' +
-                    '<div class="job-card-right">' +
-                    '<div class="job-card-salary">' + escHtml(salary) + '</div>' +
-                    '<div class="job-card-date">Posted ' + postedLabel + '</div>' +
-                    '<button class="apply-btn" id="apply-btn-' + job.id + '" data-job-id="' + job.id + '" type="button">Apply</button>' +
+                    '<div class="job-card-details">' +
+                        (job.description ? '<div class="job-detail-desc"><span class="detail-label">Description:</span> ' + escHtml(job.description) + '</div>' : '') +
+                        (skillsHtml ? '<div class="job-detail-skills"><span class="detail-label">Required Skills:</span> <div class="skills-list">' + skillsHtml + '</div></div>' : '') +
+                        '<div class="job-detail-meta">' +
+                            (job.experienceRequired ? '<span class="meta-item"><strong>Experience:</strong> ' + escHtml(job.experienceRequired) + '</span>' : '') +
+                            (job.educationLevel ? '<span class="meta-item"><strong>Education:</strong> ' + escHtml(job.educationLevel) + '</span>' : '') +
+                            (job.industry ? '<span class="meta-item"><strong>Industry:</strong> ' + escHtml(job.industry) + '</span>' : '') +
+                            (job.closingDate ? '<span class="meta-item meta-closing"><strong>Closing Date:</strong> ' + escHtml(job.closingDate) + '</span>' : '') +
+                        '</div>' +
                     '</div>';
 
                 resultsGrid.appendChild(card);
