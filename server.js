@@ -30,7 +30,7 @@ app.post('/api/login', (req, res) => {
     }
 
     const users = JSON.parse(fs.readFileSync(USERS_FILE, 'utf8'));
-    const user  = users.find(u => u.email === email);
+    const user = users.find(u => u.email === email);
 
     // Invalid email or wrong password
     if (!user || user.password !== 'hashed_' + password) {
@@ -65,11 +65,19 @@ app.post('/api/register', (request, response) => {
         return response.send('<h2>Error: This email is already registered!</h2><a href="/register.html">Go Back</a>');
     }
 
+    const defaultProfile = {
+        fullName: '', jobTitle: '', location: '', phone: '', birthday: '', website: '', about: '', skillsText: '', languages: '', avatarSrc: ''
+    };
+
     const newUser = {
         id: Date.now(),
         email,
         password: `hashed_${password}`,
-        role
+        role,
+        profile: { ...defaultProfile },
+        skills: [],
+        work: [],
+        edu: []
     };
 
     if (role === 'Employer') {
@@ -83,6 +91,41 @@ app.post('/api/register', (request, response) => {
         ? `/company-profile.html?employerId=${newUser.id}`
         : `/dashboard.html?userId=${newUser.id}`;
     return response.redirect(nextPage);
+});
+
+// Profile API: GET /api/profile
+app.get('/api/profile', (req, res) => {
+    const userId = parseInt(req.query.userId);
+    if (!userId) return res.status(400).json({ error: 'Missing userId parameter' });
+
+    const users = JSON.parse(fs.readFileSync(USERS_FILE, 'utf8'));
+    const user = users.find(u => u.id === userId);
+    if (!user) return res.status(404).json({ error: 'User not found' });
+    const { password, ...safeUser } = user;
+    res.json(safeUser);
+});
+
+// Profile API: PUT /api/profile
+app.put('/api/profile', (req, res) => {
+    const userId = parseInt(req.query.userId);
+    if (!userId) return res.status(400).json({ error: 'Missing userId parameter' });
+
+    const users = JSON.parse(fs.readFileSync(USERS_FILE, 'utf8'));
+    const index = users.findIndex(u => u.id === userId);
+    if (index === -1) return res.status(404).json({ error: 'User not found' });
+
+    const incoming = req.body;
+    const existing = users[index];
+    if (incoming.profile) {
+        existing.profile = { ...existing.profile, ...incoming.profile };
+    }
+    if (incoming.skills !== undefined) existing.skills = incoming.skills;
+    if (incoming.work) existing.work = incoming.work;
+    if (incoming.edu) existing.edu = incoming.edu;
+
+    users[index] = existing;
+    fs.writeFileSync(USERS_FILE, JSON.stringify(users, null, 2));
+    res.json({ success: true });
 });
 
 // API clients always expect JSON. Keep Express's default HTML 404/error pages
