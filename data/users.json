@@ -3,7 +3,22 @@
     "id": 1783488392951,
     "email": "ryanjulian2005@gmail.com",
     "password": "hashed_72697269@Rj",
-    "role": "Job Seeker"
+    "role": "Job Seeker",
+    "profile": {
+      "fullName": "Ryan Julian",
+      "jobTitle": "Software Engineer",
+      "location": "Kuala Lumpur, Malaysia",
+      "phone": "+60123456789",
+      "birthday": "2005-01-01",
+      "website": "https://github.com",
+      "about": "Passionate developer",
+      "skills": "JavaScript, Node.js",
+      "languages": "English, Malay"
+    },
+    "skills": [
+      "JavaScript",
+      "Node.js"
+    ]
   },
   {
     "id": 1783489528289,
@@ -23,12 +38,44 @@
     "id": 1785053640961,
     "email": "amandaxyw-wm23@student.tarc.edu.my",
     "password": "hashed_123456",
-    "role": "Job Seeker"
+    "role": "Job Seeker",
+    "skills": [
+      "JavaScript",
+      "Git",
+      "Prototyping",
+      "custom skill"
+    ],
+    "profile": {
+      "fullName": "Amanda",
+      "jobTitle": "Designer",
+      "location": "Kuala Lumpur, Malaysia",
+      "phone": "0123456789",
+      "birthday": "2026-08-05",
+      "website": "https://hello.com",
+      "about": "UI/UX enthusiast",
+      "skills": "Figma, UI/UX",
+      "languages": "Chinese, English"
+    }
   },
   {
     "id": 1785056049550,
     "email": "amandawong098@gmail.com",
     "password": "hashed_123456",
-    "role": "Job Seeker"
+    "role": "Job Seeker",
+    "profile": {
+      "fullName": "Amanda Wong",
+      "jobTitle": "Data Analyst",
+      "location": "Selangor, Malaysia",
+      "phone": "+60198765432",
+      "birthday": "2000-05-15",
+      "website": "",
+      "about": "",
+      "skills": "SQL, Excel",
+      "languages": "English, Chinese"
+    },
+    "skills": [
+      "SQL",
+      "Excel"
+    ]
   }
 ]

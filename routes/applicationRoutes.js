@@ -4,7 +4,6 @@ const { readCollection, writeCollection, ensureCollection } = require('../servic
 const router = express.Router();
 
 ensureCollection('applications');
-ensureCollection('job_seekers');
 ensureCollection('resumes');
 
 // GET /api/applications?seekerId=<id>
@@ -38,7 +37,7 @@ router.get('/api/applications/check', (req, res) => {
 });
 
 // POST /api/applications
-// Validates job_seekers.json + resumes.json, checks duplicates, saves application
+// Validates user profile in users.json + resumes.json, checks duplicates, saves application
 router.post('/api/applications', (req, res) => {
     const { seekerId, jobId } = req.body;
 
@@ -46,12 +45,12 @@ router.post('/api/applications', (req, res) => {
         return res.status(400).json({ error: 'seekerId and jobId are required.' });
     }
 
-    // 1. Check job seeker profile record exists in job_seekers.json
-    const jobSeekers = readCollection('job_seekers');
-    const seeker = jobSeekers.find(s =>
-        String(s.user_id || s.userId || s.id || s.seekerId) === String(seekerId)
-    );
-    if (!seeker) {
+    // 1. Check job seeker has submitted profile form (has non-empty fullName in profile)
+    const users = readCollection('users');
+    const seeker = users.find(u => String(u.id) === String(seekerId) && u.role === 'Job Seeker');
+    const isProfileComplete = seeker && seeker.profile && seeker.profile.fullName && seeker.profile.fullName.trim() !== '';
+
+    if (!isProfileComplete) {
         return res.status(422).json({
             error: 'no_profile',
             message: 'Please complete your profile before applying.'

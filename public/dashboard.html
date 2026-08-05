@@ -1009,10 +1009,10 @@
                     showCardMsg(jobId, 'success', '\u2713 Application submitted successfully!');
                 } else if (res.data.error === 'no_profile') {
                     btn.textContent = 'Apply'; btn.disabled = false;
-                    showCardMsg(jobId, 'error', '\u26A0 Please complete your profile. <a href="profile.html">Go to Profile \u2192</a>');
+                    showCardMsg(jobId, 'error', '\u26A0 Please complete your profile. <a href="profile.html?userId=' + encodeURIComponent(currentSeeker) + '">Go to Profile \u2192</a>');
                 } else if (res.data.error === 'no_resume') {
                     btn.textContent = 'Apply'; btn.disabled = false;
-                    showCardMsg(jobId, 'error', '\u26A0 Please upload a resume. <a href="profile.html">Go to Profile \u2192</a>');
+                    showCardMsg(jobId, 'error', '\u26A0 Please upload a resume. <a href="profile.html?userId=' + encodeURIComponent(currentSeeker) + '">Go to Profile \u2192</a>');
                 } else if (res.data.error === 'duplicate') {
                     markApplied(btn);
                 } else {
@@ -1032,7 +1032,7 @@
             if (!navActions) return;
             if (currentSeeker) {
                 navActions.innerHTML =
-                    '<a href="profile.html" class="nav-profile-link" id="nav-my-profile">My Profile</a>';
+                    '<a href="profile.html?userId=' + encodeURIComponent(currentSeeker) + '" class="nav-profile-link" id="nav-my-profile">My Profile</a>';
             } else if (storedEmployerId) {
                 navActions.innerHTML =
                     '<a href="/create-job.html?employerId=' + encodeURIComponent(storedEmployerId) +
