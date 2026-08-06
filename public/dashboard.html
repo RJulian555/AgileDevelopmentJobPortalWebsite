@@ -52,7 +52,6 @@
             color: var(--text-dark);
             display: grid;
             grid-template-rows: auto auto 1fr;
-            /* nav = auto; hero = auto; results = remaining */
         }
 
         /* ===== TOP NAV BAR ===== */
@@ -68,7 +67,6 @@
             flex-shrink: 0;
         }
 
-        /* JobWall wordmark — matches register.html styling */
         .nav-brand {
             font-size: 26px;
             font-weight: 900;
@@ -77,6 +75,12 @@
             text-shadow: 0 2px 8px rgba(46, 204, 113, 0.15);
             user-select: none;
             line-height: 1;
+        }
+
+        .nav-actions {
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
 
         .nav-cta {
@@ -101,10 +105,22 @@
             transform: scale(0.97);
         }
 
-        .nav-actions {
-            display: flex;
-            align-items: center;
-            gap: 10px;
+        .nav-login {
+            border: 1.5px solid var(--green-primary);
+            background: transparent;
+            color: var(--green-dark);
+            font-size: 13px;
+            font-weight: 600;
+            font-family: 'Inter', sans-serif;
+            padding: 8px 18px;
+            border-radius: var(--radius-pill);
+            cursor: pointer;
+            transition: background 0.2s;
+            text-decoration: none;
+        }
+
+        .nav-login:hover {
+            background: var(--green-light);
         }
 
         .nav-post-job {
@@ -117,7 +133,176 @@
             box-shadow: 0 4px 12px var(--green-glow);
         }
 
-        /* ===== HERO / SEARCH PANEL ===== */
+        /* ===== My Profile 按钮（样式不变） ===== */
+        .nav-profile-link {
+            text-decoration: none;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--green-dark);
+            border: 1.5px solid var(--green-primary);
+            padding: 8px 16px;
+            border-radius: var(--radius-pill);
+            transition: background 0.2s;
+            cursor: pointer;
+            background: transparent;
+        }
+
+        .nav-profile-link:hover {
+            background: var(--green-light);
+        }
+
+        /* ===== 技能标签轮播（位于 My Profile 左侧） ===== */
+        .skill-carousel {
+            display: none;
+            margin-right: 10px;
+            border-radius: var(--radius-pill);
+            padding: 4px 14px;
+            font-size: 13px;
+            font-weight: 600;
+            transition: background-color 0.5s ease, color 0.5s ease;
+            white-space: nowrap;
+        }
+
+        .skill-carousel.fade-out {
+            opacity: 0;
+        }
+
+        .skill-carousel.fade-in {
+            opacity: 1;
+        }
+
+        /* ===== DRAWER (SIDEBAR) ===== */
+        .drawer-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(2px);
+            z-index: 1000;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .drawer-overlay.active {
+            display: block;
+            opacity: 1;
+        }
+
+        .drawer {
+            position: fixed;
+            top: 0;
+            right: -340px;
+            width: 320px;
+            max-width: 85vw;
+            height: 100%;
+            background: var(--bg-card);
+            box-shadow: -8px 0 30px rgba(0, 0, 0, 0.1);
+            transition: right 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 1001;
+            padding: 30px 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .drawer.open {
+            right: 0;
+        }
+
+        .drawer-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid var(--green-primary);
+            padding-bottom: 14px;
+        }
+
+        .drawer-header h2 {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--text-dark);
+        }
+
+        .drawer-close {
+            background: none;
+            border: none;
+            font-size: 28px;
+            line-height: 1;
+            cursor: pointer;
+            color: var(--text-muted);
+            transition: color 0.2s, transform 0.2s;
+        }
+
+        .drawer-close:hover {
+            color: var(--text-dark);
+            transform: rotate(90deg);
+        }
+
+        .drawer-avatar {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            padding: 12px 0;
+            border-bottom: 1px solid var(--border-light);
+        }
+
+        .drawer-avatar .avatar-circle {
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            background: var(--green-primary);
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            font-weight: 700;
+        }
+
+        .drawer-avatar .avatar-name {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text-dark);
+        }
+
+        .drawer-menu {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .drawer-menu li a {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 12px 16px;
+            border-radius: var(--radius-sm);
+            text-decoration: none;
+            color: var(--text-dark);
+            font-weight: 500;
+            font-size: 15px;
+            transition: background 0.2s, transform 0.15s;
+            background: var(--bg-page);
+        }
+
+        .drawer-menu li a:hover {
+            background: var(--green-light);
+            transform: translateX(4px);
+        }
+
+        .drawer-menu li a .icon {
+            font-size: 20px;
+            width: 28px;
+            text-align: center;
+        }
+
+        /* ===== HERO & SEARCH (原样保留) ===== */
         .hero {
             background: linear-gradient(135deg, #1a2c1e 0%, #1e3a28 50%, #22462e 100%);
             padding: 28px 40px 32px;
@@ -126,7 +311,6 @@
             overflow: hidden;
         }
 
-        /* Decorative blobs */
         .hero::before {
             content: '';
             position: absolute;
@@ -167,7 +351,6 @@
             background-clip: text;
         }
 
-        /* ===== SEARCH BOX ===== */
         .search-wrapper {
             max-width: 680px;
             margin: 0 auto;
@@ -252,7 +435,6 @@
             transform: scale(0.97);
         }
 
-        /* ===== SUGGESTION CHIPS ===== */
         .suggestions {
             display: flex;
             align-items: center;
@@ -290,14 +472,12 @@
             transform: translateY(-1px);
         }
 
-        /* ===== RESULTS PANEL ===== */
         .results-panel {
             background: var(--bg-page);
             overflow-y: auto;
             padding: 20px 40px;
         }
 
-        /* Results status line */
         .results-status {
             font-size: 13px;
             color: var(--text-muted);
@@ -310,7 +490,6 @@
             font-weight: 600;
         }
 
-        /* ===== SEARCHING STATE ===== */
         .searching-state {
             display: none;
             text-align: center;
@@ -339,7 +518,6 @@
             font-weight: 500;
         }
 
-        /* ===== EMPTY STATE ===== */
         .empty-state {
             display: flex;
             flex-direction: column;
@@ -368,7 +546,6 @@
             line-height: 1.6;
         }
 
-        /* ===== RESULTS GRID ===== */
         .results-grid {
             display: none;
             grid-template-columns: 1fr;
@@ -401,7 +578,6 @@
             width: 100%;
         }
 
-        /* Company logo placeholder */
         .job-card-logo {
             flex-shrink: 0;
             width: 44px;
@@ -470,7 +646,6 @@
             background: var(--bg-page);
         }
 
-        /* Salary & date on the right */
         .job-card-right {
             flex-shrink: 0;
             text-align: right;
@@ -492,7 +667,6 @@
             color: var(--text-muted);
         }
 
-        /* ===== HOVER DETAILS (COLLAPSED BY DEFAULT, EXPANDS ON HOVER) ===== */
         .job-card-details {
             max-height: 0;
             opacity: 0;
@@ -570,47 +744,6 @@
             color: #c0392b;
         }
 
-        /* ===== FADE IN ===== */
-        .fade-in {
-            opacity: 0;
-            animation: fadeIn 0.35s ease forwards;
-        }
-
-        @keyframes fadeIn {
-            to {
-                opacity: 1;
-            }
-        }
-
-        /* ===== NAV ACTION BUTTONS ===== */
-        .nav-login {
-            border: 1.5px solid var(--green-primary);
-            background: transparent;
-            color: var(--green-dark);
-            font-size: 13px;
-            font-weight: 600;
-            font-family: 'Inter', sans-serif;
-            padding: 8px 18px;
-            border-radius: var(--radius-pill);
-            cursor: pointer;
-            transition: background 0.2s;
-            text-decoration: none;
-        }
-        .nav-login:hover { background: var(--green-light); }
-
-        .nav-profile-link {
-            text-decoration: none;
-            font-size: 13px;
-            font-weight: 600;
-            color: var(--green-dark);
-            border: 1.5px solid var(--green-primary);
-            padding: 8px 16px;
-            border-radius: var(--radius-pill);
-            transition: background 0.2s;
-        }
-        .nav-profile-link:hover { background: var(--green-light); }
-
-        /* ===== APPLY BUTTON ===== */
         .apply-btn {
             background: linear-gradient(135deg, var(--green-primary), var(--green-dark));
             color: #fff;
@@ -626,23 +759,51 @@
             white-space: nowrap;
             margin-top: 4px;
         }
+
         .apply-btn:hover:not(:disabled) {
             box-shadow: 0 5px 16px rgba(46, 204, 113, 0.4);
             transform: translateY(-1px);
         }
+
         .apply-btn:disabled {
             background: linear-gradient(135deg, #a8f0c8, #6fcf97);
             cursor: default;
             box-shadow: none;
         }
 
-        /* ===== CARD MESSAGE ===== */
-        .job-card-msg { font-size: 12px; margin-top: 6px; line-height: 1.5; min-height: 0; }
-        .job-card-msg--success { color: var(--green-dark); font-weight: 600; }
-        .job-card-msg--error   { color: #c0392b; }
-        .job-card-msg--error a { color: #c0392b; font-weight: 600; text-decoration: underline; }
+        .job-card-msg {
+            font-size: 12px;
+            margin-top: 6px;
+            line-height: 1.5;
+            min-height: 0;
+        }
 
-        /* ===== RESPONSIVE ===== */
+        .job-card-msg--success {
+            color: var(--green-dark);
+            font-weight: 600;
+        }
+
+        .job-card-msg--error {
+            color: #c0392b;
+        }
+
+        .job-card-msg--error a {
+            color: #c0392b;
+            font-weight: 600;
+            text-decoration: underline;
+        }
+
+        .fade-in {
+            opacity: 0;
+            animation: fadeIn 0.35s ease forwards;
+        }
+
+        @keyframes fadeIn {
+            to {
+                opacity: 1;
+            }
+        }
+
         @media (max-width: 640px) {
             .navbar {
                 padding: 0 16px;
@@ -719,19 +880,12 @@
     <!-- ===== RESULTS PANEL ===== -->
     <div class="results-panel">
 
-        <!-- Status line e.g. "2 jobs found for …" -->
         <div class="results-status" id="results-status" aria-live="polite"></div>
-
-        <!-- Searching spinner -->
         <div class="searching-state" id="searching-state" role="status">
             <div class="spinner" aria-hidden="true"></div>
             <p class="searching-text">Searching for jobs&hellip;</p>
         </div>
-
-        <!-- Results grid (job cards injected dynamically) -->
         <div class="results-grid" id="results-grid" aria-live="polite" aria-label="Job search results"></div>
-
-        <!-- Empty / default state -->
         <div class="empty-state fade-in" id="empty-state">
             <div class="empty-state-icon">&#x1F50D;</div>
             <h2 class="empty-state-title" id="empty-title">Search for your next opportunity</h2>
@@ -741,6 +895,39 @@
             </p>
         </div>
 
+    </div>
+
+    <!-- ===== DRAWER (SIDEBAR) ===== -->
+    <div class="drawer-overlay" id="drawerOverlay"></div>
+    <div class="drawer" id="drawer">
+        <div class="drawer-header">
+            <h2>👤 My Account</h2>
+            <button class="drawer-close" id="drawerClose" aria-label="Close drawer">&times;</button>
+        </div>
+
+        <!-- 头像区域 -->
+        <div class="drawer-avatar" id="drawerAvatar">
+            <div class="avatar-circle" id="avatarCircle">U</div>
+            <div class="avatar-name" id="avatarName">User</div>
+        </div>
+
+        <ul class="drawer-menu">
+            <li>
+                <a id="drawerProfileLink" href="#">
+                    <span class="icon">📋</span> Profile
+                </a>
+            </li>
+            <li>
+                <a id="drawerTagsLink" href="#">
+                    <span class="icon">🏷️</span> Skill Tags
+                </a>
+            </li>
+            <li>
+                <a id="drawerLogoutLink" href="logout.html">
+                    <span class="icon">🚪</span> Sign Out
+                </a>
+            </li>
+        </ul>
     </div>
 
     <!-- ===== JAVASCRIPT ===== -->
@@ -767,17 +954,175 @@
         var currentSeeker = localStorage.getItem('currentSeeker');
         var storedEmployerId = sessionStorage.getItem('jobwallEmployerId');
 
-        const searchInput    = document.getElementById('job-search-input');
-        const searchBtn      = document.getElementById('search-btn');
-        const chips          = document.querySelectorAll('.chip');
-        const emptyState     = document.getElementById('empty-state');
-        const emptyTitle     = document.getElementById('empty-title');
-        const emptyBody      = document.getElementById('empty-body');
-        const searchingState = document.getElementById('searching-state');
-        const resultsGrid    = document.getElementById('results-grid');
-        const resultsStatus  = document.getElementById('results-status');
+        /* ── Drawer 控制 ── */
+        var drawerOverlay = document.getElementById('drawerOverlay');
+        var drawer = document.getElementById('drawer');
+        var drawerClose = document.getElementById('drawerClose');
 
-        /* ── Chip → fill input + search ── */
+        function openDrawer() {
+            drawerOverlay.classList.add('active');
+            drawer.classList.add('open');
+        }
+        function closeDrawer() {
+            drawerOverlay.classList.remove('active');
+            drawer.classList.remove('open');
+        }
+        drawerOverlay.addEventListener('click', closeDrawer);
+        drawerClose.addEventListener('click', closeDrawer);
+
+        /* ── 更新抽屉内的链接和头像 ── */
+        function updateDrawer() {
+            var targetUserId = currentSeeker || '';
+            var base = targetUserId ? '?userId=' + encodeURIComponent(targetUserId) : '';
+            document.getElementById('drawerProfileLink').href = 'profile.html' + base;
+            document.getElementById('drawerTagsLink').href = 'profileTags.html' + base;
+            var avatarCircle = document.getElementById('avatarCircle');
+            var avatarName = document.getElementById('avatarName');
+            if (currentSeeker) {
+                avatarCircle.textContent = 'U';
+                avatarName.textContent = 'Job Seeker';
+            } else {
+                avatarCircle.textContent = '?';
+                avatarName.textContent = 'Guest';
+            }
+        }
+
+        /* ===== 技能标签轮播（带颜色变化和过渡） ===== */
+        var carouselInterval = null;
+        var skillCarouselEl = null;
+        var skillsArray = [];
+        var currentSkillIndex = 0;
+
+        // 随机颜色池（背景 + 文字）
+        var colorPalette = [
+            { bg: '#d5f5e3', text: '#1a7a42' },
+            { bg: '#fdebd0', text: '#a04000' },
+            { bg: '#d6eaf8', text: '#1a5276' },
+            { bg: '#f5b7b1', text: '#78281f' },
+            { bg: '#d7bde2', text: '#4a235a' },
+            { bg: '#f9e79f', text: '#7d6608' },
+            { bg: '#a9dfbf', text: '#1e8449' },
+            { bg: '#fadbd8', text: '#922b21' },
+            { bg: '#d4efdf', text: '#1e6b3b' },
+            { bg: '#fcf3cf', text: '#7d6608' },
+        ];
+
+        function applyRandomColor(el) {
+            var colors = colorPalette[Math.floor(Math.random() * colorPalette.length)];
+            el.style.backgroundColor = colors.bg;
+            el.style.color = colors.text;
+        }
+
+        function startSkillCarousel(skills) {
+            if (!skills || skills.length <= 1) {
+                if (skillCarouselEl) {
+                    skillCarouselEl.style.display = 'none';
+                }
+                return;
+            }
+            skillsArray = skills;
+            currentSkillIndex = 0;
+            if (!skillCarouselEl) {
+                skillCarouselEl = document.getElementById('skillCarousel');
+                if (!skillCarouselEl) return;
+            }
+            // 显示第一个
+            skillCarouselEl.textContent = skillsArray[0];
+            applyRandomColor(skillCarouselEl);
+            skillCarouselEl.style.display = 'inline-block';
+
+            if (carouselInterval) {
+                clearInterval(carouselInterval);
+                carouselInterval = null;
+            }
+            carouselInterval = setInterval(function () {
+                currentSkillIndex = (currentSkillIndex + 1) % skillsArray.length;
+                skillCarouselEl.textContent = skillsArray[currentSkillIndex];
+                applyRandomColor(skillCarouselEl);
+                // 颜色过渡由 CSS 自动处理，无需额外操作
+            }, 3000);
+        }
+
+        function stopSkillCarousel() {
+            if (carouselInterval) {
+                clearInterval(carouselInterval);
+                carouselInterval = null;
+            }
+            if (skillCarouselEl) {
+                skillCarouselEl.style.display = 'none';
+                skillCarouselEl.classList.remove('fade-in', 'fade-out');
+            }
+        }
+
+        // 获取技能并启动轮播
+        function loadAndStartCarousel() {
+            if (!currentSeeker) {
+                stopSkillCarousel();
+                return;
+            }
+            fetch('/api/profile?userId=' + encodeURIComponent(currentSeeker))
+                .then(function (response) {
+                    if (!response.ok) throw new Error('Failed to fetch profile');
+                    return response.json();
+                })
+                .then(function (data) {
+                    var skills = data.skills || [];
+                    startSkillCarousel(skills);
+                })
+                .catch(function (err) {
+                    console.warn('Could not load skills for carousel:', err);
+                    stopSkillCarousel();
+                });
+        }
+
+        /* ── Update nav based on login state ── */
+        function updateNav() {
+            var navActions = document.getElementById('nav-actions');
+            if (!navActions) return;
+
+            if (currentSeeker) {
+                // 求职者：轮播在左，My Profile 在右
+                navActions.innerHTML =
+                    '<span class="skill-carousel" id="skillCarousel"></span>' +
+                    '<span class="nav-profile-link" id="nav-my-profile">My Profile</span>';
+                // 绑定点击打开抽屉
+                var profileBtn = document.getElementById('nav-my-profile');
+                if (profileBtn) {
+                    profileBtn.addEventListener('click', function (e) {
+                        e.preventDefault();
+                        openDrawer();
+                    });
+                }
+                // 获取 skillCarousel 元素引用
+                skillCarouselEl = document.getElementById('skillCarousel');
+                // 加载技能并启动轮播
+                loadAndStartCarousel();
+            } else if (storedEmployerId) {
+                navActions.innerHTML =
+                    '<a href="/create-job.html?employerId=' + encodeURIComponent(storedEmployerId) +
+                    '" class="nav-cta nav-post-job" id="nav-post-job">Post a Job</a>';
+                stopSkillCarousel();
+            } else {
+                navActions.innerHTML =
+                    '<a href="login.html" class="nav-login" id="nav-login-btn">Login</a>' +
+                    '<a href="register.html" class="nav-cta" id="nav-get-started">Get Started &rarr;</a>';
+                stopSkillCarousel();
+            }
+            // 更新抽屉内容
+            updateDrawer();
+        }
+
+        /* ── 原有的搜索、渲染、申请逻辑（完全不变） ── */
+        const searchInput = document.getElementById('job-search-input');
+        const searchBtn = document.getElementById('search-btn');
+        const chips = document.querySelectorAll('.chip');
+        const emptyState = document.getElementById('empty-state');
+        const emptyTitle = document.getElementById('empty-title');
+        const emptyBody = document.getElementById('empty-body');
+        const searchingState = document.getElementById('searching-state');
+        const resultsGrid = document.getElementById('results-grid');
+        const resultsStatus = document.getElementById('results-status');
+
         chips.forEach(function (chip) {
             chip.addEventListener('click', function () {
                 searchInput.value = chip.dataset.query;
@@ -786,23 +1131,16 @@
             });
         });
 
-        /* ── Search button ── */
         searchBtn.addEventListener('click', triggerSearch);
-
-        /* ── Enter key ── */
         searchInput.addEventListener('keydown', function (e) {
             if (e.key === 'Enter') triggerSearch();
         });
-
-        /* ── Native clear (×) shows all jobs ── */
         searchInput.addEventListener('search', function () {
             if (searchInput.value === '') loadAllJobs();
         });
 
-        /* ── Main search trigger ── */
         function triggerSearch() {
             var query = searchInput.value.trim();
-
             showState('searching');
             resultsStatus.textContent = '';
 
@@ -831,10 +1169,8 @@
                 });
         }
 
-        /* ── Render job cards ── */
         function renderResults(jobs, query) {
             resultsGrid.innerHTML = '';
-
             jobs.forEach(function (job) {
                 var card = document.createElement('div');
                 card.className = 'job-card';
@@ -852,37 +1188,37 @@
                 var skillsList = Array.isArray(job.skillsRequired)
                     ? job.skillsRequired
                     : (Array.isArray(job.skills) ? job.skills : []);
-                var skillsHtml = skillsList.map(function(s) {
+                var skillsHtml = skillsList.map(function (s) {
                     return '<span class="skill-chip-card">' + escHtml(s) + '</span>';
                 }).join('');
 
                 card.innerHTML =
                     '<div class="job-card-top">' +
-                        '<div class="job-card-logo" aria-hidden="true">' + initial + '</div>' +
-                        '<div class="job-card-body">' +
-                            '<div class="job-card-title">' + escHtml(job.title) + '</div>' +
-                            '<div class="job-card-company">' + escHtml(companyName) + ' &middot; ' + escHtml(job.location) + '</div>' +
-                            '<div class="job-card-tags">' +
-                                '<span class="tag tag-type">' + escHtml(employmentType) + '</span>' +
-                                (workplaceModel ? '<span class="tag tag-workplace">' + escHtml(workplaceModel) + '</span>' : '') +
-                            '</div>' +
-                            '<div class="job-card-msg" id="msg-' + job.id + '"></div>' +
-                        '</div>' +
-                        '<div class="job-card-right">' +
-                            '<div class="job-card-salary">' + escHtml(salary) + '</div>' +
-                            '<div class="job-card-date">Posted ' + postedLabel + '</div>' +
-                            '<button class="apply-btn" id="apply-btn-' + job.id + '" data-job-id="' + job.id + '" type="button">Apply</button>' +
-                        '</div>' +
+                    '<div class="job-card-logo" aria-hidden="true">' + initial + '</div>' +
+                    '<div class="job-card-body">' +
+                    '<div class="job-card-title">' + escHtml(job.title) + '</div>' +
+                    '<div class="job-card-company">' + escHtml(companyName) + ' &middot; ' + escHtml(job.location) + '</div>' +
+                    '<div class="job-card-tags">' +
+                    '<span class="tag tag-type">' + escHtml(employmentType) + '</span>' +
+                    (workplaceModel ? '<span class="tag tag-workplace">' + escHtml(workplaceModel) + '</span>' : '') +
+                    '</div>' +
+                    '<div class="job-card-msg" id="msg-' + job.id + '"></div>' +
+                    '</div>' +
+                    '<div class="job-card-right">' +
+                    '<div class="job-card-salary">' + escHtml(salary) + '</div>' +
+                    '<div class="job-card-date">Posted ' + postedLabel + '</div>' +
+                    '<button class="apply-btn" id="apply-btn-' + job.id + '" data-job-id="' + job.id + '" type="button">Apply</button>' +
+                    '</div>' +
                     '</div>' +
                     '<div class="job-card-details">' +
-                        (job.description ? '<div class="job-detail-desc"><span class="detail-label">Description:</span> ' + escHtml(job.description) + '</div>' : '') +
-                        (skillsHtml ? '<div class="job-detail-skills"><span class="detail-label">Required Skills:</span> <div class="skills-list">' + skillsHtml + '</div></div>' : '') +
-                        '<div class="job-detail-meta">' +
-                            (job.experienceRequired ? '<span class="meta-item"><strong>Experience:</strong> ' + escHtml(job.experienceRequired) + '</span>' : '') +
-                            (job.educationLevel ? '<span class="meta-item"><strong>Education:</strong> ' + escHtml(job.educationLevel) + '</span>' : '') +
-                            (job.industry ? '<span class="meta-item"><strong>Industry:</strong> ' + escHtml(job.industry) + '</span>' : '') +
-                            (job.closingDate ? '<span class="meta-item meta-closing"><strong>Closing Date:</strong> ' + escHtml(job.closingDate) + '</span>' : '') +
-                        '</div>' +
+                    (job.description ? '<div class="job-detail-desc"><span class="detail-label">Description:</span> ' + escHtml(job.description) + '</div>' : '') +
+                    (skillsHtml ? '<div class="job-detail-skills"><span class="detail-label">Required Skills:</span> <div class="skills-list">' + skillsHtml + '</div></div>' : '') +
+                    '<div class="job-detail-meta">' +
+                    (job.experienceRequired ? '<span class="meta-item"><strong>Experience:</strong> ' + escHtml(job.experienceRequired) + '</span>' : '') +
+                    (job.educationLevel ? '<span class="meta-item"><strong>Education:</strong> ' + escHtml(job.educationLevel) + '</span>' : '') +
+                    (job.industry ? '<span class="meta-item"><strong>Industry:</strong> ' + escHtml(job.industry) + '</span>' : '') +
+                    (job.closingDate ? '<span class="meta-item meta-closing"><strong>Closing Date:</strong> ' + escHtml(job.closingDate) + '</span>' : '') +
+                    '</div>' +
                     '</div>';
 
                 resultsGrid.appendChild(card);
@@ -897,7 +1233,6 @@
             refreshAppliedStatus();
         }
 
-        /* ── Escape HTML (XSS safety) ── */
         function escHtml(str) {
             return String(str)
                 .replace(/&/g, '&amp;')
@@ -906,17 +1241,14 @@
                 .replace(/"/g, '&quot;');
         }
 
-        /* ── Relative date label ── */
         function formatDate(isoDate) {
             return JobDate.formatRelativeDate(isoDate);
         }
 
-        /* ── State machine ── */
         function showState(state) {
             emptyState.style.display = 'none';
             searchingState.style.display = 'none';
             resultsGrid.style.display = 'none';
-
             if (state === 'empty' || state === 'empty-search') {
                 emptyState.style.display = 'flex';
             } else if (state === 'searching') {
@@ -926,11 +1258,9 @@
             }
         }
 
-        /* ── Load all jobs (used on page load and when search is cleared) ── */
         function loadAllJobs() {
             showState('searching');
             resultsStatus.textContent = '';
-
             fetch('/api/jobs?q=')
                 .then(function (res) {
                     if (!res.ok) throw new Error('Server error: ' + res.status);
@@ -949,7 +1279,6 @@
                 });
         }
 
-        /* ── Apply helpers ── */
         function markApplied(btn) {
             btn.textContent = '\u2713 Applied';
             btn.disabled = true;
@@ -965,7 +1294,6 @@
             }
         }
 
-        /* ── Batch-check already-applied status ── */
         function refreshAppliedStatus() {
             if (!currentSeeker) return;
             fetch('/api/applications?seekerId=' + encodeURIComponent(currentSeeker))
@@ -976,83 +1304,62 @@
                         if (btn) markApplied(btn);
                     });
                 })
-                .catch(function () {});
+                .catch(function () { });
         }
 
-        /* ── Apply button click (event delegation) ── */
         resultsGrid.addEventListener('click', function (e) {
             var btn = e.target.closest('.apply-btn');
             if (!btn || btn.disabled) return;
-
             var jobId = btn.dataset.jobId;
-
             if (!currentSeeker) {
                 showCardMsg(jobId, 'error',
                     '\u26A0 Please <a href="login.html">login</a> or <a href="register.html">register</a> to apply.');
                 return;
             }
-
             btn.textContent = '\u2026';
-            btn.disabled    = true;
-
+            btn.disabled = true;
             fetch('/api/applications', {
-                method:  'POST',
+                method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body:    JSON.stringify({ seekerId: currentSeeker, jobId: jobId })
+                body: JSON.stringify({ seekerId: currentSeeker, jobId: jobId })
             })
-            .then(function (r) {
-                return r.json().then(function (data) { return { status: r.status, data: data }; });
-            })
-            .then(function (res) {
-                if (res.status === 201) {
-                    markApplied(btn);
-                    showCardMsg(jobId, 'success', '\u2713 Application submitted successfully!');
-                } else if (res.data.error === 'no_profile') {
+                .then(function (r) {
+                    return r.json().then(function (data) { return { status: r.status, data: data }; });
+                })
+                .then(function (res) {
+                    if (res.status === 201) {
+                        markApplied(btn);
+                        showCardMsg(jobId, 'success', '\u2713 Application submitted successfully!');
+                    } else if (res.data.error === 'no_profile') {
+                        btn.textContent = 'Apply'; btn.disabled = false;
+                        showCardMsg(jobId, 'error', '\u26A0 Please complete your profile. <a href="profile.html?userId=' + encodeURIComponent(currentSeeker) + '">Go to Profile \u2192</a>');
+                    } else if (res.data.error === 'no_resume') {
+                        btn.textContent = 'Apply'; btn.disabled = false;
+                        showCardMsg(jobId, 'error', '\u26A0 Please upload a resume. <a href="profile.html?userId=' + encodeURIComponent(currentSeeker) + '">Go to Profile \u2192</a>');
+                    } else if (res.data.error === 'duplicate') {
+                        markApplied(btn);
+                    } else {
+                        btn.textContent = 'Apply'; btn.disabled = false;
+                        showCardMsg(jobId, 'error', '\u26A0 Something went wrong. Please try again.');
+                    }
+                })
+                .catch(function () {
                     btn.textContent = 'Apply'; btn.disabled = false;
-                    showCardMsg(jobId, 'error', '\u26A0 Please complete your profile. <a href="profile.html?userId=' + encodeURIComponent(currentSeeker) + '">Go to Profile \u2192</a>');
-                } else if (res.data.error === 'no_resume') {
-                    btn.textContent = 'Apply'; btn.disabled = false;
-                    showCardMsg(jobId, 'error', '\u26A0 Please upload a resume. <a href="profile.html?userId=' + encodeURIComponent(currentSeeker) + '">Go to Profile \u2192</a>');
-                } else if (res.data.error === 'duplicate') {
-                    markApplied(btn);
-                } else {
-                    btn.textContent = 'Apply'; btn.disabled = false;
-                    showCardMsg(jobId, 'error', '\u26A0 Something went wrong. Please try again.');
-                }
-            })
-            .catch(function () {
-                btn.textContent = 'Apply'; btn.disabled = false;
-                showCardMsg(jobId, 'error', '\u26A0 Network error. Please try again.');
-            });
+                    showCardMsg(jobId, 'error', '\u26A0 Network error. Please try again.');
+                });
         });
 
-        /* ── Update nav based on login state ── */
-        function updateNav() {
-            var navActions = document.getElementById('nav-actions');
-            if (!navActions) return;
-            if (currentSeeker) {
-                navActions.innerHTML =
-                    '<a href="profile.html?userId=' + encodeURIComponent(currentSeeker) + '" class="nav-profile-link" id="nav-my-profile">My Profile</a>';
-            } else if (storedEmployerId) {
-                navActions.innerHTML =
-                    '<a href="/create-job.html?employerId=' + encodeURIComponent(storedEmployerId) +
-                    '" class="nav-cta nav-post-job" id="nav-post-job">Post a Job</a>';
-            } else {
-                navActions.innerHTML =
-                    '<a href="login.html" class="nav-login" id="nav-login-btn">Login</a>' +
-                    '<a href="register.html" class="nav-cta" id="nav-get-started">Get Started &rarr;</a>';
-            }
-        }
-
-        /* ── Reset to default browse state (kept for fallback) ── */
-        function resetToDefault() {
-            loadAllJobs();
-        }
-
-        /* ── Load all jobs on page load ── */
+        /* ── 页面加载初始化 ── */
         document.addEventListener('DOMContentLoaded', function () {
             loadAllJobs();
             updateNav();
+        });
+
+        // 当页面重新获得焦点时，刷新技能标签轮播（例如从 profileTags 返回）
+        window.addEventListener('focus', function () {
+            if (currentSeeker) {
+                loadAndStartCarousel();
+            }
         });
     </script>
 
