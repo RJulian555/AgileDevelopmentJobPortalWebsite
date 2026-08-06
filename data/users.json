@@ -77,5 +77,79 @@
       "SQL",
       "Excel"
     ]
+  },
+  {
+    "id": 1785966009616,
+    "email": "Ali123@gmail.com",
+    "password": "hashed_123456",
+    "role": "Job Seeker",
+    "profile": {
+      "fullName": "",
+      "jobTitle": "",
+      "location": "",
+      "phone": "",
+      "birthday": "",
+      "website": "",
+      "about": "",
+      "skillsText": "",
+      "languages": "",
+      "avatarSrc": ""
+    },
+    "skills": [
+      "Node.js",
+      "Python",
+      "Angular",
+      "AWS"
+    ],
+    "work": [],
+    "edu": []
+  },
+  {
+    "id": 1785968709636,
+    "email": "Bli123@gmail.com",
+    "password": "hashed_123456",
+    "role": "Employer",
+    "profile": {
+      "fullName": "",
+      "jobTitle": "",
+      "location": "",
+      "phone": "",
+      "birthday": "",
+      "website": "",
+      "about": "",
+      "skillsText": "",
+      "languages": "",
+      "avatarSrc": ""
+    },
+    "skills": [],
+    "work": [],
+    "edu": [],
+    "companyId": "company-05cbed16-3de8-40f9-8419-962e3c9ec737"
+  },
+  {
+    "id": 1785982606438,
+    "email": "mm@mm.mm",
+    "password": "hashed_123456",
+    "role": "Job Seeker",
+    "profile": {
+      "fullName": "",
+      "jobTitle": "",
+      "location": "",
+      "phone": "",
+      "birthday": "",
+      "website": "",
+      "about": "",
+      "skillsText": "",
+      "languages": "",
+      "avatarSrc": "data:image/svg+xml,%3Csvg xmlns=\"http://www.w3.org/2000/svg\" width=\"50\" height=\"50\" viewBox=\"0 0 50 50\"%3E%3Ccircle cx=\"25\" cy=\"25\" r=\"25\" fill=\"%23bdc3c7\"/%3E%3Ccircle cx=\"25\" cy=\"18\" r=\"8\" fill=\"%2395a5a6\"/%3E%3Cpath d=\"M12 38 Q25 45 38 38\" stroke=\"%2395a5a6\" stroke-width=\"4\" fill=\"none\" stroke-linecap=\"round\"/%3E%3C/svg%3E",
+      "skills": ""
+    },
+    "skills": [
+      "JavaScript",
+      "TypeScript",
+      "React"
+    ],
+    "work": [],
+    "edu": []
   }
 ]

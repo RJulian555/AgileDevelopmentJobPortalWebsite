@@ -55,8 +55,6 @@
         .footer-actions button { padding: 10px 32px; border-radius: 30px; border: none; font-weight: 700; font-size: 0.95rem; cursor: pointer; transition: 0.2s; }
         .btn-save { background: #2ecc71; color: #fff; box-shadow: 0 4px 14px rgba(46,204,113,0.25); }
         .btn-save:hover { background: #27ae60; transform: translateY(-2px); box-shadow: 0 6px 20px rgba(46,204,113,0.35); }
-        .btn-cancel { background: #f2f5f3; color: #2c3e50; }
-        .btn-cancel:hover { background: #e8eeec; }
         @media (max-width: 640px) { .container { padding: 1.2rem; } .header { flex-wrap: wrap; gap: 10px; } .header .title h1 { font-size: 1.3rem; } .custom-input-group { flex-wrap: wrap; } .custom-input-group button { width: 100%; padding: 10px; } .footer-actions { flex-wrap: wrap; } .footer-actions button { flex: 1; text-align: center; } }
     </style>
 </head>
@@ -75,7 +73,7 @@
                 <h1>🏷️ Skills</h1>
                 <span class="count-badge" id="headerCount">0 / 5</span>
             </div>
-            <div class="back-link" onclick="window.close()">← Close</div>
+            <div class="back-link" id="closeLink">← Close</div>
         </div>
 
         <div class="info-bar">
@@ -89,25 +87,24 @@
             <div id="presetSkillsContainer" class="skills-grid"></div>
 
             <div class="custom-section">
-                <div class="section-label" style="margin-top:0;">✏️ Custom Skills</div>
+                <div class="section-label" style="margin-top:0;">✏️ Custom Tags</div>
                 <div class="custom-input-group">
-                    <input type="text" id="customSkillInput" placeholder="Enter skill name, e.g., Figma" maxlength="30" />
+                    <input type="text" id="customSkillInput" placeholder="Enter tag name, e.g., Figma" />
                     <button id="addCustomBtn">Add</button>
                 </div>
                 <div id="customError" class="error-msg"></div>
             </div>
 
             <div class="selected-section">
-                <div class="section-label">✅ Selected Skills</div>
+                <div class="section-label">✅ Selected Tags</div>
                 <div id="selectedSkillsContainer" class="selected-tags">
-                    <span class="empty-hint">No skills selected yet</span>
+                    <span class="empty-hint">No tags selected yet</span>
                 </div>
             </div>
         </div>
 
         <div class="footer-actions">
-            <button class="btn-cancel" onclick="window.close()">Cancel</button>
-            <button class="btn-save" id="saveSkillsBtn">Save Skills</button>
+            <button class="btn-save" id="saveSkillsBtn">Save Tags</button>
         </div>
     </div>
 
@@ -123,7 +120,6 @@
         const currentUserId = getUserIdFromURL();
         if (!currentUserId) {
             alert('Missing userId parameter. Please provide ?userId=xxx');
-            window.close();
         }
 
         // ================================================================
@@ -189,7 +185,7 @@
             const container = document.getElementById('selectedSkillsContainer');
             container.innerHTML = '';
             if (selectedSkills.length === 0) {
-                container.innerHTML = '<span class="empty-hint">No skills selected yet</span>';
+                container.innerHTML = '<span class="empty-hint">No tags selected yet</span>';
                 return;
             }
             selectedSkills.forEach(skill => {
@@ -267,26 +263,45 @@
             }
         }
 
+        // ================================================================
+        // 7. Custom skill validation & add
+        // ================================================================
+        function isValidSkillName(value) {
+            const trimmed = value.trim();
+            if (trimmed.length === 0) return { valid: false, msg: 'Please enter a tag name' };
+            if (trimmed.length > 15) return { valid: false, msg: 'Tag can’t exceed 15 characters!' };
+            const pattern = /^[a-zA-Z0-9\u4e00-\u9fa5\s\-]+$/;
+            if (!pattern.test(trimmed)) {
+                return { valid: false, msg: 'Tag name cannot contain special symbols (only letters, numbers, spaces, and hyphens allowed)' };
+            }
+            return { valid: true, msg: '' };
+        }
+
         function addCustomSkill() {
             const input = document.getElementById('customSkillInput');
             const errorEl = document.getElementById('customError');
-            const value = input.value.trim();
+            const rawValue = input.value;
+            const value = rawValue.trim();
             errorEl.textContent = '';
 
-            if (value === '') {
-                errorEl.textContent = 'Please enter a skill name';
+            const validation = isValidSkillName(rawValue);
+            if (!validation.valid) {
+                errorEl.textContent = validation.msg;
                 return;
             }
+
             if (selectedSkills.includes(value)) {
                 errorEl.textContent = `"${value}" already exists`;
                 input.value = '';
                 return;
             }
+
             if (selectedSkills.length >= 5) {
                 errorEl.textContent = 'Maximum limit reached';
                 input.value = '';
                 return;
             }
+
             selectedSkills.push(value);
             input.value = '';
             renderAll();
@@ -294,22 +309,39 @@
         }
 
         // ================================================================
-        // 7. Save & Close
+        // 8. Save (不关闭窗口)
         // ================================================================
         async function saveSkills() {
             try {
                 await saveUserSkills(selectedSkills);
-                alert('✅ Skills saved successfully!');
-                window.close();
+                alert('✅ Tags Add Success!');
+                // 不关闭窗口
             } catch (e) {
                 alert('❌ Save error: ' + e.message);
             }
         }
 
         // ================================================================
-        // 8. Init
+        // 9. Navigate to Dashboard (不关闭窗口，跳转)
+        // ================================================================
+        function goToDashboard() {
+            if (currentUserId) {
+                window.location.href = '/dashboard.html?userId=' + encodeURIComponent(currentUserId);
+            } else {
+                window.location.href = '/dashboard.html';
+            }
+        }
+
+        // ================================================================
+        // 10. Init
         // ================================================================
         window.onload = async function() {
+            document.getElementById('closeLink').addEventListener('click', goToDashboard);
+
+            if (!currentUserId) {
+                document.querySelector('.container').innerHTML = '<h2 style="text-align:center;color:#c0392b;">Missing userId in URL. Please provide ?userId=xxx</h2>';
+                return;
+            }
             try {
                 const data = await fetchUserData();
                 if (data && Array.isArray(data.skills)) {
@@ -324,7 +356,6 @@
                 renderAll();
             }
 
-            // event listeners
             document.getElementById('addCustomBtn').addEventListener('click', addCustomSkill);
             document.getElementById('customSkillInput').addEventListener('keypress', (e) => {
                 if (e.key === 'Enter') addCustomSkill();

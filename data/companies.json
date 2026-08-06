@@ -70,5 +70,18 @@
     "website": "https://github.com/dashboard",
     "createdAt": "2026-07-18T04:06:15.910Z",
     "updatedAt": "2026-07-18T04:06:15.910Z"
+  },
+  {
+    "id": "company-05cbed16-3de8-40f9-8419-962e3c9ec737",
+    "name": "BliDynasty",
+    "description": "Tec Com",
+    "industry": "technology",
+    "address": "Selangor",
+    "email": "blidynasty6699@gmail.com",
+    "phone": "+60 33 666 9999",
+    "website": "",
+    "logoUrl": "",
+    "createdAt": "2026-08-05T22:26:41.388Z",
+    "updatedAt": "2026-08-05T22:26:41.388Z"
   }
 ]
