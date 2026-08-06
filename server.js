@@ -129,7 +129,7 @@ app.use(applicationRoutes);
 
 // ========== 兜底 404（处理未匹配的 /api/* 请求） ==========
 app.use('/api', (req, res) => {
-    res.status(404).json({ error: `API not found: ${req.method} ${req.originalUrl}` });
+    res.status(404).json({ error: `API route not found: ${req.method} ${req.originalUrl}` });
 });
 
 // ========== 全局错误处理 ==========
@@ -143,7 +143,11 @@ app.use((error, req, res, next) => {
 });
 
 // ========== 启动服务器 ==========
-app.listen(PORT, () => {
-    console.log(`✅ Server running on http://localhost:${PORT}`);
-    console.log(`📌 Visit: http://localhost:${PORT}/register.html`);
-});
+if (require.main === module) {
+    app.listen(PORT, () => {
+        console.log(`✅ Server running on http://localhost:${PORT}`);
+        console.log(`📌 Visit: http://localhost:${PORT}/register.html`);
+    });
+}
+
+module.exports = app;
