@@ -302,5 +302,67 @@
     "industry": "Professional Services / Audit",
     "postedAt": "2026-07-05",
     "createdAt": "2026-07-05T08:00:00.000Z"
+  },
+  {
+    "id": "job-7e8275a1-72ec-4c50-add4-810e295af946",
+    "companyId": "company-05cbed16-3de8-40f9-8419-962e3c9ec737",
+    "company": "BliDynasty",
+    "createdByEmployerId": 1785968709636,
+    "title": "Accountant",
+    "description": "jjsfkjd",
+    "salary": 6579,
+    "employmentType": "Full-Time",
+    "location": "Kelantan, Malaysia",
+    "skillsRequired": [
+      "Adobe Illustrator",
+      "Amazon Web Services (AWS)",
+      "Angular",
+      "Machine Learning"
+    ],
+    "experienceRequired": "Less than 1 year",
+    "educationLevel": "Master's Degree",
+    "closingDate": "2026-08-16",
+    "industry": "technology",
+    "postedAt": "2026-08-06",
+    "createdAt": "2026-08-06T04:53:58.881Z",
+    "jobType": "Full-Time",
+    "requirements": [
+      "Less than 1 year",
+      "Master's Degree",
+      "Adobe Illustrator",
+      "Amazon Web Services (AWS)",
+      "Angular",
+      "Machine Learning"
+    ]
+  },
+  {
+    "id": "job-b289dc17-05fb-475c-8431-9544ad383ac3",
+    "companyId": "company-05cbed16-3de8-40f9-8419-962e3c9ec737",
+    "company": "BliDynasty",
+    "createdByEmployerId": 1785968709636,
+    "title": "Business Analyst",
+    "description": "11\\test",
+    "salary": 1200,
+    "employmentType": "Temporary",
+    "location": "Kuala Lumpur, Malaysia",
+    "skillsRequired": [
+      "Adobe Illustrator",
+      "Agile",
+      "Angular"
+    ],
+    "experienceRequired": "1-2 years",
+    "educationLevel": "Master's Degree",
+    "closingDate": "2026-08-18",
+    "industry": "technology",
+    "postedAt": "2026-08-06",
+    "createdAt": "2026-08-06T05:11:14.613Z",
+    "jobType": "Temporary",
+    "requirements": [
+      "1-2 years",
+      "Master's Degree",
+      "Adobe Illustrator",
+      "Agile",
+      "Angular"
+    ]
   }
 ]
