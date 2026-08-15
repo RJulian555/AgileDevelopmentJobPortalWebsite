@@ -1,10 +1,13 @@
 const express = require('express');
 const fs = require('fs');
 const path = require('path');
+const crypto = require('crypto');
 
 const app = express();
 const PORT = 3000;
 const USERS_FILE = path.join(__dirname, 'data', 'users.json');
+
+let resetTokensMemory = {};
 
 // ========== 中间件（顺序很重要） ==========
 app.use(express.urlencoded({ extended: true }));
@@ -116,6 +119,87 @@ app.put('/api/profile', (req, res) => {
     users[index] = existing;
     fs.writeFileSync(USERS_FILE, JSON.stringify(users, null, 2));
     res.json({ success: true });
+});
+
+// =========================================================================
+// 3. ADDED HERE: US-04 Forgot Password Endpoint (Connected to users.json)
+// =========================================================================
+app.post('/api/auth/forgot-password', (req, res) => {
+    const { email } = req.body;
+
+    // Validation Check
+    if (!email) {
+        return res.status(400).json({ error: "Email address field is required." });
+    }
+
+    // Database Lookup from your real data/users.json file
+    const users = JSON.parse(fs.readFileSync(USERS_FILE, 'utf8'));
+    const user = users.find(u => u.email.toLowerCase() === email.toLowerCase());
+    
+    if (!user) {
+        return res.status(404).json({ error: "No account registered with that email address." });
+    }
+
+    // Generate Secure Token & Expiry (Valid for 15 minutes)
+    const secureToken = crypto.randomBytes(20).toString('hex');
+    const expiryTime = Date.now() + 900000; 
+
+    // Store token mapped directly to user email
+    resetTokensMemory[secureToken] = {
+        email: user.email,
+        expires: expiryTime
+    };
+
+    // Output Mock Email Link directly to your running terminal log
+    const mockResetLink = `http://localhost:3000/reset-password.html?token=${secureToken}`;
+    console.log("==========================================");
+    console.log(`MOCK EMAIL SENT TO: ${user.email}`);
+    console.log(`RESET URL LINK: ${mockResetLink}`);
+    console.log("==========================================");
+
+    return res.status(200).json({ message: "Secure recovery token generated successfully." });
+});
+
+// =========================================================================
+// 4. ADDED HERE: US-04 Complete Password Reset Action Endpoint
+// =========================================================================
+app.post('/api/auth/reset-password', (req, res) => {
+    const { token, newPassword } = req.body;
+
+    // 1. Validation Check: Ensure data is sent
+    if (!token || !newPassword) {
+        return res.status(400).json({ error: "Token and new password are required." });
+    }
+
+    // 2. Token Check: Verify if token exists in memory
+    const tokenData = resetTokensMemory[token];
+    if (!tokenData) {
+        return res.status(400).json({ error: "Invalid or expired password reset token." });
+    }
+
+    // 3. Expiry Check: Ensure the 15 minutes haven't passed
+    if (Date.now() > tokenData.expires) {
+        delete resetTokensMemory[token]; // Clean up expired token
+        return res.status(400).json({ error: "This token has expired. Please request a new one." });
+    }
+
+    // 4. Update the Real Database
+    const users = JSON.parse(fs.readFileSync(USERS_FILE, 'utf8'));
+    const userIndex = users.findIndex(u => u.email.toLowerCase() === tokenData.email.toLowerCase());
+
+    if (userIndex === -1) {
+        return res.status(404).json({ error: "User account no longer exists." });
+    }
+
+    // Update password using your exact schema convention ("hashed_" prefix)
+    users[userIndex].password = `hashed_${newPassword}`;
+    fs.writeFileSync(USERS_FILE, JSON.stringify(users, null, 2));
+
+    // 5. Token Cleanup: Delete token so it can't be used twice
+    delete resetTokensMemory[token];
+
+    console.log(`🔒 PASSWORD UPDATED SUCCESSFULLY FOR: ${tokenData.email}`);
+    return res.status(200).json({ message: "Your password has been successfully reset." });
 });
 
 // ========== 外部业务路由（挂载在根路径，但已包含 /api/*） ==========
