@@ -236,7 +236,7 @@ router.get('/api/employer/applications', (req, res) => {
     const companyJobIds = jobs.map(j => String(j.id));
 
     const applications = readCollection('applications');
-    const companyApplications = applications.filter(a => companyJobIds.includes(String(a.jobId)));
+    const companyApplications = applications.filter(a => a && a.id && a.jobId && companyJobIds.includes(String(a.jobId)));
 
     const enrichedApplications = companyApplications.map(app => {
         const job = jobs.find(j => String(j.id) === String(app.jobId));

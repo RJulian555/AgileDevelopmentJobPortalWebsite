@@ -120,11 +120,10 @@
         </div>
 
         <div class="filter-bar">
-            <button class="filter-btn active" data-filter="all" onclick="setFilter('all', this)">All Applicants</button>
-            <button class="filter-btn" data-filter="meets" onclick="setFilter('meets', this)">🟢 Meets Requirements</button>
-            <button class="filter-btn" data-filter="pending" onclick="setFilter('pending', this)">⏳ Pending Review</button>
+            <button class="filter-btn active" data-filter="pending" onclick="setFilter('pending', this)">⏳ Pending Review</button>
             <button class="filter-btn" data-filter="accepted" onclick="setFilter('accepted', this)">✓ Accepted</button>
             <button class="filter-btn" data-filter="rejected" onclick="setFilter('rejected', this)">✕ Rejected</button>
+            <button class="filter-btn" data-filter="all" onclick="setFilter('all', this)">All Applicants</button>
         </div>
 
         <div id="applicantsList" class="applicants-list">
@@ -153,9 +152,9 @@
 
     <script>
         const params = new URLSearchParams(window.location.search);
-        let employerId = params.get('employerId') || sessionStorage.getItem('jobwallEmployerId');
+        let employerId = params.get('employerId') || sessionStorage.getItem('employerId') || sessionStorage.getItem('jobwallEmployerId') || localStorage.getItem('employerId');
         let allApplications = [];
-        let currentFilter = 'all';
+        let currentFilter = 'pending';
         let pendingAppId = null;
 
         function showToast(message) {
@@ -200,17 +199,25 @@
 
         function renderApplications() {
             const container = document.getElementById('applicantsList');
-            let filtered = allApplications;
+            let filtered = (allApplications || []).filter(a => a && a.id);
 
-            if (currentFilter === 'meets') {
-                filtered = allApplications.filter(a => a.fit && a.fit.fitStatus === 'Meets Requirements');
-            } else if (currentFilter === 'pending') {
-                filtered = allApplications.filter(a => (a.status || 'pending') === 'pending');
+            if (currentFilter === 'pending') {
+                filtered = filtered.filter(a => (a.status || 'pending') === 'pending');
             } else if (currentFilter === 'accepted') {
-                filtered = allApplications.filter(a => a.status === 'accepted');
+                filtered = filtered.filter(a => a.status === 'accepted');
             } else if (currentFilter === 'rejected') {
-                filtered = allApplications.filter(a => a.status === 'rejected');
+                filtered = filtered.filter(a => a.status === 'rejected');
             }
+
+            // Auto sort descending order of requirements match (100% fit first)
+            filtered.sort((a, b) => {
+                const matchA = a.fit ? a.fit.matchPercentage : 0;
+                const matchB = b.fit ? b.fit.matchPercentage : 0;
+                if (matchB !== matchA) {
+                    return matchB - matchA;
+                }
+                return new Date(b.appliedAt || 0) - new Date(a.appliedAt || 0);
+            });
 
             if (filtered.length === 0) {
                 container.innerHTML = `
@@ -316,7 +323,7 @@
         }
 
         function showConfirmModal(app) {
-            pendingAppId = app.id;
+            const targetAppId = app.id;
             document.getElementById('modalBodyText').innerHTML = `
                 Candidate <strong style="color:#fff;">${escapeHtml(app.seekerName)}</strong> does not fully meet all job requirements for <strong style="color:#2ecc71;">${escapeHtml(app.jobTitle)}</strong>.
             `;
@@ -327,7 +334,7 @@
 
             document.getElementById('modalConfirmBtn').onclick = () => {
                 closeConfirmModal();
-                performStatusUpdate(pendingAppId, 'accepted');
+                performStatusUpdate(targetAppId, 'accepted');
             };
 
             document.getElementById('confirmModal').style.display = 'flex';
@@ -339,6 +346,10 @@
         }
 
         async function performStatusUpdate(appId, newStatus) {
+            if (!appId || appId === 'null' || appId === 'undefined') {
+                showToast('Error: Invalid application ID');
+                return;
+            }
             const app = allApplications.find(a => String(a.id) === String(appId));
             try {
                 const res = await fetch(`/api/applications/${encodeURIComponent(appId)}/status`, {
