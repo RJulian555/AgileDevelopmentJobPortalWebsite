@@ -1099,6 +1099,8 @@
                 loadAndStartCarousel();
             } else if (storedEmployerId) {
                 navActions.innerHTML =
+                    '<a href="/employer-applicants.html?employerId=' + encodeURIComponent(storedEmployerId) +
+                    '" class="nav-login" id="nav-manage-applicants">Applicants</a>' +
                     '<a href="/create-job.html?employerId=' + encodeURIComponent(storedEmployerId) +
                     '" class="nav-cta nav-post-job" id="nav-post-job">Post a Job</a>';
                 stopSkillCarousel();

@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Applicants - JobWall</title>
+    <style>
+        * { box-sizing: border-box; font-family: 'Segoe UI', Arial, sans-serif; margin: 0; padding: 0; }
+        body { background: #0d1117; color: #c9d1d9; min-height: 100vh; display: flex; flex-direction: column; }
+        
+        .bg-glow-wrapper { position: fixed; top: 0; left: 0; width: 100%; height: 100%; overflow: hidden; z-index: 1; pointer-events: none; }
+        .glow-orb { position: absolute; border-radius: 50%; filter: blur(100px); opacity: 0.15; }
+        .glow-orb.orb-1 { width: 400px; height: 400px; background: #2ecc71; top: 5%; left: 10%; }
+        .glow-orb.orb-2 { width: 500px; height: 500px; background: #10b981; bottom: 5%; right: 10%; }
+
+        .top-bar { position: relative; z-index: 10; display: flex; align-items: center; justify-content: space-between; padding: 16px 32px; background: rgba(22, 27, 34, 0.8); backdrop-filter: blur(12px); border-bottom: 1px solid #30363d; }
+        .top-left { display: flex; align-items: center; gap: 16px; }
+        .back-btn { background: #161b22; border: 1px solid #30363d; color: #2ecc71; width: 40px; height: 40px; border-radius: 10px; font-size: 18px; font-weight: bold; cursor: pointer; transition: 0.2s; display: flex; align-items: center; justify-content: center; }
+        .back-btn:hover { background: #2ecc71; color: #fff; border-color: #2ecc71; }
+        .brand { font-size: 24px; font-weight: 800; color: #fff; }
+        .brand span { color: #2ecc71; }
+
+        .container { max-width: 1100px; margin: 30px auto; padding: 0 24px; width: 100%; position: relative; z-index: 10; flex: 1; }
+        
+        .page-header { margin-bottom: 24px; display: flex; justify-content: space-between; align-items: flex-end; flex-wrap: wrap; gap: 16px; }
+        .page-header h1 { font-size: 28px; font-weight: 800; color: #fff; margin-bottom: 6px; }
+        .page-header p { color: #8b949e; font-size: 14px; }
+
+        .filter-bar { display: flex; gap: 10px; margin-bottom: 24px; flex-wrap: wrap; align-items: center; }
+        .filter-btn { background: #161b22; border: 1px solid #30363d; color: #8b949e; padding: 8px 18px; border-radius: 20px; font-size: 13px; font-weight: 600; cursor: pointer; transition: 0.2s; }
+        .filter-btn.active, .filter-btn:hover { background: #21262d; color: #2ecc71; border-color: rgba(46, 204, 113, 0.4); }
+
+        .applicants-list { display: flex; flex-direction: column; gap: 16px; }
+        
+        .applicant-card { background: #161b22; border: 1px solid #30363d; border-radius: 16px; padding: 24px; display: flex; flex-direction: column; gap: 16px; transition: 0.2s; }
+        .applicant-card:hover { border-color: rgba(46, 204, 113, 0.4); box-shadow: 0 8px 24px rgba(0,0,0,0.4); }
+
+        .card-header { display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 12px; }
+        .candidate-info { display: flex; align-items: center; gap: 14px; }
+        .avatar-box { width: 48px; height: 48px; border-radius: 50%; background: #21262d; border: 2px solid #30363d; color: #2ecc71; font-weight: 800; font-size: 20px; display: flex; align-items: center; justify-content: center; }
+        .candidate-name { font-size: 18px; font-weight: 700; color: #fff; margin-bottom: 2px; }
+        .candidate-meta { font-size: 13px; color: #8b949e; }
+        
+        .fit-badge { display: inline-flex; align-items: center; gap: 6px; padding: 6px 14px; border-radius: 20px; font-size: 12px; font-weight: 700; }
+        .fit-badge.meets { background: rgba(46, 204, 113, 0.15); color: #2ecc71; border: 1px solid rgba(46, 204, 113, 0.3); }
+        .fit-badge.partial { background: rgba(241, 196, 15, 0.15); color: #f1c40f; border: 1px solid rgba(241, 196, 15, 0.3); }
+        .fit-badge.below { background: rgba(231, 76, 60, 0.15); color: #e74c3c; border: 1px solid rgba(231, 76, 60, 0.3); }
+
+        .status-badge { display: inline-block; padding: 4px 12px; border-radius: 12px; font-size: 12px; font-weight: 700; text-transform: uppercase; }
+        .status-badge.accepted { background: #2ecc71; color: #0d1117; }
+        .status-badge.rejected { background: #30363d; color: #8b949e; }
+        .status-badge.pending { background: rgba(52, 152, 219, 0.2); color: #3498db; border: 1px solid rgba(52, 152, 219, 0.3); }
+
+        .job-applied-title { font-size: 14px; font-weight: 600; color: #2ecc71; background: rgba(46, 204, 113, 0.08); padding: 4px 10px; border-radius: 6px; display: inline-block; }
+
+        .skills-section { background: #0d1117; border-radius: 10px; padding: 12px 16px; border: 1px solid #21262d; }
+        .skills-title { font-size: 12px; font-weight: 700; color: #8b949e; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px; }
+        .skills-list { display: flex; flex-wrap: wrap; gap: 6px; }
+        .skill-chip { padding: 4px 12px; border-radius: 12px; font-size: 12px; font-weight: 600; }
+        .skill-chip.matched { background: rgba(46, 204, 113, 0.2); color: #2ecc71; border: 1px solid rgba(46, 204, 113, 0.4); }
+        .skill-chip.missing { background: rgba(231, 76, 60, 0.15); color: #e74c3c; border: 1px solid rgba(231, 76, 60, 0.3); }
+        .skill-chip.neutral { background: #21262d; color: #8b949e; border: 1px solid #30363d; }
+
+        .card-actions { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; border-top: 1px solid #21262d; padding-top: 14px; }
+        .resume-link { color: #3498db; font-size: 13px; text-decoration: none; font-weight: 600; display: inline-flex; align-items: center; gap: 4px; }
+        .resume-link:hover { text-decoration: underline; }
+
+        .btn-group { display: flex; gap: 10px; }
+        .action-btn { padding: 8px 20px; border-radius: 8px; font-size: 13px; font-weight: 700; cursor: pointer; transition: 0.2s; border: none; }
+        .btn-accept { background: #2ecc71; color: #0d1117; }
+        .btn-accept:hover { background: #27ae60; transform: translateY(-1px); }
+        .btn-reject { background: #21262d; color: #e74c3c; border: 1px solid rgba(231, 76, 60, 0.3); }
+        .btn-reject:hover { background: rgba(231, 76, 60, 0.2); }
+
+        .toast { position: fixed; bottom: 24px; right: 24px; background: #2ecc71; color: #0d1117; padding: 14px 24px; border-radius: 12px; font-weight: 700; font-size: 14px; box-shadow: 0 8px 24px rgba(0,0,0,0.5); z-index: 100; display: none; animation: slideUp 0.3s ease; }
+        @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+
+        .empty-box { text-align: center; padding: 60px 20px; background: #161b22; border: 1px dashed #30363d; border-radius: 16px; color: #8b949e; }
+        .empty-box h3 { font-size: 18px; color: #fff; margin-bottom: 8px; }
+
+        /* ===== MODERN GLASSMORPHIC CONFIRM MODAL ===== */
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(13, 17, 23, 0.85); backdrop-filter: blur(10px); z-index: 1000; display: flex; align-items: center; justify-content: center; padding: 20px; animation: fadeIn 0.2s ease; }
+        .modal-card { background: #161b22; border: 1px solid #30363d; border-radius: 20px; padding: 32px; max-width: 500px; width: 100%; box-shadow: 0 20px 50px rgba(0,0,0,0.6); display: flex; flex-direction: column; gap: 18px; text-align: center; animation: scaleUp 0.25s ease; }
+        .modal-icon { width: 56px; height: 56px; border-radius: 50%; background: rgba(241, 196, 15, 0.15); color: #f1c40f; font-size: 28px; display: flex; align-items: center; justify-content: center; margin: 0 auto; border: 1px solid rgba(241, 196, 15, 0.3); }
+        .modal-title { font-size: 20px; font-weight: 800; color: #fff; }
+        .modal-body { font-size: 14px; color: #8b949e; line-height: 1.5; }
+        .modal-missing-chips { display: flex; flex-direction: column; gap: 8px; text-align: left; margin-top: 4px; }
+        .missing-chip { background: rgba(231, 76, 60, 0.15); color: #e74c3c; border: 1px solid rgba(231, 76, 60, 0.3); padding: 8px 14px; border-radius: 10px; font-size: 13px; font-weight: 600; }
+        .modal-actions { display: flex; gap: 12px; margin-top: 8px; }
+        .modal-btn { flex: 1; padding: 12px; border-radius: 10px; font-size: 14px; font-weight: 700; cursor: pointer; border: none; transition: 0.2s; }
+        .modal-btn-cancel { background: #21262d; color: #8b949e; border: 1px solid #30363d; }
+        .modal-btn-cancel:hover { background: #30363d; color: #fff; }
+        .modal-btn-confirm { background: #2ecc71; color: #0d1117; }
+        .modal-btn-confirm:hover { background: #27ae60; }
+
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes scaleUp { from { transform: scale(0.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+    </style>
+</head>
+<body>
+    <div class="bg-glow-wrapper">
+        <div class="glow-orb orb-1"></div>
+        <div class="glow-orb orb-2"></div>
+    </div>
+
+    <div class="top-bar">
+        <div class="top-left">
+            <button class="back-btn" onclick="window.history.back()">←</button>
+            <div class="brand">Job<span>Wall</span></div>
+        </div>
+        <div style="font-size: 13px; color: #8b949e;">Employer Workspace</div>
+    </div>
+
+    <div class="container">
+        <div class="page-header">
+            <div>
+                <h1>Manage Applicants</h1>
+                <p>Review candidate qualifications, job requirements fit (Skills, Experience, Education), and accept applicants for interviews.</p>
+            </div>
+        </div>
+
+        <div class="filter-bar">
+            <button class="filter-btn active" data-filter="all" onclick="setFilter('all', this)">All Applicants</button>
+            <button class="filter-btn" data-filter="meets" onclick="setFilter('meets', this)">🟢 Meets Requirements</button>
+            <button class="filter-btn" data-filter="pending" onclick="setFilter('pending', this)">⏳ Pending Review</button>
+            <button class="filter-btn" data-filter="accepted" onclick="setFilter('accepted', this)">✓ Accepted</button>
+            <button class="filter-btn" data-filter="rejected" onclick="setFilter('rejected', this)">✕ Rejected</button>
+        </div>
+
+        <div id="applicantsList" class="applicants-list">
+            <div class="empty-box">
+                <h3>Loading applicants...</h3>
+                <p>Please wait while we retrieve candidate submissions.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== MODERN CONFIRMATION MODAL ===== -->
+    <div id="confirmModal" class="modal-overlay" style="display:none;">
+        <div class="modal-card">
+            <div class="modal-icon">⚠️</div>
+            <h3 class="modal-title">Requirements Warning</h3>
+            <p class="modal-body" id="modalBodyText"></p>
+            <div class="modal-missing-chips" id="modalMissingSkills"></div>
+            <div class="modal-actions">
+                <button class="modal-btn modal-btn-cancel" onclick="closeConfirmModal()">Cancel</button>
+                <button class="modal-btn modal-btn-confirm" id="modalConfirmBtn">Confirm Accept</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="toast" class="toast"></div>
+
+    <script>
+        const params = new URLSearchParams(window.location.search);
+        let employerId = params.get('employerId') || sessionStorage.getItem('jobwallEmployerId');
+        let allApplications = [];
+        let currentFilter = 'all';
+        let pendingAppId = null;
+
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.style.display = 'block';
+            setTimeout(() => { toast.style.display = 'none'; }, 4000);
+        }
+
+        async function loadApplications() {
+            if (!employerId) {
+                document.getElementById('applicantsList').innerHTML = `
+                    <div class="empty-box">
+                        <h3>Employer Sign-in Required</h3>
+                        <p>Please log in as an employer to review job applicants.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            try {
+                const res = await fetch(`/api/employer/applications?employerId=${encodeURIComponent(employerId)}`);
+                if (!res.ok) throw new Error('Unable to load applications');
+                allApplications = await res.json();
+                renderApplications();
+            } catch (err) {
+                document.getElementById('applicantsList').innerHTML = `
+                    <div class="empty-box">
+                        <h3>Error Loading Applicants</h3>
+                        <p>${err.message}</p>
+                    </div>
+                `;
+            }
+        }
+
+        function setFilter(filter, btn) {
+            currentFilter = filter;
+            document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+            if (btn) btn.classList.add('active');
+            renderApplications();
+        }
+
+        function renderApplications() {
+            const container = document.getElementById('applicantsList');
+            let filtered = allApplications;
+
+            if (currentFilter === 'meets') {
+                filtered = allApplications.filter(a => a.fit && a.fit.fitStatus === 'Meets Requirements');
+            } else if (currentFilter === 'pending') {
+                filtered = allApplications.filter(a => (a.status || 'pending') === 'pending');
+            } else if (currentFilter === 'accepted') {
+                filtered = allApplications.filter(a => a.status === 'accepted');
+            } else if (currentFilter === 'rejected') {
+                filtered = allApplications.filter(a => a.status === 'rejected');
+            }
+
+            if (filtered.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-box">
+                        <h3>No Applicants Found</h3>
+                        <p>There are no candidates matching the selected filter criteria.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = filtered.map(app => {
+                const fit = app.fit || { fitStatus: 'Meets Requirements', matchedSkills: [], missingSkills: [], matchPercentage: 100, requiredSkills: [] };
+                let fitBadgeClass = 'meets';
+                let fitIcon = '🟢';
+                if (fit.fitStatus === 'Partial Match') {
+                    fitBadgeClass = 'partial'; fitIcon = '🟡';
+                } else if (fit.fitStatus === 'Below Requirements') {
+                    fitBadgeClass = 'below'; fitIcon = '🔴';
+                }
+
+                const initial = app.seekerName ? app.seekerName.charAt(0).toUpperCase() : 'A';
+                const status = app.status || 'pending';
+
+                // Skills HTML
+                const matchedSkillsHtml = (fit.matchedSkills || []).map(s => `<span class="skill-chip matched">✓ Skill: ${escapeHtml(s)}</span>`).join('');
+                const missingSkillsHtml = (fit.missingSkills || []).map(s => `<span class="skill-chip missing">✕ Skill: ${escapeHtml(s)}</span>`).join('');
+
+                // Experience HTML
+                let expHtml = '';
+                if (fit.experience && fit.experience.required) {
+                    if (fit.experience.matched) {
+                        expHtml = `<span class="skill-chip matched">✓ Experience: ${fit.experience.candidateYears} yrs (Req: ${escapeHtml(fit.experience.required)})</span>`;
+                    } else {
+                        expHtml = `<span class="skill-chip missing">✕ Experience: Req ${escapeHtml(fit.experience.required)} (Has ${fit.experience.candidateYears} yrs)</span>`;
+                    }
+                }
+
+                // Education HTML
+                let eduHtml = '';
+                if (fit.education && fit.education.required) {
+                    if (fit.education.matched) {
+                        eduHtml = `<span class="skill-chip matched">✓ Education: ${escapeHtml(fit.education.candidateEduLabel || 'Passed')} (Req: ${escapeHtml(fit.education.required)})</span>`;
+                    } else {
+                        eduHtml = `<span class="skill-chip missing">✕ Education: Req ${escapeHtml(fit.education.required)} (Has ${escapeHtml(fit.education.candidateEduLabel || 'None')})</span>`;
+                    }
+                }
+
+                return `
+                    <div class="applicant-card" id="app-card-${app.id}">
+                        <div class="card-header">
+                            <div class="candidate-info">
+                                <div class="avatar-box">${initial}</div>
+                                <div>
+                                    <div class="candidate-name">${escapeHtml(app.seekerName)}</div>
+                                    <div class="candidate-meta">${escapeHtml(app.seekerEmail)} ${app.seekerLocation ? '• ' + escapeHtml(app.seekerLocation) : ''}</div>
+                                </div>
+                            </div>
+                            <div style="display:flex; flex-direction:column; align-items:flex-end; gap:6px;">
+                                <span class="fit-badge ${fitBadgeClass}">${fitIcon} ${fit.fitStatus} (${fit.matchPercentage}%)</span>
+                                <span class="job-applied-title">Applied for: ${escapeHtml(app.jobTitle)}</span>
+                            </div>
+                        </div>
+
+                        <div class="skills-section">
+                            <div class="skills-title">Requirements Match Breakdown</div>
+                            <div class="skills-list">
+                                ${matchedSkillsHtml}
+                                ${missingSkillsHtml}
+                                ${expHtml}
+                                ${eduHtml}
+                                ${(!matchedSkillsHtml && !missingSkillsHtml && !expHtml && !eduHtml) ? '<span class="skill-chip neutral">No specific requirements specified for this job</span>' : ''}
+                            </div>
+                        </div>
+
+                        <div class="card-actions">
+                            <div style="display:flex; align-items:center; gap:16px;">
+                                <a href="${escapeHtml(app.resumeUrl || '/uploads/sample_resume.html')}" target="_blank" class="resume-link">📄 View Resume</a>
+                                <span class="status-badge ${status}">${status}</span>
+                            </div>
+                            
+                            <div class="btn-group">
+                                ${status !== 'accepted' ? `
+                                    <button class="action-btn btn-accept" onclick="handleAcceptClick('${app.id}')">✓ Accept Applicant</button>
+                                ` : ''}
+                                ${status !== 'rejected' ? `
+                                    <button class="action-btn btn-reject" onclick="performStatusUpdate('${app.id}', 'rejected')">✕ Reject</button>
+                                ` : ''}
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function handleAcceptClick(appId) {
+            const app = allApplications.find(a => String(a.id) === String(appId));
+            if (app && app.fit && app.fit.allMissingRequirements && app.fit.allMissingRequirements.length > 0) {
+                showConfirmModal(app);
+            } else {
+                performStatusUpdate(appId, 'accepted');
+            }
+        }
+
+        function showConfirmModal(app) {
+            pendingAppId = app.id;
+            document.getElementById('modalBodyText').innerHTML = `
+                Candidate <strong style="color:#fff;">${escapeHtml(app.seekerName)}</strong> does not fully meet all job requirements for <strong style="color:#2ecc71;">${escapeHtml(app.jobTitle)}</strong>.
+            `;
+            
+            const missingContainer = document.getElementById('modalMissingSkills');
+            missingContainer.innerHTML = (app.fit.allMissingRequirements || [])
+                .map(req => `<div class="missing-chip">✕ ${escapeHtml(req)}</div>`).join('');
+
+            document.getElementById('modalConfirmBtn').onclick = () => {
+                closeConfirmModal();
+                performStatusUpdate(pendingAppId, 'accepted');
+            };
+
+            document.getElementById('confirmModal').style.display = 'flex';
+        }
+
+        function closeConfirmModal() {
+            document.getElementById('confirmModal').style.display = 'none';
+            pendingAppId = null;
+        }
+
+        async function performStatusUpdate(appId, newStatus) {
+            const app = allApplications.find(a => String(a.id) === String(appId));
+            try {
+                const res = await fetch(`/api/applications/${encodeURIComponent(appId)}/status`, {
+                    method: 'PATCH',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        employerId: employerId,
+                        status: newStatus
+                    })
+                });
+
+                const data = await res.json();
+                if (!res.ok) throw new Error(data.error || 'Failed to update applicant status');
+
+                if (app) app.status = newStatus;
+                renderApplications();
+                showToast(newStatus === 'accepted'
+                    ? `✓ ${app ? app.seekerName : 'Applicant'} accepted for interview preparation!`
+                    : `Applicant status updated to ${newStatus}.`
+                );
+            } catch (err) {
+                showToast('Error: ' + err.message);
+            }
+        }
+
+        function escapeHtml(str) {
+            if (!str) return '';
+            return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+        }
+
+        document.addEventListener('DOMContentLoaded', loadApplications);
+    </script>
+</body>
+</html>

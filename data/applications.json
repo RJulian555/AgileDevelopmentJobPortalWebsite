@@ -4,41 +4,55 @@
     "jobId": "1",
     "seekerId": "1785053640961",
     "appliedAt": "2026-07-26T09:02:16.390Z",
-    "resumeUrl": "uploads/resume_1785053640961.pdf"
+    "resumeUrl": "/uploads/sample_resume.html",
+    "status": "rejected"
   },
   {
     "id": "app-1785056668678",
     "jobId": "2",
     "seekerId": "1785053640961",
     "appliedAt": "2026-07-26T09:04:28.678Z",
-    "resumeUrl": "uploads/resume_1785053640961.pdf"
+    "resumeUrl": "/uploads/sample_resume.html",
+    "status": "pending"
   },
   {
     "id": "app-1785056765211",
     "jobId": "5",
     "seekerId": "1785053640961",
     "appliedAt": "2026-07-26T09:06:05.211Z",
-    "resumeUrl": "uploads/resume_1785053640961.pdf"
+    "resumeUrl": "/uploads/sample_resume.html",
+    "status": "pending"
   },
   {
     "id": "app-1785982734994",
     "jobId": "1",
     "seekerId": "1785982606438",
     "appliedAt": "2026-08-06T02:18:54.994Z",
-    "resumeUrl": "uploads/resume_1785053640961.pdf"
+    "resumeUrl": "/uploads/sample_resume.html",
+    "status": "rejected"
   },
   {
     "id": "app-1785993309756",
     "jobId": "2",
     "seekerId": "1785966009616",
     "appliedAt": "2026-08-06T05:15:09.756Z",
-    "resumeUrl": "uploads/resume_1785053640961.pdf"
+    "resumeUrl": "/uploads/sample_resume.html",
+    "status": "pending"
   },
   {
     "id": "app-1785993321547",
     "jobId": "3",
     "seekerId": "1785966009616",
     "appliedAt": "2026-08-06T05:15:21.547Z",
-    "resumeUrl": "uploads/resume_1785053640961.pdf"
+    "resumeUrl": "/uploads/sample_resume.html",
+    "status": "pending"
+  },
+  {
+    "id": "app-1786762929531",
+    "jobId": "9",
+    "seekerId": "1785053640961",
+    "appliedAt": "2026-08-15T03:02:09.531Z",
+    "resumeUrl": "/uploads/sample_resume.html",
+    "status": "pending"
   }
 ]
