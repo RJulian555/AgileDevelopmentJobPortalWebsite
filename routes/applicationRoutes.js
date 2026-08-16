@@ -34,24 +34,31 @@ function getRequiredEduRank(jobEdu) {
 }
 
 function getSeekerHighestEduRank(seeker) {
-    if (!seeker || !Array.isArray(seeker.edu) || seeker.edu.length === 0) return { rank: 0, label: 'No Formal Education Listed' };
+    if (!seeker || !Array.isArray(seeker.edu) || seeker.edu.length === 0) return { rank: 0, label: 'No Formal Qualification' };
     let maxRank = 0;
-    let highestEduLabel = seeker.edu[0].major || seeker.edu[0].school || 'Education Listed';
+    let highestEduLabel = 'No Formal Qualification';
 
     seeker.edu.forEach(item => {
-        const text = `${item.major || ''} ${item.school || ''} ${item.desc || ''}`.toLowerCase();
+        const levelStr = String(item.level || item.educationLevel || item.major || '').toLowerCase();
+        let itemRank = 0;
+        let itemLabel = item.level || item.educationLevel || item.major || 'Education Listed';
+
         for (const [key, rank] of Object.entries(EDU_RANKS)) {
-            if (text.includes(key)) {
-                if (rank > maxRank) {
-                    maxRank = rank;
-                    highestEduLabel = item.major || item.school || key;
-                }
+            if (levelStr.includes(key)) {
+                itemRank = rank;
+                break;
             }
+        }
+
+        if (itemRank > maxRank) {
+            maxRank = itemRank;
+            highestEduLabel = itemLabel;
         }
     });
 
     if (maxRank === 0 && seeker.edu.length > 0) {
         maxRank = 3;
+        highestEduLabel = seeker.edu[0].level || seeker.edu[0].major || 'Diploma';
     }
 
     return { rank: maxRank, label: highestEduLabel };

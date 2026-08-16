@@ -40,10 +40,10 @@
     "password": "hashed_123456",
     "role": "Job Seeker",
     "skills": [
-      "Adobe Photoshop",
-      "Adobe Illustrator",
-      "Git",
       "UI/UX Design",
+      "Adobe Illustrator",
+      "Adobe Photoshop",
+      "Git",
       "Graphic Design"
     ],
     "profile": {
@@ -69,18 +69,12 @@
     ],
     "edu": [
       {
-        "school": "tarumt",
-        "major": "diploma only",
+        "school": "TAR UMT",
+        "level": "SPM / O-Level",
+        "major": "Graphic Design",
         "start": "2024-12-31",
         "end": "2026-08-15",
         "desc": "tarumt is so big i have to walk until cannot skip leg day"
-      },
-      {
-        "school": "maluri",
-        "major": "degree",
-        "start": "2025-06-15",
-        "end": "2026-08-15",
-        "desc": "yakuza in disguise"
       }
     ]
   },
