@@ -74,4 +74,49 @@ function updateCompanyLogo(details, database = jsonDatabase, logoStorage = store
     return company;
 }
 
-module.exports = { CompanyProfileError, createCompanyProfile, updateCompanyLogo };
+function updateCompanyProfile(details, database = jsonDatabase, logoStorage = storeCompanyLogo) {
+    const users = database.readCollection('users');
+    const companies = database.readCollection('companies');
+    const employer = users.find(user => String(user.id) === String(details.employerId));
+    const companyIndex = companies.findIndex(record => record.id === details.companyId);
+
+    if (companyIndex === -1) throw new CompanyProfileError('Company not found.', 404);
+    if (!employer || employer.role !== 'Employer' || employer.companyId !== details.companyId) {
+        throw new CompanyProfileError('Only an Employer linked to this company can edit its portfolio.', 403);
+    }
+
+    const current = companies[companyIndex];
+    const companyEmail = details.email?.trim().toLowerCase();
+    if (companies.some((company, index) => index !== companyIndex && company.email.toLowerCase() === companyEmail)) {
+        throw new CompanyProfileError('A company with this email already exists.', 409);
+    }
+
+    let updated;
+    try {
+        updated = new Company({
+            id: current.id,
+            name: details.companyName,
+            description: details.description,
+            industry: details.industry,
+            address: details.address,
+            email: companyEmail,
+            phone: details.phone,
+            website: details.website,
+            logoUrl: current.logoUrl,
+            createdAt: current.createdAt,
+            updatedAt: new Date().toISOString()
+        });
+    } catch (error) {
+        throw new CompanyProfileError(error.message);
+    }
+
+    if (details.logoData) {
+        updated.logoUrl = logoStorage(updated.id, details.logoData);
+    }
+
+    companies[companyIndex] = updated.toJSON();
+    database.writeCollection('companies', companies);
+    return companies[companyIndex];
+}
+
+module.exports = { CompanyProfileError, createCompanyProfile, updateCompanyLogo, updateCompanyProfile };

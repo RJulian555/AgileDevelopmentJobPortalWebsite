@@ -39,6 +39,10 @@ class Company {
             throw new Error('Company email must be valid.');
         }
 
+        if (!/^\+?[0-9][0-9\s().-]{6,19}$/.test(this.phone)) {
+            throw new Error('Company phone must be a valid phone number.');
+        }
+
         if (this.website) {
             try {
                 const url = new URL(this.website);

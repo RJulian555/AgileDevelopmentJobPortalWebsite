@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Job Portal - Create Company Profile</title>
+    <title>Job Portal - Company Portfolio</title>
     <style>
         * {
             box-sizing: border-box;
@@ -234,6 +234,12 @@
             color: #2c3e50;
         }
 
+        button:disabled {
+            cursor: not-allowed;
+            opacity: 0.65;
+            transform: none;
+        }
+
         @media (max-width: 900px) {
             .form-grid {
                 grid-template-columns: 1fr;
@@ -254,8 +260,8 @@
 <body>
     <div class="page-card">
         <div class="header">
-            <h1>Create Company Profile</h1>
-            <p>Tell employers and job seekers more about your organization.</p>
+            <h1 id="pageTitle">Create Company Profile</h1>
+            <p id="pageSubtitle">Tell employers and job seekers more about your organization.</p>
         </div>
 
         <div class="form-body">
@@ -264,11 +270,7 @@
                 <img id="savedCompanyLogo" class="saved-company-logo" alt="" hidden>
                 <h2 id="savedCompanyName"></h2>
                 <p>Company profile saved successfully.</p>
-                <div id="logoUpdate" class="logo-update">
-                    <label for="replacementLogo">Upload or replace company logo</label>
-                    <input id="replacementLogo" class="file-input" type="file" accept="image/png,image/jpeg,image/webp">
-                    <button id="uploadLogoButton" type="button">Save Logo</button>
-                </div>
+                <button id="editCompanyButton" class="dashboard-link" type="button">Edit Company</button>
                 <a id="createJobLink" class="dashboard-link" href="/create-job.html">Create a Job Opening</a>
                 <a class="dashboard-link secondary-btn" href="/dashboard.html">Continue to Dashboard</a>
             </section>
@@ -333,7 +335,7 @@
 
                     <div>
                         <label for="phone" class="required">Phone Number</label>
-                        <input id="phone" name="phone" type="tel" placeholder="e.g. +60 12 345 6789" required>
+                        <input id="phone" name="phone" type="tel" placeholder="e.g. +60 12 345 6789" pattern="\+?[0-9][0-9\s().-]{6,19}" title="Enter a valid phone number using 7 to 20 digits and common phone separators." required>
                     </div>
 
                     <div>
@@ -342,7 +344,7 @@
                     </div>
 
                     <div class="full-width actions">
-                        <button class="secondary-btn" type="button" onclick="window.location.href='/dashboard.html'">Cancel</button>
+                        <button id="cancelButton" class="secondary-btn" type="button">Cancel</button>
                         <button class="primary-btn" type="submit">Save Profile</button>
                     </div>
                 </div>
@@ -351,39 +353,40 @@
     </div>
     <script>
         const query = new URLSearchParams(window.location.search);
-        const employerId = query.get('employerId');
-        const companyId = query.get('companyId');
+        const requestedEmployerId = query.get('employerId');
+        const requestedCompanyId = query.get('companyId');
         const form = document.getElementById('companyProfileForm');
         const formMessage = document.getElementById('formMessage');
+        const savedCompany = document.getElementById('savedCompany');
         const submitButton = form.querySelector('[type="submit"]');
+        const cancelButton = document.getElementById('cancelButton');
+        const editCompanyButton = document.getElementById('editCompanyButton');
         const logoInput = document.getElementById('logo');
         const logoPreview = document.getElementById('logoPreview');
-        const replacementLogo = document.getElementById('replacementLogo');
-        const uploadLogoButton = document.getElementById('uploadLogoButton');
-        let activeCompanyId = companyId;
-        let activeEmployerId = employerId;
+        let activeCompanyId = requestedCompanyId;
+        let activeEmployerId = requestedEmployerId || sessionStorage.getItem('jobwallEmployerId');
+        let currentCompany = null;
+        let editing = false;
 
-        document.getElementById('employerId').value = employerId || '';
-        if (employerId) sessionStorage.setItem('jobwallEmployerId', employerId);
+        document.getElementById('employerId').value = activeEmployerId || '';
+        if (activeEmployerId) sessionStorage.setItem('jobwallEmployerId', activeEmployerId);
 
-        if (companyId) {
-            loadCompanyProfile(companyId);
-        } else if (!employerId) {
+        if (requestedCompanyId) {
+            loadCompanyProfile(requestedCompanyId);
+        } else if (activeEmployerId) {
+            loadEmployerCompany(activeEmployerId);
+        } else {
             showMessage('Please register or sign in as an employer before creating a company profile.', 'error');
             submitButton.disabled = true;
         }
 
         logoInput.addEventListener('change', () => {
             const logo = logoInput.files[0];
-            if (!logo) {
-                logoPreview.hidden = true;
-                logoPreview.removeAttribute('src');
-                return;
-            }
+            if (!logo) return showCurrentLogo();
 
             if (logo.size > 2 * 1024 * 1024) {
                 logoInput.value = '';
-                logoPreview.hidden = true;
+                showCurrentLogo();
                 showMessage('Company logo must be no larger than 2 MB.', 'error');
                 return;
             }
@@ -392,44 +395,24 @@
             logoPreview.hidden = false;
         });
 
-        uploadLogoButton.addEventListener('click', async () => {
-            const logo = replacementLogo.files[0];
-            if (!logo) return showMessage('Please select a company logo.', 'error');
-            if (logo.size > 2 * 1024 * 1024) {
-                return showMessage('Company logo must be no larger than 2 MB.', 'error');
+        editCompanyButton.addEventListener('click', beginEditing);
+        cancelButton.addEventListener('click', () => {
+            if (!editing || !currentCompany) {
+                window.location.href = '/dashboard.html';
+                return;
             }
 
-            uploadLogoButton.disabled = true;
-            uploadLogoButton.textContent = 'Saving...';
-
-            try {
-                const response = await fetch(`/api/companies/${encodeURIComponent(activeCompanyId)}/logo`, {
-                    method: 'PATCH',
-                    headers: {
-                        'Accept': 'application/json',
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        employerId: activeEmployerId,
-                        logoData: await readFileAsDataUrl(logo)
-                    })
-                });
-                const result = await response.json();
-                if (!response.ok) throw new Error(result.error || 'Unable to save the company logo.');
-
-                showMessage(result.message, 'success');
-                displayCompanyProfile(result.company);
-                replacementLogo.value = '';
-            } catch (error) {
-                showMessage(error.message, 'error');
-            } finally {
-                uploadLogoButton.disabled = false;
-                uploadLogoButton.textContent = 'Save Logo';
-            }
+            form.reset();
+            editing = false;
+            showMessage('Editing cancelled. No changes were saved.', 'success');
+            displayCompanyProfile(currentCompany);
         });
 
         form.addEventListener('submit', async event => {
             event.preventDefault();
+            if (!form.reportValidity()) return;
+
+            const originalButtonText = editing ? 'Save Changes' : 'Save Profile';
             submitButton.disabled = true;
             submitButton.textContent = 'Saving...';
 
@@ -440,31 +423,72 @@
                 const payload = Object.fromEntries(formData);
                 if (logo?.size) payload.logoData = await readFileAsDataUrl(logo);
 
-                const response = await fetch(form.action, {
-                    method: 'POST',
-                    headers: {
-                        'Accept': 'application/json',
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify(payload)
-                });
+                const response = await fetch(
+                    editing ? `/api/companies/${encodeURIComponent(activeCompanyId)}` : '/api/companies',
+                    {
+                        method: editing ? 'PUT' : 'POST',
+                        headers: { 'Accept': 'application/json', 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    }
+                );
                 const result = await response.json();
+                if (!response.ok) throw new Error(result.error || 'Unable to save the company portfolio.');
 
-                if (!response.ok) throw new Error(result.error || 'Unable to create the company profile.');
-
+                currentCompany = result.company;
+                activeCompanyId = result.company.id;
+                editing = false;
+                form.reset();
+                const employerQuery = activeEmployerId ? `&employerId=${encodeURIComponent(activeEmployerId)}` : '';
+                window.history.replaceState({}, '', `/company-profile.html?companyId=${encodeURIComponent(activeCompanyId)}${employerQuery}`);
                 showMessage(result.message, 'success');
-                window.history.replaceState({}, '', `/company-profile.html?companyId=${encodeURIComponent(result.company.id)}`);
                 displayCompanyProfile(result.company);
             } catch (error) {
                 showMessage(error.message, 'error');
+            } finally {
                 submitButton.disabled = false;
-                submitButton.textContent = 'Save Profile';
+                submitButton.textContent = originalButtonText;
             }
         });
 
+        function beginEditing() {
+            if (!currentCompany || !activeEmployerId) return;
+            editing = true;
+            savedCompany.classList.remove('visible');
+            form.hidden = false;
+            fillForm(currentCompany);
+            document.getElementById('pageTitle').textContent = 'Edit Company Portfolio';
+            document.getElementById('pageSubtitle').textContent = 'Correct or update your company information and logo.';
+            submitButton.textContent = 'Save Changes';
+            showMessage('', '');
+            document.getElementById('companyName').focus();
+        }
+
+        function fillForm(company) {
+            document.getElementById('employerId').value = activeEmployerId || '';
+            document.getElementById('companyName').value = company.name || '';
+            document.getElementById('description').value = company.description || '';
+            document.getElementById('industry').value = company.industry || '';
+            document.getElementById('address').value = company.address || '';
+            document.getElementById('email').value = company.email || '';
+            document.getElementById('phone').value = company.phone || '';
+            document.getElementById('website').value = company.website || '';
+            logoInput.value = '';
+            showCurrentLogo();
+        }
+
+        function showCurrentLogo() {
+            if (currentCompany?.logoUrl) {
+                logoPreview.src = currentCompany.logoUrl;
+                logoPreview.hidden = false;
+            } else {
+                logoPreview.hidden = true;
+                logoPreview.removeAttribute('src');
+            }
+        }
+
         function showMessage(message, type) {
             formMessage.textContent = message;
-            formMessage.className = `form-message ${type}`;
+            formMessage.className = type ? `form-message ${type}` : 'form-message';
         }
 
         function readFileAsDataUrl(file) {
@@ -474,6 +498,18 @@
                 reader.onerror = () => reject(new Error('Unable to read the selected company logo.'));
                 reader.readAsDataURL(file);
             });
+        }
+
+        async function loadEmployerCompany(id) {
+            try {
+                const response = await fetch(`/api/employers/${encodeURIComponent(id)}/company`);
+                if (response.status === 404) return;
+                const company = await response.json();
+                if (!response.ok) throw new Error(company.error || 'Unable to load the company profile.');
+                displayCompanyProfile(company);
+            } catch (error) {
+                showMessage(error.message, 'error');
+            }
         }
 
         async function loadCompanyProfile(id) {
@@ -488,24 +524,24 @@
         }
 
         function displayCompanyProfile(company) {
-            const savedCompany = document.getElementById('savedCompany');
             const savedLogo = document.getElementById('savedCompanyLogo');
-
-            form.hidden = true;
+            currentCompany = company;
             activeCompanyId = company.id;
-            activeEmployerId = activeEmployerId || company.employers?.[0]?.id;
-            if (activeEmployerId) {
-                sessionStorage.setItem('jobwallEmployerId', activeEmployerId);
-                document.getElementById('createJobLink').href =
-                    `/create-job.html?employerId=${encodeURIComponent(activeEmployerId)}`;
-            }
+            editing = false;
+            form.hidden = true;
+            savedCompany.classList.add('visible');
+            document.getElementById('pageTitle').textContent = 'Company Portfolio';
+            document.getElementById('pageSubtitle').textContent = 'Review your organization profile or make updates.';
             document.getElementById('savedCompanyName').textContent = company.name;
+            editCompanyButton.hidden = !activeEmployerId;
+            if (activeEmployerId) {
+                document.getElementById('createJobLink').href = `/create-job.html?employerId=${encodeURIComponent(activeEmployerId)}`;
+            }
             savedLogo.hidden = !company.logoUrl;
             if (company.logoUrl) {
                 savedLogo.src = company.logoUrl;
                 savedLogo.alt = `${company.name} logo`;
             }
-            savedCompany.classList.add('visible');
         }
     </script>
 </body>
