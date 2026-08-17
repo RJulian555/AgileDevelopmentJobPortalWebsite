@@ -664,142 +664,127 @@
         // ================================================================
         // 8. Send As PDF (简历格式)
         // ================================================================
-        function sendAsPDF() {
-    // 1. 收集当前数据
+function sendAsPDF() {
+    // 收集数据
     const data = collectFormData();
     const profile = data.profile || {};
-    const fullName = profile.fullName || '未填写';
-    const jobTitle = profile.jobTitle || '未填写';
-    const location = profile.location || '';
-    const phone = profile.phone || '';
-    const email = data.email || '';
-    const about = profile.about || '';
-    const skillsText = profile.skills || '';
-    const languages = profile.languages || '';
-    const avatarSrc = document.getElementById('avatarPreview').src;
+    const fullName = profile.fullName || '';
+    const userEmail = data.email || '';
 
-    // 2. 取工作经历（最多3条）
-    const workEntries = data.work || [];
-    const workDisplay = workEntries.slice(0, 3);
+    if (!fullName) {
+        alert('Please enter your full name first.');
+        return;
+    }
 
-    // 3. 取教育经历（最多3条）
-    const eduEntries = data.edu || [];
-    const eduDisplay = eduEntries.slice(0, 3);
+    if (!userEmail) {
+        alert('Please save your profile first (email required).');
+        return;
+    }
 
-    // 4. 构建简历 HTML
-    const resumeHTML = `
-    <div id="resumePrintContainer" style="padding: 20px 30px; background: white; max-width: 100%; font-family: Arial, sans-serif;">
-        <!-- 顶部：头像 + 姓名/职位 -->
-        <div style="display: flex; align-items: center; gap: 24px; padding-bottom: 16px; border-bottom: 3px solid #2ecc71; margin-bottom: 20px;">
-            <img src="${avatarSrc}" style="width: 80px; height: 80px; border-radius: 50%; object-fit: cover; border: 2px solid #2ecc71; flex-shrink: 0;" alt="Avatar">
-            <div>
-                <h1 style="font-size: 28px; font-weight: 700; color: #2c3e50; margin: 0;">${escapeHtml(fullName)}</h1>
-                <div style="font-size: 18px; color: #2ecc71; font-weight: 600; margin-top: 4px;">${escapeHtml(jobTitle)}</div>
-            </div>
-        </div>
+    // 构建预览 URL
+    const params = new URLSearchParams();
+    params.set('userId', currentUserId);
+    params.set('fullName', fullName);
+    params.set('jobTitle', profile.jobTitle || '');
+    params.set('email', userEmail);
+    params.set('phone', profile.phone || '');
+    params.set('location', profile.location || '');
+    params.set('about', profile.about || '');
+    params.set('skills', profile.skills || '');
+    params.set('languages', profile.languages || '');
+    params.set('work', encodeURIComponent(JSON.stringify(data.work || [])));
+    params.set('edu', encodeURIComponent(JSON.stringify(data.edu || [])));
 
-        <!-- 主体：两栏 -->
-        <div style="display: flex; gap: 30px;">
-            <!-- 左栏 -->
-            <div style="flex: 0 0 30%; min-width: 200px;">
-                <div style="margin-bottom: 16px;">
-                    <h3 style="font-size: 14px; font-weight: 700; color: #2c3e50; border-bottom: 2px solid #2ecc71; padding-bottom: 4px; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 1px;">Contact</h3>
-                    ${location ? `<div style="font-size: 12px; padding: 3px 0; color: #34495e; line-height: 1.6;"><strong>Address:</strong> ${escapeHtml(location)}</div>` : ''}
-                    ${email ? `<div style="font-size: 12px; padding: 3px 0; color: #34495e; line-height: 1.6;"><strong>Email:</strong> ${escapeHtml(email)}</div>` : ''}
-                    ${phone ? `<div style="font-size: 12px; padding: 3px 0; color: #34495e; line-height: 1.6;"><strong>Phone:</strong> ${escapeHtml(phone)}</div>` : ''}
-                    ${languages ? `<div style="font-size: 12px; padding: 3px 0; color: #34495e; line-height: 1.6;"><strong>Languages:</strong> ${escapeHtml(languages)}</div>` : ''}
-                </div>
-            </div>
+    const previewUrl = `/preview.html?${params.toString()}`;
 
-            <!-- 右栏 -->
-            <div style="flex: 1;">
-                ${about ? `
-                <div style="margin-bottom: 16px;">
-                    <h3 style="font-size: 14px; font-weight: 700; color: #2c3e50; border-bottom: 2px solid #2ecc71; padding-bottom: 4px; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 1px;">About Me</h3>
-                    <div style="font-size: 12px; color: #34495e; line-height: 1.6;">${escapeHtml(about)}</div>
-                </div>
-                ` : ''}
+    // 在新窗口打开预览
+    const previewWindow = window.open(previewUrl, '_blank', 'width=1000,height=800');
+    if (!previewWindow) {
+        alert('Popup blocked. Please allow popups for this site.');
+    }
+}
 
-                ${skillsText ? `
-                <div style="margin-bottom: 16px;">
-                    <h3 style="font-size: 14px; font-weight: 700; color: #2c3e50; border-bottom: 2px solid #2ecc71; padding-bottom: 4px; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 1px;">Skills</h3>
-                    <div style="display: flex; flex-wrap: wrap; gap: 6px; margin-top: 4px;">
-                        ${skillsText.split(',').map(s => `<span style="background: #eef9f2; color: #2ecc71; padding: 2px 12px; border-radius: 20px; font-size: 11px; font-weight: 600; border: 1px solid #2ecc71;">${escapeHtml(s.trim())}</span>`).join('')}
-                    </div>
-                </div>
-                ` : ''}
+async function sendToInbox(receiverEmail) {
+    const data = collectFormData();
+    const profile = data.profile || {};
+    const fullName = profile.fullName || 'User';
+    const userEmail = data.email || '';
 
-                ${workDisplay.length > 0 ? `
-                <div style="margin-bottom: 16px;">
-                    <h3 style="font-size: 14px; font-weight: 700; color: #2c3e50; border-bottom: 2px solid #2ecc71; padding-bottom: 4px; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 1px;">Work Experience</h3>
-                    ${workDisplay.map(w => `
-                        <div style="margin-bottom: 10px; padding-bottom: 8px; border-bottom: 1px dashed #ecf0f1;">
-                            <div style="display: flex; justify-content: space-between; align-items: baseline; flex-wrap: wrap; margin-bottom: 2px;">
-                                <span style="font-size: 13px; font-weight: 700; color: #2c3e50;">${escapeHtml(w.position || 'Position')}</span>
-                                <span style="font-size: 12px; font-weight: 600; color: #2ecc71;">${escapeHtml(w.company || 'Company')}</span>
-                            </div>
-                            <div style="display: flex; justify-content: flex-end; align-items: baseline; flex-wrap: wrap; margin-top: -2px;">
-                                <span style="font-size: 11px; color: #7f8c8d; font-weight: 500;">${escapeHtml(w.start || '')} ${w.start && w.end ? '–' : ''} ${escapeHtml(w.end || '')}</span>
-                            </div>
-                            ${w.desc ? `<div style="font-size: 12px; color: #34495e; margin-top: 3px; line-height: 1.5;">${escapeHtml(w.desc)}</div>` : ''}
-                        </div>
-                    `).join('')}
-                </div>
-                ` : ''}
+    if (!userEmail) {
+        alert('Please save your profile first (email required).');
+        return;
+    }
 
-                ${eduDisplay.length > 0 ? `
-                <div style="margin-bottom: 16px;">
-                    <h3 style="font-size: 14px; font-weight: 700; color: #2c3e50; border-bottom: 2px solid #2ecc71; padding-bottom: 4px; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 1px;">Education</h3>
-                    ${eduDisplay.map(e => `
-                        <div style="margin-bottom: 10px; padding-bottom: 8px; border-bottom: 1px dashed #ecf0f1;">
-                            <div style="display: flex; justify-content: space-between; align-items: baseline; flex-wrap: wrap; margin-bottom: 2px;">
-                                <span style="font-size: 13px; font-weight: 700; color: #2c3e50;">${escapeHtml(e.school || 'School')}</span>
-                                <span style="font-size: 11px; color: #7f8c8d; font-weight: 500;">${escapeHtml(e.start || '')} ${e.start && e.end ? '–' : ''} ${escapeHtml(e.end || '')}</span>
-                            </div>
-                            <div style="font-size: 12px; font-weight: 600; color: #2c3e50;">${escapeHtml(e.major || 'Major')}</div>
-                        </div>
-                    `).join('')}
-                </div>
-                ` : ''}
-            </div>
-        </div>
-    </div>
-    `;
+    if (!fullName || fullName === 'User') {
+        alert('Please enter your full name in the profile first.');
+        return;
+    }
 
-    // 5. 隐藏所有现有内容，只显示简历
-    // 保存原内容以便恢复
-    const originalBody = document.body.innerHTML;
-    
-    // 替换 body 内容为简历
-    document.body.innerHTML = resumeHTML;
+    try {
+        // 显示加载状态
+        const btn = document.querySelector('.btn-pdf');
+        const originalText = btn ? btn.textContent : '';
+        if (btn) btn.textContent = '⏳ Generating PDF...';
 
-    // 确保打印样式
-    const style = document.createElement('style');
-    style.textContent = `
-        @media print {
-            body { margin: 0; padding: 0; background: white; }
-            #resumePrintContainer { display: block !important; }
-            * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+        // 1. 生成 PDF 文件
+        const pdfResponse = await fetch('/api/generate-pdf', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                userId: currentUserId,
+                fullName: fullName,
+                jobTitle: profile.jobTitle || '',
+                email: userEmail,
+                phone: profile.phone || '',
+                location: profile.location || '',
+                about: profile.about || '',
+                skills: profile.skills || '',
+                languages: profile.languages || '',
+                work: data.work || [],
+                edu: data.edu || []
+            })
+        });
+        const pdfResult = await pdfResponse.json();
+
+        if (btn) btn.textContent = originalText;
+
+        if (!pdfResult.success) {
+            alert('❌ Failed to generate PDF: ' + pdfResult.error);
+            return;
         }
-        @page {
-            size: A4;
-            margin: 15mm;
-        }
-    `;
-    document.head.appendChild(style);
 
-    // 6. 等待 DOM 渲染完成后打印
-    setTimeout(() => {
-        window.print();
-        
-        // 7. 打印完成后恢复原内容
-        setTimeout(() => {
-            document.body.innerHTML = originalBody;
-            document.head.removeChild(style);
-            // 重新初始化事件绑定
-            window.onload();
-        }, 500);
-    }, 300);
+        // 2. 构建消息内容
+        const content = 
+            `📋 Profile Shared\n\n` +
+            `Name: ${fullName}\n` +
+            `Position: ${profile.jobTitle || 'N/A'}\n` +
+            `Email: ${userEmail}\n` +
+            `Phone: ${profile.phone || 'N/A'}\n\n` +
+            `📄 PDF attached below. Click "Download PDF" to save.`;
+
+        // 3. 发送到 Inbox（带 PDF 附件链接）
+        const response = await fetch('/api/inbox/send', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                senderEmail: userEmail,
+                receiverEmail: receiverEmail,
+                subject: `${fullName} shared their profile with you (PDF)`,
+                content: content,
+                attachment: pdfResult.pdfUrl  // PDF 下载链接
+            })
+        });
+
+        const result = await response.json();
+        if (result.success) {
+            alert(`✅ PDF Profile sent to ${receiverEmail}'s inbox!`);
+        } else {
+            alert('❌ ' + result.error);
+        }
+    } catch (e) {
+        alert('❌ Network error. Please try again.');
+        console.error('Send to inbox error:', e);
+    }
 }
 
         // ================================================================

@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profile Preview</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font-family: Arial, sans-serif; 
+            padding: 30px; 
+            max-width: 1000px; 
+            margin: 0 auto; 
+            background: #f4f7f6; 
+            min-height: 100vh;
+        }
+        .toolbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+            padding: 16px 24px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        .toolbar .title {
+            font-size: 18px;
+            font-weight: 700;
+            color: #2c3e50;
+        }
+        .toolbar .title span {
+            color: #2ecc71;
+        }
+        .toolbar .actions {
+            display: flex;
+            gap: 12px;
+        }
+        .toolbar .actions button {
+            padding: 10px 28px;
+            border: none;
+            border-radius: 30px;
+            font-weight: 700;
+            font-size: 14px;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .btn-close {
+            background: #ecf0f1;
+            color: #2c3e50;
+        }
+        .btn-close:hover {
+            background: #dfe4e8;
+        }
+        .btn-pdf {
+            background: #e74c3c;
+            color: #fff;
+        }
+        .btn-pdf:hover {
+            background: #c0392b;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(231,76,60,0.3);
+        }
+        .btn-send {
+            background: #2ecc71;
+            color: #fff;
+        }
+        .btn-send:hover {
+            background: #27ae60;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(46,204,113,0.3);
+        }
+        .preview-container {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            padding: 40px;
+            min-height: 500px;
+        }
+        .loading {
+            text-align: center;
+            padding: 60px;
+            color: #95a5a6;
+        }
+        .loading .spinner {
+            display: inline-block;
+            width: 32px;
+            height: 32px;
+            border: 3px solid #ecf0f1;
+            border-top: 3px solid #2ecc71;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin-right: 12px;
+            vertical-align: middle;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        @media print {
+            .toolbar { display: none !important; }
+            body { background: white; padding: 20px; }
+            .preview-container { box-shadow: none; padding: 0; }
+        }
+        @media (max-width: 640px) {
+            .toolbar { flex-wrap: wrap; gap: 10px; }
+            .toolbar .actions { flex-wrap: wrap; width: 100%; }
+            .toolbar .actions button { flex: 1; text-align: center; }
+        }
+    </style>
+</head>
+<body>
+    <div class="toolbar" id="toolbar">
+        <div class="title">📄 <span>Profile</span> Preview</div>
+        <div class="actions">
+            <button class="btn-close" onclick="closePreview()">✕ Close</button>
+            <button class="btn-pdf" onclick="downloadPDF()">📥 Download PDF</button>
+            <button class="btn-send" id="sendBtn" onclick="sendToInbox()">📤 Send to Inbox</button>
+        </div>
+    </div>
+
+    <div class="preview-container" id="previewContainer">
+        <div class="loading"><span class="spinner"></span> Loading preview...</div>
+    </div>
+
+    <script>
+        // ================================================================
+        // 从 URL 参数获取数据
+        // ================================================================
+        function getQueryParams() {
+            const params = new URLSearchParams(window.location.search);
+            return {
+                userId: params.get('userId'),
+                fullName: params.get('fullName'),
+                jobTitle: params.get('jobTitle'),
+                email: params.get('email'),
+                phone: params.get('phone'),
+                location: params.get('location'),
+                about: params.get('about'),
+                skills: params.get('skills'),
+                languages: params.get('languages'),
+                work: JSON.parse(decodeURIComponent(params.get('work') || '[]')),
+                edu: JSON.parse(decodeURIComponent(params.get('edu') || '[]'))
+            };
+        }
+
+        const data = getQueryParams();
+        const userId = data.userId;
+
+        // ================================================================
+        // 加载预览
+        // ================================================================
+        async function loadPreview() {
+            try {
+                const response = await fetch('/api/preview-profile', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+
+                if (!response.ok) {
+                    throw new Error('Failed to load preview');
+                }
+
+                const html = await response.text();
+                document.getElementById('previewContainer').innerHTML = html;
+            } catch (e) {
+                document.getElementById('previewContainer').innerHTML = `
+                    <div style="text-align:center;padding:60px;color:#e74c3c;">
+                        ❌ Failed to load preview: ${e.message}
+                    </div>
+                `;
+            }
+        }
+
+        // ================================================================
+        // 下载 PDF（使用 window.print 或直接下载）
+        // ================================================================
+        function downloadPDF() {
+            window.print();
+        }
+
+        // ================================================================
+        // 发送到 Inbox
+        // ================================================================
+        async function sendToInbox() {
+            const receiverEmail = prompt('Enter recipient email:');
+            if (!receiverEmail || receiverEmail.trim() === '') return;
+
+            const btn = document.getElementById('sendBtn');
+            const originalText = btn.textContent;
+            btn.textContent = '⏳ Sending...';
+            btn.disabled = true;
+
+            try {
+                // 构建发送数据
+                const sendData = {
+                    userId: userId,
+                    fullName: data.fullName,
+                    jobTitle: data.jobTitle || '',
+                    email: data.email || '',
+                    phone: data.phone || '',
+                    location: data.location || '',
+                    about: data.about || '',
+                    skills: data.skills || '',
+                    languages: data.languages || '',
+                    work: data.work || [],
+                    edu: data.edu || []
+                };
+
+                // 1. 生成 PDF
+                const pdfResponse = await fetch('/api/generate-pdf', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(sendData)
+                });
+                const pdfResult = await pdfResponse.json();
+
+                if (!pdfResult.success) {
+                    alert('❌ Failed to generate PDF: ' + pdfResult.error);
+                    btn.textContent = originalText;
+                    btn.disabled = false;
+                    return;
+                }
+
+                // 2. 发送消息
+                const content = 
+                    `📋 Profile Shared\n\n` +
+                    `Name: ${data.fullName}\n` +
+                    `Position: ${data.jobTitle || 'N/A'}\n` +
+                    `Email: ${data.email || 'N/A'}\n` +
+                    `Phone: ${data.phone || 'N/A'}\n\n` +
+                    `📄 PDF attached below. Click "Download PDF" to save.`;
+
+                const inboxResponse = await fetch('/api/inbox/send', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        senderEmail: data.email || '',
+                        receiverEmail: receiverEmail.trim(),
+                        subject: `${data.fullName} shared their profile with you (PDF)`,
+                        content: content,
+                        attachment: pdfResult.pdfUrl
+                    })
+                });
+                const inboxResult = await inboxResponse.json();
+
+                if (inboxResult.success) {
+                    alert(`✅ PDF Profile sent to ${receiverEmail.trim()}'s inbox!`);
+                    window.close();
+                } else {
+                    alert('❌ ' + inboxResult.error);
+                }
+            } catch (e) {
+                alert('❌ Network error: ' + e.message);
+            } finally {
+                btn.textContent = originalText;
+                btn.disabled = false;
+            }
+        }
+
+        // ================================================================
+        // 关闭预览
+        // ================================================================
+        function closePreview() {
+            window.close();
+        }
+
+        // ================================================================
+        // 初始化
+        // ================================================================
+        loadPreview();
+
+        // 如果是从 inbox 打开的（只读模式），隐藏发送按钮
+        const isReadOnly = new URLSearchParams(window.location.search).get('readonly') === 'true';
+        if (isReadOnly) {
+            document.getElementById('sendBtn').style.display = 'none';
+        }
+    </script>
+</body>
+</html>
