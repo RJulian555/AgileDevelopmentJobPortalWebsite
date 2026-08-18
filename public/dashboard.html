@@ -151,6 +151,40 @@
             background: var(--green-light);
         }
 
+        /* ===== Inbox 按钮样式 ===== */
+        .nav-inbox {
+            text-decoration: none;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-dark);
+            border: 1.5px solid var(--border-light);
+            padding: 8px 16px;
+            border-radius: var(--radius-pill);
+            transition: background 0.2s;
+            cursor: pointer;
+            background: transparent;
+            position: relative;
+        }
+
+        .nav-inbox:hover {
+            background: var(--green-light);
+            border-color: var(--green-primary);
+        }
+
+        /* 红点徽章 */
+        #inboxBadge {
+            background: #e74c3c;
+            color: #fff;
+            border-radius: 50%;
+            padding: 1px 7px;
+            font-size: 11px;
+            font-weight: 700;
+            margin-left: 4px;
+            display: none;
+            position: relative;
+            top: -1px;
+        }
+
         /* ===== 技能标签轮播（位于 My Profile 左侧） ===== */
         .skill-carousel {
             display: none;
@@ -1097,12 +1131,15 @@
             var navActions = document.getElementById('nav-actions');
             if (!navActions) return;
 
+            // 🔥 获取当前用户的 userId（用于 Inbox 链接）
+            var userId = currentSeeker || storedEmployerId || '';
+
             if (currentSeeker) {
-                // 求职者：轮播在左，My Profile 在右
                 navActions.innerHTML =
                     '<span class="skill-carousel" id="skillCarousel"></span>' +
-                    '<span class="nav-profile-link" id="nav-my-profile">My Profile</span>';
-                // 绑定点击打开抽屉
+                    '<span class="nav-profile-link" id="nav-my-profile">My Profile</span>' +
+                    '<a href="inbox.html?userId=' + encodeURIComponent(userId) + '" class="nav-inbox" id="nav-inbox">📬 Inbox <span id="inboxBadge">0</span></a>';
+
                 var profileBtn = document.getElementById('nav-my-profile');
                 if (profileBtn) {
                     profileBtn.addEventListener('click', function (e) {
@@ -1110,25 +1147,94 @@
                         openDrawer();
                     });
                 }
-                // 获取 skillCarousel 元素引用
                 skillCarouselEl = document.getElementById('skillCarousel');
-                // 加载技能并启动轮播
                 loadAndStartCarousel();
+                // 加载未读数量（需要先获取邮箱）
+                loadUserEmailAndUnread(userId);
             } else if (storedEmployerId) {
                 navActions.innerHTML =
                     '<a href="/employer-applicants.html?employerId=' + encodeURIComponent(storedEmployerId) +
                     '" class="nav-login" id="nav-manage-applicants">Applicants</a>' +
                     '<a href="/create-job.html?employerId=' + encodeURIComponent(storedEmployerId) +
-                    '" class="nav-cta nav-post-job" id="nav-post-job">Post a Job</a>';
+                    '" class="nav-cta nav-post-job" id="nav-post-job">Post a Job</a>' +
+                    '<a href="inbox.html?userId=' + encodeURIComponent(storedEmployerId) + '" class="nav-inbox" id="nav-inbox">📬 Inbox <span id="inboxBadge">0</span></a>';
                 stopSkillCarousel();
+                // 加载未读数量
+                loadUserEmailAndUnread(storedEmployerId);
             } else {
                 navActions.innerHTML =
                     '<a href="login.html" class="nav-login" id="nav-login-btn">Login</a>' +
                     '<a href="register.html" class="nav-cta" id="nav-get-started">Get Started &rarr;</a>';
                 stopSkillCarousel();
             }
-            // 更新抽屉内容
             updateDrawer();
+        }
+
+        // 🔥 通过 userId 获取邮箱，然后加载未读数量
+        function loadUserEmailAndUnread(userId) {
+            if (!userId) {
+                var badge = document.getElementById('inboxBadge');
+                if (badge) badge.style.display = 'none';
+                return;
+            }
+
+            // 先尝试从 localStorage 获取邮箱
+            var email = localStorage.getItem('userEmail');
+            if (email) {
+                loadUnreadCount(email);
+                return;
+            }
+
+            // 如果没有，通过 API 获取
+            fetch('/api/profile?userId=' + encodeURIComponent(userId))
+                .then(function (res) { return res.json(); })
+                .then(function (data) {
+                    if (data && data.email) {
+                        localStorage.setItem('userEmail', data.email);
+                        loadUnreadCount(data.email);
+                    }
+                })
+                .catch(function () {
+                    // 如果获取失败，隐藏红点
+                    var badge = document.getElementById('inboxBadge');
+                    if (badge) badge.style.display = 'none';
+                });
+        }
+
+        // 加载未读消息数量（红点）
+        function loadUnreadCount(email) {
+            if (!email) {
+                var badge = document.getElementById('inboxBadge');
+                if (badge) badge.style.display = 'none';
+                return;
+            }
+            fetch('/api/inbox/unread?email=' + encodeURIComponent(email))
+                .then(function (res) { return res.json(); })
+                .then(function (data) {
+                    var badge = document.getElementById('inboxBadge');
+                    if (badge) {
+                        if (data.unreadCount > 0) {
+                            badge.style.display = 'inline';
+                            badge.textContent = data.unreadCount;
+                        } else {
+                            badge.style.display = 'none';
+                        }
+                    }
+                })
+                .catch(function () {
+                    var badge = document.getElementById('inboxBadge');
+                    if (badge) badge.style.display = 'none';
+                });
+        }
+
+        // 页面加载时定时刷新未读数量（每30秒）
+        function startInboxPolling() {
+            var userId = currentSeeker || storedEmployerId || '';
+            if (!userId) return;
+            loadUserEmailAndUnread(userId);
+            setInterval(function () {
+                loadUserEmailAndUnread(userId);
+            }, 30000);
         }
 
         /* ── 原有的搜索、渲染、申请逻辑（完全不变） ── */
@@ -1381,12 +1487,18 @@
         document.addEventListener('DOMContentLoaded', function () {
             loadAllJobs();
             updateNav();
+            startInboxPolling();
         });
 
         // 当页面重新获得焦点时，刷新技能标签轮播（例如从 profileTags 返回）
         window.addEventListener('focus', function () {
             if (currentSeeker) {
                 loadAndStartCarousel();
+            }
+            // 刷新红点
+            var userId = currentSeeker || storedEmployerId || '';
+            if (userId) {
+                loadUserEmailAndUnread(userId);
             }
         });
     </script>
