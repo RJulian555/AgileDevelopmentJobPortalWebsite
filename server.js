@@ -1,10 +1,13 @@
 const express = require('express');
 const fs = require('fs');
 const path = require('path');
+const crypto = require('crypto');
 
 const app = express();
 const PORT = 3000;
 const USERS_FILE = path.join(__dirname, 'data', 'users.json');
+
+let resetTokensMemory = {};
 
 // ========== 中间件（顺序很重要） ==========
 app.use(express.urlencoded({ extended: true }));
@@ -119,6 +122,116 @@ app.put('/api/profile', (req, res) => {
     users[index] = existing;
     fs.writeFileSync(USERS_FILE, JSON.stringify(users, null, 2));
     res.json({ success: true });
+});
+
+// =========================================================================
+// 3. ADDED HERE: US-04 Forgot Password Endpoint (Connected to users.json)
+// =========================================================================
+app.post('/api/auth/forgot-password', (req, res) => {
+    const { email } = req.body;
+
+    // Validation Check
+    if (!email) {
+        return res.status(400).json({ error: "Email address field is required." });
+    }
+
+    // Database Lookup from your real data/users.json file
+    const users = JSON.parse(fs.readFileSync(USERS_FILE, 'utf8'));
+    const user = users.find(u => u.email.toLowerCase() === email.toLowerCase());
+    
+    if (!user) {
+        return res.status(404).json({ error: "No account registered with that email address." });
+    }
+
+    // Generate Secure Token & Expiry (Valid for 15 minutes)
+    const secureToken = crypto.randomBytes(20).toString('hex');
+    const expiryTime = Date.now() + 900000; 
+
+    // Store token mapped directly to user email
+    resetTokensMemory[secureToken] = {
+        email: user.email,
+        expires: expiryTime
+    };
+
+    // Output Mock Email Link directly to your running terminal log
+    const mockResetLink = `http://localhost:3000/reset-password.html?token=${secureToken}`;
+    console.log("==========================================");
+    console.log(`MOCK EMAIL SENT TO: ${user.email}`);
+    console.log(`RESET URL LINK: ${mockResetLink}`);
+    console.log("==========================================");
+
+    return res.status(200).json({ message: "Secure recovery token generated successfully." });
+});
+
+// =========================================================================
+// UPDATED: US-04 Forgot Password Endpoint with REAL Email Delivery
+// =========================================================================
+app.post('/api/auth/forgot-password', async (req, res) => {
+    const { email } = req.body;
+
+    if (!email) {
+        return res.status(400).json({ error: "Email address field is required." });
+    }
+
+    const users = JSON.parse(fs.readFileSync(USERS_FILE, 'utf8'));
+    const user = users.find(u => u.email.toLowerCase() === email.toLowerCase());
+    
+    if (!user) {
+        return res.status(404).json({ error: "No account registered with that email address." });
+    }
+
+    const secureToken = crypto.randomBytes(20).toString('hex');
+    const expiryTime = Date.now() + 900000; 
+
+    resetTokensMemory[secureToken] = {
+        email: user.email,
+        expires: expiryTime
+    };
+
+    const mockResetLink = `http://localhost:3000/reset-password.html?token=${secureToken}`;
+
+    // 📬 CREATE A REAL SMTP TRANSPORTER
+    // For testing without setting up a personal Gmail, we will use a free, automatic Ethereal SMTP account
+    try {
+        // Generates a temporary test email inbox on the fly for you
+        let testAccount = await nodemailer.createTestAccount();
+
+        let transporter = nodemailer.createTransport({
+            host: "smtp.ethereal.email",
+            port: 587,
+            secure: false, // true for 465, false for other ports
+            auth: {
+                user: testAccount.user, // generated ethereal user
+                pass: testAccount.pass, // generated ethereal password
+            },
+        });
+
+        // 📝 CONSTRUCT THE REAL EMAIL PACKET
+        let info = await transporter.sendMail({
+            from: '"Job Portal Support" <noreply@jobportal.com>', 
+            to: user.email, // This sends to whatever email address they typed!
+            subject: "Password Reset Request ✔", 
+            text: `You requested a password reset. Click this link to restore access: ${mockResetLink}`, 
+            html: `<div style="font-family: sans-serif; padding: 20px; border: 1px solid #e5e7eb; border-radius: 8px;">
+                    <h2>Password Reset Request</h2>
+                    <p>We received a request to reset your password. Click the button below to configure your new credentials. This link is valid for 15 minutes.</p>
+                    <a href="${mockResetLink}" style="background: #2563eb; color: white; padding: 10px 20px; text-decoration: none; border-radius: 6px; display: inline-block; font-weight: bold; margin: 15px 0;">Reset My Password</a>
+                    <p style="color: #6b7280; font-size: 12px;">If you didn't request this, you can safely ignore this message.</p>
+                   </div>`, 
+        });
+
+        console.log("==========================================");
+        console.log(`✉️ REAL EMAIL DISPATCHED TO: ${user.email}`);
+        // This generates a web URL where you can view your real sent email in an inbox!
+        console.log(`🔗 VIEW SENT EMAIL HERE: ${nodemailer.getTestMessageUrl(info)}`);
+        console.log("==========================================");
+
+        return res.status(200).json({ message: "Secure recovery token sent to your real email." });
+
+    } catch (emailError) {
+        console.error("Email delivery failed:", emailError);
+        return res.status(500).json({ error: "Failed to process email dispatch routing safely." });
+    }
 });
 
 // ========== 外部业务路由（挂载在根路径，但已包含 /api/*） ==========
