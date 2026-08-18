@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Job Applicants - JobWall</title>
+    <style>
+        * { box-sizing: border-box; }
+        :root { --green: #27ae60; --green-dark: #1f8b4c; --ink: #20302a; --muted: #66756f; --line: #dfe8e3; --soft: #f3f8f5; }
+        body { margin: 0; font-family: Arial, sans-serif; color: var(--ink); background: #f5f7f6; }
+        header { background: #fff; border-bottom: 1px solid var(--line); }
+        .nav { max-width: 1180px; margin: auto; min-height: 72px; padding: 0 24px; display: flex; align-items: center; justify-content: space-between; }
+        .brand { color: var(--green); font-size: 24px; font-weight: 800; text-decoration: none; }
+        .back { color: var(--ink); font-weight: 700; text-decoration: none; }
+        main { max-width: 1180px; margin: 34px auto; padding: 0 24px; }
+        .eyebrow { color: var(--green-dark); font-weight: 700; margin: 0 0 8px; }
+        h1 { font-size: clamp(28px, 4vw, 42px); margin: 0 0 8px; }
+        .job-meta { color: var(--muted); margin: 0 0 28px; }
+        .layout { display: grid; grid-template-columns: minmax(280px, 390px) minmax(0, 1fr); gap: 24px; align-items: start; }
+        .panel { background: #fff; border: 1px solid var(--line); border-radius: 16px; box-shadow: 0 8px 28px rgba(31, 60, 46, .06); overflow: hidden; }
+        .panel-heading { padding: 20px 22px; border-bottom: 1px solid var(--line); display: flex; align-items: center; justify-content: space-between; }
+        .panel-heading h2 { font-size: 19px; margin: 0; }
+        .count { min-width: 30px; padding: 5px 9px; border-radius: 20px; color: var(--green-dark); background: #e8f7ee; font-weight: 700; text-align: center; }
+        .applicant-list { margin: 0; padding: 0; list-style: none; }
+        .applicant-button { width: 100%; border: 0; border-bottom: 1px solid var(--line); padding: 18px 22px; background: #fff; text-align: left; cursor: pointer; display: flex; gap: 13px; align-items: center; }
+        .applicant-button:hover, .applicant-button.active { background: var(--soft); }
+        .applicant-button.active { box-shadow: inset 4px 0 var(--green); }
+        .avatar { width: 46px; height: 46px; flex: 0 0 46px; border-radius: 50%; object-fit: cover; display: grid; place-items: center; background: #dff2e7; color: var(--green-dark); font-weight: 800; }
+        .applicant-name { display: block; margin-bottom: 4px; font-size: 16px; font-weight: 700; }
+        .applicant-subtitle, .applied-date { display: block; color: var(--muted); font-size: 13px; line-height: 1.4; }
+        .details { min-height: 520px; padding: 28px; }
+        .profile-header { display: flex; gap: 18px; align-items: center; padding-bottom: 24px; border-bottom: 1px solid var(--line); }
+        .profile-header .avatar { width: 70px; height: 70px; flex-basis: 70px; font-size: 24px; }
+        .profile-header h2 { margin: 0 0 5px; }
+        .profile-header p { margin: 0; color: var(--muted); }
+        .resume-link { margin-left: auto; padding: 11px 16px; border-radius: 8px; color: #fff; background: var(--green); font-weight: 700; text-decoration: none; }
+        .resume-link:hover { background: var(--green-dark); }
+        .resume-missing { margin-left: auto; color: var(--muted); font-size: 14px; }
+        .info-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; margin: 24px 0; }
+        .info { padding: 14px 16px; border-radius: 10px; background: var(--soft); }
+        .label { display: block; margin-bottom: 5px; color: var(--muted); font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: .04em; }
+        .section { margin-top: 25px; }
+        .section h3 { margin: 0 0 10px; font-size: 17px; }
+        .section p { margin: 0; color: #44534d; line-height: 1.65; white-space: pre-wrap; }
+        .tags { display: flex; flex-wrap: wrap; gap: 8px; }
+        .tag { padding: 7px 10px; border-radius: 20px; background: #e8f7ee; color: var(--green-dark); font-size: 13px; font-weight: 700; }
+        .history { margin: 0; padding-left: 20px; color: #44534d; }
+        .history li { margin-bottom: 8px; }
+        .empty, .loading, .error { padding: 58px 26px; text-align: center; color: var(--muted); }
+        .empty-icon { width: 64px; height: 64px; margin: 0 auto 18px; border-radius: 50%; display: grid; place-items: center; background: #e8f7ee; color: var(--green); font-size: 28px; }
+        .empty h2, .error h2 { color: var(--ink); margin: 0 0 8px; }
+        [hidden] { display: none !important; }
+        @media (max-width: 760px) {
+            .layout { grid-template-columns: 1fr; }
+            .details { min-height: auto; }
+            .profile-header { align-items: flex-start; flex-wrap: wrap; }
+            .resume-link, .resume-missing { margin-left: 88px; }
+            .info-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <nav class="nav" aria-label="Main navigation">
+            <a class="brand" href="/dashboard.html">JobWall</a>
+            <a class="back" id="backLink" href="/dashboard.html">&larr; Back to jobs</a>
+        </nav>
+    </header>
+    <main>
+        <p class="eyebrow">Applicants</p>
+        <h1 id="jobTitle">Job applicants</h1>
+        <p class="job-meta" id="jobMeta">Loading job opening...</p>
+
+        <div id="loadingState" class="panel loading" role="status">Loading applicants...</div>
+        <div id="errorState" class="panel error" role="alert" hidden>
+            <h2>Unable to load applicants</h2>
+            <p id="errorMessage"></p>
+        </div>
+        <div id="emptyState" class="panel empty" hidden>
+            <div class="empty-icon" aria-hidden="true">&#128101;</div>
+            <h2>No applicants yet</h2>
+            <p>Applications for this job opening will appear here.</p>
+        </div>
+
+        <div id="applicantLayout" class="layout" hidden>
+            <section class="panel" aria-labelledby="listTitle">
+                <div class="panel-heading">
+                    <h2 id="listTitle">Applicant list</h2>
+                    <span class="count" id="applicantCount">0</span>
+                </div>
+                <ul class="applicant-list" id="applicantList"></ul>
+            </section>
+            <section class="panel details" id="applicantDetails" aria-live="polite"></section>
+        </div>
+    </main>
+    <script>
+        const params = new URLSearchParams(window.location.search);
+        const jobId = params.get('jobId');
+        const employerId = params.get('employerId') || sessionStorage.getItem('jobwallEmployerId');
+        const backLink = document.getElementById('backLink');
+        if (employerId) {
+            sessionStorage.setItem('jobwallEmployerId', employerId);
+            backLink.href = `/dashboard.html?employerId=${encodeURIComponent(employerId)}`;
+        }
+
+        const escapeHtml = value => String(value ?? '')
+            .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;').replace(/'/g, '&#039;');
+
+        function initials(name) {
+            return String(name || '?').split(/\s+/).slice(0, 2).map(part => part[0]).join('').toUpperCase();
+        }
+
+        function formatDate(value) {
+            if (!value) return 'Date unavailable';
+            const date = new Date(value);
+            return Number.isNaN(date.getTime()) ? 'Date unavailable' : `Applied ${date.toLocaleDateString('en-MY', { day: 'numeric', month: 'short', year: 'numeric' })}`;
+        }
+
+        function avatar(profile, extraClass = '') {
+            return profile.avatarSrc
+                ? `<img class="avatar ${extraClass}" src="${escapeHtml(profile.avatarSrc)}" alt="${escapeHtml(profile.fullName)}">`
+                : `<span class="avatar ${extraClass}" aria-hidden="true">${escapeHtml(initials(profile.fullName))}</span>`;
+        }
+
+        function renderList(applicants) {
+            document.getElementById('applicantCount').textContent = applicants.length;
+            document.getElementById('applicantList').innerHTML = applicants.map((applicant, index) => `
+                <li>
+                    <button class="applicant-button${index === 0 ? ' active' : ''}" type="button" data-application-id="${escapeHtml(applicant.applicationId)}">
+                        ${avatar(applicant.profile)}
+                        <span>
+                            <span class="applicant-name">${escapeHtml(applicant.profile.fullName)}</span>
+                            <span class="applicant-subtitle">${escapeHtml(applicant.profile.jobTitle || 'Job seeker')}</span>
+                            <span class="applied-date">${escapeHtml(formatDate(applicant.appliedAt))}</span>
+                        </span>
+                    </button>
+                </li>`).join('');
+        }
+
+        function historyList(items, type) {
+            if (!items.length) return '<p>Not provided.</p>';
+            return `<ul class="history">${items.map(item => {
+                if (typeof item === 'string') return `<li>${escapeHtml(item)}</li>`;
+                const title = item.title || item.position || item.degree || item.school || item.company || '';
+                const place = item.company || item.school || item.institution || '';
+                return `<li><strong>${escapeHtml(title)}</strong>${place && place !== title ? ` at ${escapeHtml(place)}` : ''}</li>`;
+            }).join('')}</ul>`;
+        }
+
+        function renderDetails(applicant) {
+            const profile = applicant.profile;
+            const resume = applicant.resumeUrl
+                ? `<a class="resume-link" href="${escapeHtml(applicant.resumeUrl)}" target="_blank" rel="noopener">View resume</a>`
+                : '<span class="resume-missing">No resume provided</span>';
+            const skills = profile.skills.length
+                ? profile.skills.map(skill => `<span class="tag">${escapeHtml(skill)}</span>`).join('')
+                : '<p>Not provided.</p>';
+
+            document.getElementById('applicantDetails').innerHTML = `
+                <div class="profile-header">
+                    ${avatar(profile)}
+                    <div><h2>${escapeHtml(profile.fullName)}</h2><p>${escapeHtml(profile.jobTitle || 'Job seeker')}</p></div>
+                    ${resume}
+                </div>
+                <div class="info-grid">
+                    <div class="info"><span class="label">Email</span>${escapeHtml(profile.email)}</div>
+                    <div class="info"><span class="label">Phone</span>${escapeHtml(profile.phone || 'Not provided')}</div>
+                    <div class="info"><span class="label">Location</span>${escapeHtml(profile.location || 'Not provided')}</div>
+                    <div class="info"><span class="label">Languages</span>${escapeHtml(profile.languages || 'Not provided')}</div>
+                </div>
+                <div class="section"><h3>About</h3><p>${escapeHtml(profile.about || 'Not provided.')}</p></div>
+                <div class="section"><h3>Skills</h3><div class="tags">${skills}</div></div>
+                <div class="section"><h3>Work experience</h3>${historyList(profile.work, 'work')}</div>
+                <div class="section"><h3>Education</h3>${historyList(profile.education, 'education')}</div>
+                <div class="section"><h3>Cover letter</h3><p>${escapeHtml(applicant.coverLetter || 'No cover letter was provided.')}</p></div>`;
+        }
+
+        async function selectApplicant(applicationId) {
+            document.querySelectorAll('.applicant-button').forEach(button => {
+                button.classList.toggle('active', button.dataset.applicationId === String(applicationId));
+            });
+            try {
+                const response = await fetch(`/api/jobs/${encodeURIComponent(jobId)}/applicants/${encodeURIComponent(applicationId)}?employerId=${encodeURIComponent(employerId)}`);
+                const result = await response.json();
+                if (!response.ok) throw new Error(result.error || 'Unable to load applicant details.');
+                renderDetails(result.applicant);
+            } catch (error) {
+                document.getElementById('applicantDetails').innerHTML = `<div class="error"><h2>Unable to load applicant</h2><p>${escapeHtml(error.message)}</p></div>`;
+            }
+        }
+
+        document.getElementById('applicantList').addEventListener('click', event => {
+            const button = event.target.closest('.applicant-button');
+            if (button) selectApplicant(button.dataset.applicationId);
+        });
+
+        async function loadApplicants() {
+            if (!jobId || !employerId) {
+                showError('A job opening and employer account are required. Open this page from one of your job listings.');
+                return;
+            }
+            try {
+                const response = await fetch(`/api/jobs/${encodeURIComponent(jobId)}/applicants?employerId=${encodeURIComponent(employerId)}`);
+                const result = await response.json();
+                if (!response.ok) throw new Error(result.error || 'Unable to load applicants.');
+                document.getElementById('jobTitle').textContent = result.job.title;
+                document.getElementById('jobMeta').textContent = [result.job.company, result.job.location, result.job.employmentType].filter(Boolean).join(' · ');
+                document.getElementById('loadingState').hidden = true;
+                if (!result.applicants.length) {
+                    document.getElementById('emptyState').hidden = false;
+                    return;
+                }
+                renderList(result.applicants);
+                document.getElementById('applicantLayout').hidden = false;
+                selectApplicant(result.applicants[0].applicationId);
+            } catch (error) {
+                showError(error.message);
+            }
+        }
+
+        function showError(message) {
+            document.getElementById('loadingState').hidden = true;
+            document.getElementById('errorMessage').textContent = message;
+            document.getElementById('errorState').hidden = false;
+        }
+
+        loadApplicants();
+    </script>
+</body>
+</html>

@@ -40,13 +40,14 @@
     "password": "hashed_123456",
     "role": "Job Seeker",
     "skills": [
-      "JavaScript",
+      "UI/UX Design",
+      "Adobe Illustrator",
+      "Adobe Photoshop",
       "Git",
-      "Prototyping",
-      "custom skill"
+      "Graphic Design"
     ],
     "profile": {
-      "fullName": "Amanda",
+      "fullName": "Amanda Test",
       "jobTitle": "Designer",
       "location": "Kuala Lumpur, Malaysia",
       "phone": "0123456789",
@@ -54,8 +55,36 @@
       "website": "https://hello.com",
       "about": "UI/UX enthusiast",
       "skills": "Figma, UI/UX",
-      "languages": "Chinese, English"
-    }
+      "languages": "Chinese, English",
+      "avatarSrc": "data:image/svg+xml,%3Csvg xmlns=\"http://www.w3.org/2000/svg\" width=\"50\" height=\"50\" viewBox=\"0 0 50 50\"%3E%3Ccircle cx=\"25\" cy=\"25\" r=\"25\" fill=\"%23bdc3c7\"/%3E%3Ccircle cx=\"25\" cy=\"18\" r=\"8\" fill=\"%2395a5a6\"/%3E%3Cpath d=\"M12 38 Q25 45 38 38\" stroke=\"%2395a5a6\" stroke-width=\"4\" fill=\"none\" stroke-linecap=\"round\"/%3E%3C/svg%3E"
+    },
+    "work": [
+      {
+        "company": "abc company",
+        "position": "ui designer",
+        "start": "2020-01-01",
+        "end": "2026-08-15",
+        "desc": "i sleep everything and didnt do anywork since ai can help me do it, i responsible for living only"
+      }
+    ],
+    "edu": [
+      {
+        "school": "TAR UMT",
+        "level": "SPM / O-Level",
+        "major": "Graphic Design",
+        "start": "2024-12-31",
+        "end": "2026-08-15",
+        "desc": "tarumt is so big i have to walk until cannot skip leg day"
+      },
+      {
+        "school": "also tarumt",
+        "level": "Diploma",
+        "major": "hci",
+        "start": "2026-08-16",
+        "end": "2026-08-16",
+        "desc": ""
+      }
+    ]
   },
   {
     "id": 1785056049550,
@@ -70,13 +99,16 @@
       "birthday": "2000-05-15",
       "website": "",
       "about": "",
-      "skills": "SQL, Excel",
-      "languages": "English, Chinese"
+      "skills": "SQL, Exceljyyyy, jhgyufu",
+      "languages": "English, Chinese",
+      "avatarSrc": "data:image/svg+xml,%3Csvg xmlns=\"http://www.w3.org/2000/svg\" width=\"50\" height=\"50\" viewBox=\"0 0 50 50\"%3E%3Ccircle cx=\"25\" cy=\"25\" r=\"25\" fill=\"%23bdc3c7\"/%3E%3Ccircle cx=\"25\" cy=\"18\" r=\"8\" fill=\"%2395a5a6\"/%3E%3Cpath d=\"M12 38 Q25 45 38 38\" stroke=\"%2395a5a6\" stroke-width=\"4\" fill=\"none\" stroke-linecap=\"round\"/%3E%3C/svg%3E"
     },
     "skills": [
       "SQL",
       "Excel"
-    ]
+    ],
+    "work": [],
+    "edu": []
   },
   {
     "id": 1785966009616,
@@ -84,17 +116,17 @@
     "password": "hashed_123456",
     "role": "Job Seeker",
     "profile": {
-      "fullName": "mm",
-      "jobTitle": "",
-      "location": "",
-      "phone": "",
-      "birthday": "",
+      "fullName": "Ali",
+      "jobTitle": "Software enginner",
+      "location": "Kuala Lumpur",
+      "phone": "+60 001234 5678",
+      "birthday": "2026-08-17",
       "website": "",
-      "about": "",
+      "about": "I am fresh grade programmer",
       "skillsText": "",
-      "languages": "",
+      "languages": "Chinese average",
       "avatarSrc": "data:image/svg+xml,%3Csvg xmlns=\"http://www.w3.org/2000/svg\" width=\"50\" height=\"50\" viewBox=\"0 0 50 50\"%3E%3Ccircle cx=\"25\" cy=\"25\" r=\"25\" fill=\"%23bdc3c7\"/%3E%3Ccircle cx=\"25\" cy=\"18\" r=\"8\" fill=\"%2395a5a6\"/%3E%3Cpath d=\"M12 38 Q25 45 38 38\" stroke=\"%2395a5a6\" stroke-width=\"4\" fill=\"none\" stroke-linecap=\"round\"/%3E%3C/svg%3E",
-      "skills": ""
+      "skills": "Good in collabrate"
     },
     "skills": [
       "Node.js",
@@ -103,8 +135,24 @@
       "AWS",
       "1"
     ],
-    "work": [],
-    "edu": []
+    "work": [
+      {
+        "company": "Huaweei",
+        "position": "Programmer",
+        "start": "2026-08-16",
+        "end": "2026-08-17",
+        "desc": "Good"
+      }
+    ],
+    "edu": [
+      {
+        "school": "TARUMT",
+        "major": "Degree",
+        "start": "2026-08-16",
+        "end": "2026-08-17",
+        "desc": "Good"
+      }
+    ]
   },
   {
     "id": 1785968709636,
@@ -153,5 +201,49 @@
     ],
     "work": [],
     "edu": []
+  },
+  {
+    "id": 1786759055149,
+    "email": "emp@emp.emp",
+    "password": "hashed_emp",
+    "role": "Employer",
+    "profile": {
+      "fullName": "",
+      "jobTitle": "",
+      "location": "",
+      "phone": "",
+      "birthday": "",
+      "website": "",
+      "about": "",
+      "skillsText": "",
+      "languages": "",
+      "avatarSrc": ""
+    },
+    "skills": [],
+    "work": [],
+    "edu": [],
+    "companyId": "company-4d451e15-0b63-42e3-8e9e-a88511965390"
+  },
+  {
+    "id": 1786759141663,
+    "email": "emp2@emp.emp",
+    "password": "hashed_emp",
+    "role": "Employer",
+    "profile": {
+      "fullName": "",
+      "jobTitle": "",
+      "location": "",
+      "phone": "",
+      "birthday": "",
+      "website": "",
+      "about": "",
+      "skillsText": "",
+      "languages": "",
+      "avatarSrc": ""
+    },
+    "skills": [],
+    "work": [],
+    "edu": [],
+    "companyId": null
   }
 ]

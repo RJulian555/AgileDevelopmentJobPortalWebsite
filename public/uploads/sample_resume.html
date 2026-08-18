@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Resume - Benjamin Shah</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Arial, sans-serif; }
+        body { background: #f4f7f6; color: #2c3e50; padding: 40px 20px; display: flex; justify-content: center; }
+        .resume-card { background: #ffffff; max-width: 800px; width: 100%; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); padding: 40px; border-top: 6px solid #2ecc71; }
+        
+        .header { display: flex; gap: 24px; align-items: center; border-bottom: 2px solid #eef2f5; padding-bottom: 24px; margin-bottom: 24px; }
+        .avatar { width: 100px; height: 100px; border-radius: 12px; object-fit: cover; background: #bdc3c7; flex-shrink: 0; }
+        .header-info h1 { font-size: 28px; font-weight: 800; color: #1a252f; letter-spacing: 0.5px; text-transform: uppercase; margin-bottom: 8px; }
+        .contact-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 6px 16px; font-size: 13px; color: #566573; }
+        .contact-grid span strong { color: #2c3e50; }
+
+        .section { margin-bottom: 24px; }
+        .section-title { font-size: 16px; font-weight: 800; color: #2ecc71; text-transform: uppercase; border-bottom: 1.5px solid #2ecc71; padding-bottom: 4px; margin-bottom: 14px; letter-spacing: 0.5px; }
+
+        .summary-p { font-size: 13.5px; line-height: 1.6; color: #34495e; text-align: justify; }
+
+        .entry { margin-bottom: 16px; }
+        .entry-header { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 4px; }
+        .entry-title { font-size: 14.5px; font-weight: 700; color: #1a252f; }
+        .entry-date { font-size: 12.5px; font-weight: 700; color: #7f8c8d; }
+        .entry-sub { font-size: 13px; font-style: italic; color: #7f8c8d; margin-bottom: 6px; }
+
+        ul.bullets { padding-left: 18px; }
+        ul.bullets li { font-size: 13px; line-height: 1.5; color: #4a5568; margin-bottom: 4px; }
+
+        .info-list p { font-size: 13px; line-height: 1.6; color: #34495e; margin-bottom: 6px; }
+        .info-list strong { color: #1a252f; }
+
+        .print-btn { display: inline-block; background: #2ecc71; color: #fff; border: none; padding: 10px 20px; border-radius: 20px; font-weight: 700; font-size: 13px; cursor: pointer; text-decoration: none; margin-bottom: 20px; transition: 0.2s; }
+        .print-btn:hover { background: #27ae60; }
+        
+        @media print {
+            body { background: #fff; padding: 0; }
+            .resume-card { box-shadow: none; padding: 0; border: none; }
+            .print-btn { display: none; }
+        }
+    </style>
+</head>
+<body>
+
+    <div style="max-width:800px; width:100%;">
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+            <button class="print-btn" onclick="window.print()">🖨️ Print / Save as PDF</button>
+            <a href="javascript:history.back()" style="color:#7f8c8d; text-decoration:none; font-size:13px; font-weight:600;">← Back</a>
+        </div>
+
+        <div class="resume-card">
+            <!-- Header -->
+            <div class="header">
+                <svg width="100" height="100" viewBox="0 0 100 100" class="avatar">
+                    <rect width="100" height="100" fill="#2c3e50"/>
+                    <circle cx="50" cy="40" r="22" fill="#ecf0f1"/>
+                    <path d="M 20 90 Q 50 60 80 90 Z" fill="#ecf0f1"/>
+                </svg>
+                <div class="header-info">
+                    <h1>BENJAMIN SHAH</h1>
+                    <div class="contact-grid">
+                        <span><strong>Address:</strong> 123 Anywhere St., Any City</span>
+                        <span><strong>Phone:</strong> 123-456-7890</span>
+                        <span><strong>Email:</strong> hello@reallygreatsite.com</span>
+                        <span><strong>Website:</strong> www.reallygreatsite.com</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Summary -->
+            <div class="section">
+                <div class="section-title">Summary</div>
+                <p class="summary-p">
+                    Results-oriented Mechanical and Mechatronics Engineer seeking a challenging position to apply expertise in designing and implementing innovative solutions for complex engineering challenges. Proven track record of success in project management, problem-solving, and cross-functional collaboration. Adept at utilising cutting-edge technologies to optimise processes and enhance overall efficiency.
+                </p>
+            </div>
+
+            <!-- Work Experience -->
+            <div class="section">
+                <div class="section-title">Work Experience</div>
+
+                <div class="entry">
+                    <div class="entry-header">
+                        <span class="entry-title">Mechatronics Engineer, Borcelle Technologies</span>
+                        <span class="entry-date">Jan 2023 - Present</span>
+                    </div>
+                    <ul class="bullets">
+                        <li>Led development of an advanced automation system, achieving a 15% increase in operational efficiency.</li>
+                        <li>Streamlined manufacturing processes, reducing production costs by 10%.</li>
+                        <li>Implemented preventive maintenance strategies, resulting in a 20% decrease in equipment downtime.</li>
+                    </ul>
+                </div>
+
+                <div class="entry">
+                    <div class="entry-header">
+                        <span class="entry-title">System Engineer, Arrowai Industries</span>
+                        <span class="entry-date">Feb 2021 - Dec 2022</span>
+                    </div>
+                    <ul class="bullets">
+                        <li>Designed and optimised a robotic control system, realizing a 12% performance improvement.</li>
+                        <li>Coordinated testing and validation, ensuring compliance with industry standards.</li>
+                        <li>Provided technical expertise, contributing to a 15% reduction in system failures.</li>
+                    </ul>
+                </div>
+
+                <div class="entry">
+                    <div class="entry-header">
+                        <span class="entry-title">Junior Project Engineer, Salford & Co Manufacturing</span>
+                        <span class="entry-date">Mar 2020 - Jan 2021</span>
+                    </div>
+                    <ul class="bullets">
+                        <li>Managed full lifecycle of a cutting-edge automation project, meeting all milestones.</li>
+                        <li>Conducted feasibility studies and risk assessments, mitigating potential project risks.</li>
+                        <li>Collaborated with clients, leading to a 25% increase in customer satisfaction.</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Education -->
+            <div class="section">
+                <div class="section-title">Education</div>
+
+                <div class="entry">
+                    <div class="entry-header">
+                        <span class="entry-title">Bachelor of Mechatronics Engineering with Honours</span>
+                        <span class="entry-date">Aug 2016 - Oct 2019</span>
+                    </div>
+                    <div class="entry-sub">University of Engineering Excellence</div>
+                    <ul class="bullets">
+                        <li>Major in Automotive Technology.</li>
+                        <li>Thesis on "Technological Advancements within the current Mechatronics Industry".</li>
+                    </ul>
+                </div>
+
+                <div class="entry">
+                    <div class="entry-header">
+                        <span class="entry-title">Diploma in Mechanical Engineering</span>
+                        <span class="entry-date">May 2014 - May 2016</span>
+                    </div>
+                    <div class="entry-sub">Engineering University</div>
+                    <ul class="bullets">
+                        <li>Relevant coursework in Structural Design and Project Management.</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Additional Information -->
+            <div class="section">
+                <div class="section-title">Additional Information</div>
+                <div class="info-list">
+                    <p><strong>Technical Skills:</strong> Mechatronics System Integration, Automotive Engineering Technology, Project Management, Robotics and Automation, CAD for Mechatronics.</p>
+                    <p><strong>Languages:</strong> English, Malay, Japanese.</p>
+                    <p><strong>Certifications:</strong> Professional Engineer (PE) License, Project Management Professional (PMP).</p>
+                    <p><strong>Awards/Activities:</strong> Actively participated in the "Innovation for Tomorrow" community outreach program, promoting STEM education and inspiring local students.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>

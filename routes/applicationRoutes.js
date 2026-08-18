@@ -1,10 +1,217 @@
 const express = require('express');
 const { readCollection, writeCollection, ensureCollection } = require('../services/jsonDatabase');
+const { getApplicantForJob, listApplicantsForJob } = require('../services/applicantService');
 
 const router = express.Router();
 
 ensureCollection('applications');
 ensureCollection('resumes');
+
+// Education Rank Mapping
+const EDU_RANKS = {
+    'no formal qualification': 0,
+    'spm / o-level': 1,
+    'spm': 1,
+    'o-level': 1,
+    'high school': 1,
+    'certificate': 2,
+    'diploma': 3,
+    "bachelor's degree": 4,
+    'bachelor': 4,
+    'degree': 4,
+    "master's degree": 5,
+    'master': 5,
+    'doctorate': 6,
+    'phd': 6
+};
+
+function getRequiredEduRank(jobEdu) {
+    if (!jobEdu) return 0;
+    const lower = String(jobEdu).toLowerCase();
+    for (const [key, rank] of Object.entries(EDU_RANKS)) {
+        if (lower.includes(key)) return rank;
+    }
+    return 0;
+}
+
+function getSeekerHighestEduRank(seeker) {
+    if (!seeker || !Array.isArray(seeker.edu) || seeker.edu.length === 0) return { rank: 0, label: 'No Formal Qualification' };
+    let maxRank = 0;
+    let highestEduLabel = 'No Formal Qualification';
+
+    seeker.edu.forEach(item => {
+        const levelStr = String(item.level || item.educationLevel || item.major || '').toLowerCase();
+        let itemRank = 0;
+        let itemLabel = item.level || item.educationLevel || item.major || 'Education Listed';
+
+        for (const [key, rank] of Object.entries(EDU_RANKS)) {
+            if (levelStr.includes(key)) {
+                itemRank = rank;
+                break;
+            }
+        }
+
+        if (itemRank > maxRank) {
+            maxRank = itemRank;
+            highestEduLabel = itemLabel;
+        }
+    });
+
+    if (maxRank === 0 && seeker.edu.length > 0) {
+        maxRank = 3;
+        highestEduLabel = seeker.edu[0].level || seeker.edu[0].major || 'Diploma';
+    }
+
+    return { rank: maxRank, label: highestEduLabel };
+}
+
+function getRequiredMinYears(jobExp) {
+    if (!jobExp) return 0;
+    const lower = String(jobExp).toLowerCase();
+    if (lower.includes('no experience') || lower.includes('internship') || lower.includes('less than 1')) return 0;
+    if (lower.includes('1-2') || lower.includes('1 year')) return 1;
+    if (lower.includes('3-5')) return 3;
+    if (lower.includes('6-8')) return 6;
+    if (lower.includes('9-10')) return 9;
+    if (lower.includes('more than 10') || lower.includes('10+')) return 10;
+    return 0;
+}
+
+function calculateSeekerExperienceYears(seeker) {
+    if (!seeker || !Array.isArray(seeker.work) || seeker.work.length === 0) return 0;
+    let totalMonths = 0;
+
+    seeker.work.forEach(item => {
+        const start = item.start ? new Date(item.start) : null;
+        const end = item.end ? new Date(item.end) : new Date();
+
+        if (start && !isNaN(start.getTime())) {
+            const months = (end.getFullYear() - start.getFullYear()) * 12 + (end.getMonth() - start.getMonth());
+            if (months > 0) totalMonths += months;
+        }
+    });
+
+    return Math.round((totalMonths / 12) * 10) / 10;
+}
+
+// Helper to compute complete requirements match fit (Skills + Experience Years + Education Level)
+function calculateRequirementsFit(seeker, job) {
+    // 1. SKILLS
+    const requiredSkills = Array.isArray(job.skillsRequired)
+        ? job.skillsRequired
+        : (Array.isArray(job.skills) ? job.skills : []);
+
+    let seekerSkills = [];
+    if (seeker) {
+        if (Array.isArray(seeker.skills)) seekerSkills = seekerSkills.concat(seeker.skills);
+        if (seeker.profile && typeof seeker.profile.skills === 'string') {
+            const parsed = seeker.profile.skills.split(',').map(s => s.trim()).filter(Boolean);
+            seekerSkills = seekerSkills.concat(parsed);
+        }
+    }
+
+    const lowerSeekerSkills = seekerSkills.map(s => String(s).toLowerCase());
+    const matchedSkills = [];
+    const missingSkills = [];
+
+    requiredSkills.forEach(reqSkill => {
+        if (lowerSeekerSkills.includes(String(reqSkill).toLowerCase())) {
+            matchedSkills.push(reqSkill);
+        } else {
+            missingSkills.push(reqSkill);
+        }
+    });
+
+    // 2. EXPERIENCE
+    const requiredExperience = job.experienceRequired || 'No experience required';
+    const minYearsRequired = getRequiredMinYears(requiredExperience);
+    const candidateYears = calculateSeekerExperienceYears(seeker);
+    const experienceMatched = candidateYears >= minYearsRequired;
+
+    // 3. EDUCATION
+    const requiredEducation = job.educationLevel || 'No formal qualification';
+    const reqEduRank = getRequiredEduRank(requiredEducation);
+    const seekerEduInfo = getSeekerHighestEduRank(seeker);
+    const educationMatched = seekerEduInfo.rank >= reqEduRank;
+
+    // TOTAL POINTS
+    let totalItems = requiredSkills.length;
+    let passedItems = matchedSkills.length;
+
+    if (job.experienceRequired && requiredExperience !== 'No experience required') {
+        totalItems += 1;
+        if (experienceMatched) passedItems += 1;
+    }
+
+    if (job.educationLevel && requiredEducation !== 'No formal qualification') {
+        totalItems += 1;
+        if (educationMatched) passedItems += 1;
+    }
+
+    const matchPercentage = totalItems > 0 ? Math.round((passedItems / totalItems) * 100) : 100;
+
+    let fitStatus = 'Meets Requirements';
+    if (totalItems > 0) {
+        if (matchPercentage === 100) {
+            fitStatus = 'Meets Requirements';
+        } else if (matchPercentage >= 50) {
+            fitStatus = 'Partial Match';
+        } else {
+            fitStatus = 'Below Requirements';
+        }
+    }
+
+    const allMissingRequirements = [...missingSkills];
+    if (job.experienceRequired && requiredExperience !== 'No experience required' && !experienceMatched) {
+        allMissingRequirements.push(`Experience: ${requiredExperience} required (${candidateYears} yrs current)`);
+    }
+    if (job.educationLevel && requiredEducation !== 'No formal qualification' && !educationMatched) {
+        allMissingRequirements.push(`Education: ${requiredEducation} required (${seekerEduInfo.label || 'lower'})`);
+    }
+
+    return {
+        matchedSkills,
+        missingSkills,
+        experience: {
+            required: requiredExperience,
+            candidateYears,
+            matched: experienceMatched
+        },
+        education: {
+            required: requiredEducation,
+            candidateEduLabel: seekerEduInfo.label,
+            matched: educationMatched
+        },
+        allMissingRequirements,
+        matchPercentage,
+        fitStatus,
+        requiredSkills
+    };
+}
+// Employer view: applicants are always scoped to one owned job opening.
+router.get('/api/jobs/:jobId/applicants', (req, res) => {
+    try {
+        return res.json(listApplicantsForJob(req.params.jobId, req.query.employerId));
+    } catch (error) {
+        return res.status(error.statusCode || 500).json({
+            error: error.message || 'Unable to retrieve applicants.'
+        });
+    }
+});
+
+router.get('/api/jobs/:jobId/applicants/:applicationId', (req, res) => {
+    try {
+        return res.json(getApplicantForJob(
+            req.params.jobId,
+            req.params.applicationId,
+            req.query.employerId
+        ));
+    } catch (error) {
+        return res.status(error.statusCode || 500).json({
+            error: error.message || 'Unable to retrieve the applicant.'
+        });
+    }
+});
 
 // GET /api/applications?seekerId=<id>
 // Returns array of jobIds the seeker has already applied to
@@ -34,6 +241,99 @@ router.get('/api/applications/check', (req, res) => {
     );
 
     res.json({ applied: !!existing });
+});
+
+// GET /api/employer/applications?employerId=<id>
+// Retrieves applicants for jobs posted by the employer's company, with full fit scoring (skills + experience + education)
+router.get('/api/employer/applications', (req, res) => {
+    const employerId = req.query.employerId;
+    if (!employerId) {
+        return res.status(400).json({ error: 'employerId is required.' });
+    }
+
+    const users = readCollection('users');
+    const employer = users.find(u => String(u.id) === String(employerId) && u.role === 'Employer');
+    if (!employer || !employer.companyId) {
+        return res.status(403).json({ error: 'Employer must belong to a company to view applicants.' });
+    }
+
+    const jobs = readCollection('jobs').filter(j => String(j.companyId) === String(employer.companyId));
+    const companyJobIds = jobs.map(j => String(j.id));
+
+    const applications = readCollection('applications');
+    const companyApplications = applications.filter(a => a && a.id && a.jobId && companyJobIds.includes(String(a.jobId)));
+
+    const enrichedApplications = companyApplications.map(app => {
+        const job = jobs.find(j => String(j.id) === String(app.jobId));
+        const seeker = users.find(u => String(u.id) === String(app.seekerId));
+
+        const fit = calculateRequirementsFit(seeker, job || {});
+
+        return {
+            id: app.id,
+            jobId: app.jobId,
+            jobTitle: job ? job.title : 'Unknown Job',
+            companyId: employer.companyId,
+            seekerId: app.seekerId,
+            seekerName: (seeker && seeker.profile && seeker.profile.fullName) || 'Applicant',
+            seekerEmail: seeker ? seeker.email : '',
+            seekerJobTitle: (seeker && seeker.profile && seeker.profile.jobTitle) || '',
+            seekerLocation: (seeker && seeker.profile && seeker.profile.location) || '',
+            appliedAt: app.appliedAt,
+            resumeUrl: app.resumeUrl,
+            status: app.status || 'pending',
+            fit: fit
+        };
+    });
+
+    res.json(enrichedApplications);
+});
+
+// PATCH /api/applications/:id/status
+// Allows employer to accept or reject an applicant
+router.patch('/api/applications/:id/status', (req, res) => {
+    const { id } = req.params;
+    const { employerId, status } = req.body;
+
+    if (!employerId || !status) {
+        return res.status(400).json({ error: 'employerId and status are required.' });
+    }
+
+    if (!['accepted', 'rejected', 'pending'].includes(status)) {
+        return res.status(400).json({ error: 'Status must be accepted, rejected, or pending.' });
+    }
+
+    const users = readCollection('users');
+    const employer = users.find(u => String(u.id) === String(employerId) && u.role === 'Employer');
+    if (!employer || !employer.companyId) {
+        return res.status(403).json({ error: 'Employer must belong to a company to manage applicants.' });
+    }
+
+    const applications = readCollection('applications');
+    const appIndex = applications.findIndex(a => String(a.id) === String(id));
+    if (appIndex === -1) {
+        return res.status(404).json({ error: 'Application not found.' });
+    }
+
+    const targetApp = applications[appIndex];
+    const jobs = readCollection('jobs');
+    const job = jobs.find(j => String(j.id) === String(targetApp.jobId));
+
+    if (!job || String(job.companyId) !== String(employer.companyId)) {
+        return res.status(403).json({ error: 'You are not authorized to update applications for this job.' });
+    }
+
+    applications[appIndex].status = status;
+    writeCollection('applications', applications);
+
+    const message = status === 'accepted'
+        ? 'Applicant accepted successfully!'
+        : `Applicant status set to ${status}.`;
+
+    res.json({
+        message,
+        application: applications[appIndex]
+    });
 });
 
 // POST /api/applications
@@ -92,13 +392,14 @@ router.post('/api/applications', (req, res) => {
         return res.status(404).json({ error: 'Job not found.' });
     }
 
-    // 5. Save application
+    // 5. Save application with status = pending
     const newApplication = {
         id: `app-${Date.now()}`,
         jobId:     String(jobId),
         seekerId:  String(seekerId),
         appliedAt: new Date().toISOString(),
-        resumeUrl: String(resumeUrl)
+        resumeUrl: String(resumeUrl),
+        status:    'pending'
     };
 
     applications.push(newApplication);

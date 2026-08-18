@@ -1,10 +1,12 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Personal Information</title>
     <style>
+        /* ===== 原有的所有样式（保持不变） ===== */
         * { box-sizing: border-box; font-family: 'Arial', sans-serif; margin: 0; padding: 0; }
         html, body { height: 100%; overflow: hidden; }
         body { background-color: #f4f7f6; display: flex; flex-direction: column; position: relative; }
@@ -21,6 +23,8 @@
         .top-bar .actions button { border-radius: 30px; border: none; padding: 8px 24px; font-weight: 700; font-size: 0.9rem; cursor: pointer; transition: 0.2s; }
         .btn-save { background: #2ecc71; color: #fff; box-shadow: 0 4px 10px rgba(46,204,113,0.25); }
         .btn-save:hover { background: #27ae60; transform: translateY(-2px); box-shadow: 0 6px 16px rgba(46,204,113,0.35); }
+        .btn-pdf { background: #e74c3c; color: #fff; box-shadow: 0 4px 10px rgba(231,76,60,0.25); }
+        .btn-pdf:hover { background: #c0392b; transform: translateY(-2px); box-shadow: 0 6px 16px rgba(231,76,60,0.35); }
         .btn-reset { background: transparent; color: #7f8c8d; border: 1px solid #bdc3c7 !important; }
         .btn-reset:hover { border-color: #2ecc71 !important; color: #2ecc71; background: #f0faf4; }
         .back-btn { background: transparent; border: 2px solid #2ecc71 !important; color: #2ecc71; width: 42px; height: 42px; border-radius: 50%; font-size: 20px; display: flex; align-items: center; justify-content: center; padding: 0; font-weight: bold; transition: 0.2s; cursor: pointer; }
@@ -56,8 +60,198 @@
         .column::-webkit-scrollbar-thumb:hover { background: #95a5a6; }
         @media (max-width: 820px) { .columns-container { flex-direction: column; overflow-y: auto; padding: 15px; gap: 16px; } .column { max-height: none; overflow-y: visible; flex: none; height: auto; } .top-bar { padding: 12px 20px; } .top-bar .brand { font-size: 22px; } }
         .validation-error { border-color: #e74c3c !important; background-color: #fff5f5 !important; }
+
+        /* ================================================================
+           打印样式（简历格式）
+           ================================================================ */
+        @media print {
+            /* 隐藏界面元素 */
+            .top-bar { display: none !important; }
+            .bg-animation-wrapper { display: none !important; }
+            .column .add-btn { display: none !important; }
+            .entry-card .delete-btn { display: none !important; }
+            .profile-field .value input, .profile-field .value textarea {
+                border: none !important;
+                background: transparent !important;
+                padding: 0 !important;
+            }
+
+            /* 重置页面 */
+            html, body {
+                overflow: visible !important;
+                background: white !important;
+                height: auto !important;
+                display: block !important;
+            }
+            body {
+                padding: 20px !important;
+            }
+
+            /* 隐藏非打印区域 */
+            body > *:not(.print-resume) {
+                display: none !important;
+            }
+            .print-resume {
+                display: block !important;
+                max-width: 100% !important;
+                font-family: 'Arial', sans-serif !important;
+            }
+
+            /* ===== 顶部：头像 + 姓名/职位 ===== */
+            .resume-header {
+                display: flex !important;
+                align-items: center !important;
+                gap: 24px !important;
+                padding-bottom: 16px !important;
+                border-bottom: 3px solid #2ecc71 !important;
+                margin-bottom: 20px !important;
+            }
+            .resume-header .avatar {
+                width: 80px !important;
+                height: 80px !important;
+                border-radius: 50% !important;
+                object-fit: cover !important;
+                border: 2px solid #2ecc71 !important;
+                flex-shrink: 0 !important;
+            }
+            .resume-header .name-title h1 {
+                font-size: 28px !important;
+                font-weight: 700 !important;
+                color: #2c3e50 !important;
+                margin: 0 !important;
+            }
+            .resume-header .name-title .position {
+                font-size: 18px !important;
+                color: #2ecc71 !important;
+                font-weight: 600 !important;
+                margin-top: 4px !important;
+            }
+
+            /* ===== 主体：两栏布局 ===== */
+            .resume-body {
+                display: flex !important;
+                gap: 30px !important;
+            }
+            .resume-left {
+                flex: 0 0 30% !important;
+                min-width: 200px !important;
+            }
+            .resume-right {
+                flex: 1 !important;
+            }
+
+            /* ===== 左栏样式 ===== */
+            .resume-section {
+                margin-bottom: 16px !important;
+            }
+            .resume-section h3 {
+                font-size: 14px !important;
+                font-weight: 700 !important;
+                color: #2c3e50 !important;
+                border-bottom: 2px solid #2ecc71 !important;
+                padding-bottom: 4px !important;
+                margin-bottom: 8px !important;
+                text-transform: uppercase !important;
+                letter-spacing: 1px !important;
+            }
+            .resume-item {
+                font-size: 12px !important;
+                padding: 3px 0 !important;
+                color: #34495e !important;
+                line-height: 1.6 !important;
+            }
+            .resume-item strong {
+                font-weight: 600 !important;
+                color: #2c3e50 !important;
+            }
+
+            /* ===== 右栏样式 ===== */
+            .resume-right .resume-section {
+                margin-bottom: 18px !important;
+            }
+            .resume-right .resume-section h3 {
+                font-size: 14px !important;
+                font-weight: 700 !important;
+                color: #2c3e50 !important;
+                border-bottom: 2px solid #2ecc71 !important;
+                padding-bottom: 4px !important;
+                margin-bottom: 8px !important;
+                text-transform: uppercase !important;
+                letter-spacing: 1px !important;
+            }
+
+            /* 工作/教育条目 */
+            .resume-entry {
+                margin-bottom: 10px !important;
+                padding-bottom: 8px !important;
+                border-bottom: 1px dashed #ecf0f1 !important;
+            }
+            .resume-entry:last-child {
+                border-bottom: none !important;
+            }
+            .resume-entry .entry-header {
+                display: flex !important;
+                justify-content: space-between !important;
+                align-items: baseline !important;
+                flex-wrap: wrap !important;
+                margin-bottom: 2px !important;
+            }
+            .resume-entry .entry-title {
+                font-size: 13px !important;
+                font-weight: 700 !important;
+                color: #2c3e50 !important;
+            }
+            .resume-entry .entry-company {
+                font-size: 12px !important;
+                font-weight: 600 !important;
+                color: #2ecc71 !important;
+            }
+            .resume-entry .entry-date {
+                font-size: 11px !important;
+                color: #7f8c8d !important;
+                font-weight: 500 !important;
+            }
+            .resume-entry .entry-desc {
+                font-size: 12px !important;
+                color: #34495e !important;
+                margin-top: 3px !important;
+                line-height: 1.5 !important;
+            }
+
+            /* 教育特殊样式 */
+            .resume-entry .entry-major {
+                font-size: 12px !important;
+                font-weight: 600 !important;
+                color: #2c3e50 !important;
+            }
+
+            /* 技能标签 */
+            .resume-skills {
+                display: flex !important;
+                flex-wrap: wrap !important;
+                gap: 6px !important;
+                margin-top: 4px !important;
+            }
+            .resume-skills .skill-tag {
+                background: #eef9f2 !important;
+                color: #2ecc71 !important;
+                padding: 2px 12px !important;
+                border-radius: 20px !important;
+                font-size: 11px !important;
+                font-weight: 600 !important;
+                border: 1px solid #2ecc71 !important;
+            }
+
+            /* About Me 文本 */
+            .resume-about {
+                font-size: 12px !important;
+                color: #34495e !important;
+                line-height: 1.6 !important;
+            }
+        }
     </style>
 </head>
+
 <body>
 
     <!-- Background animation -->
@@ -77,6 +271,7 @@
         <div class="actions">
             <button class="btn-reset" type="button" onclick="resetForm()">Reset</button>
             <button class="btn-save" type="button" onclick="saveForm()">Save Information</button>
+            <button class="btn-pdf" type="button" onclick="sendAsPDF()">📄 Send As PDF</button>
         </div>
     </div>
 
@@ -90,25 +285,57 @@
                 <div class="profile-field avatar-field">
                     <span class="label">Avatar</span>
                     <div class="value">
-                        <img id="avatarPreview" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='50' height='50' viewBox='0 0 50 50'%3E%3Ccircle cx='25' cy='25' r='25' fill='%23bdc3c7'/%3E%3Ccircle cx='25' cy='18' r='8' fill='%2395a5a6'/%3E%3Cpath d='M12 38 Q25 45 38 38' stroke='%2395a5a6' stroke-width='4' fill='none' stroke-linecap='round'/%3E%3C/svg%3E" alt="avatar">
-                        <input type="file" id="avatarInput" name="avatar" accept="image/*" onchange="previewAvatar(event)">
+                        <img id="avatarPreview"
+                            src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='50' height='50' viewBox='0 0 50 50'%3E%3Ccircle cx='25' cy='25' r='25' fill='%23bdc3c7'/%3E%3Ccircle cx='25' cy='18' r='8' fill='%2395a5a6'/%3E%3Cpath d='M12 38 Q25 45 38 38' stroke='%2395a5a6' stroke-width='4' fill='none' stroke-linecap='round'/%3E%3C/svg%3E"
+                            alt="avatar">
+                        <input type="file" id="avatarInput" name="avatar" accept="image/*"
+                            onchange="previewAvatar(event)">
                     </div>
                 </div>
-                <div class="profile-field"><span class="label">Name</span><div class="value"><input type="text" name="fullName" placeholder="Please enter your name" maxlength="50" required></div></div>
-                <div class="profile-field"><span class="label">Position</span><div class="value"><input type="text" name="jobTitle" placeholder="Please enter your position" maxlength="50"></div></div>
-                <div class="profile-field"><span class="label">Location</span><div class="value"><input type="text" name="location" placeholder="City · Area" maxlength="50"></div></div>
-                <div class="profile-field"><span class="label">Email</span><div class="value"><input type="email" name="email" placeholder="example@email.com" required></div></div>
-                <div class="profile-field"><span class="label">Phone</span><div class="value"><input type="tel" name="phone" placeholder="+60 00000 88888" maxlength="20"></div></div>
-                <div class="profile-field"><span class="label">Birthday</span><div class="value"><input type="date" name="birthday"></div></div>
-                <div class="profile-field"><span class="label">Website</span><div class="value"><input type="url" name="website" placeholder="https://example.com" maxlength="200"></div></div>
-                <div class="profile-field"><span class="label">About Me</span><div class="value"><textarea name="about" rows="2" placeholder="Tell us a bit about yourself..." maxlength="100"></textarea></div></div>
-                <div class="profile-field"><span class="label">Skills</span><div class="value"><input type="text" name="skills" placeholder="Skills, separated by commas..." maxlength="50"></div></div>
-                <div class="profile-field"><span class="label">Languages</span><div class="value"><input type="text" name="languages" placeholder="Chinese (Native), English (Professional)..." maxlength="50"></div></div>
+                <div class="profile-field"><span class="label">Name</span>
+                    <div class="value"><input type="text" name="fullName" placeholder="Please enter your name"
+                            maxlength="50" required></div>
+                </div>
+                <div class="profile-field"><span class="label">Position</span>
+                    <div class="value"><input type="text" name="jobTitle" placeholder="Please enter your position"
+                            maxlength="50"></div>
+                </div>
+                <div class="profile-field"><span class="label">Location</span>
+                    <div class="value"><input type="text" name="location" placeholder="City · Area" maxlength="50">
+                    </div>
+                </div>
+                <div class="profile-field"><span class="label">Email</span>
+                    <div class="value"><input type="email" name="email" placeholder="example@email.com" required></div>
+                </div>
+                <div class="profile-field"><span class="label">Phone</span>
+                    <div class="value"><input type="tel" name="phone" placeholder="+60 00000 88888" maxlength="20">
+                    </div>
+                </div>
+                <div class="profile-field"><span class="label">Birthday</span>
+                    <div class="value"><input type="date" name="birthday"></div>
+                </div>
+                <div class="profile-field"><span class="label">Website</span>
+                    <div class="value"><input type="url" name="website" placeholder="https://example.com"
+                            maxlength="200"></div>
+                </div>
+                <div class="profile-field"><span class="label">About Me</span>
+                    <div class="value"><textarea name="about" rows="2" placeholder="Tell us a bit about yourself..."
+                            maxlength="100"></textarea></div>
+                </div>
+                <div class="profile-field"><span class="label">Skills</span>
+                    <div class="value"><input type="text" name="skills" placeholder="Skills, separated by commas..."
+                            maxlength="50"></div>
+                </div>
+                <div class="profile-field"><span class="label">Languages</span>
+                    <div class="value"><input type="text" name="languages"
+                            placeholder="Chinese (Native), English (Professional)..." maxlength="50"></div>
+                </div>
             </div>
 
             <!-- Mid：working experience -->
             <div class="column">
-                <h2>💼 working experience <button type="button" class="add-btn" onclick="addEntry('work')">+ add</button></h2>
+                <h2>💼 working experience <button type="button" class="add-btn" onclick="addEntry('work')">+
+                        add</button></h2>
                 <div id="workEntries"></div>
             </div>
 
@@ -138,7 +365,7 @@
         }
 
         // ================================================================
-        // 2. API calls (with userId in query)
+        // 2. API calls
         // ================================================================
         const API_BASE = '/api/profile';
 
@@ -161,7 +388,7 @@
         }
 
         // ================================================================
-        // 3. Form fields mapping & helpers
+        // 3. Form helpers
         // ================================================================
         const defaultAvatar = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="50" height="50" viewBox="0 0 50 50"%3E%3Ccircle cx="25" cy="25" r="25" fill="%23bdc3c7"/%3E%3Ccircle cx="25" cy="18" r="8" fill="%2395a5a6"/%3E%3Cpath d="M12 38 Q25 45 38 38" stroke="%2395a5a6" stroke-width="4" fill="none" stroke-linecap="round"/%3E%3C/svg%3E';
 
@@ -201,7 +428,20 @@
                     <button type="button" class="delete-btn" onclick="deleteEntry(this)">✕</button>
                     <div class="field-row">
                         <label>School <input type="text" name="edu_school_${index}" placeholder="School Name" maxlength="50"></label>
-                        <label>Major <input type="text" name="edu_major_${index}" placeholder="Major/Degree" maxlength="50"></label>
+                        <label>Level
+                            <select name="edu_level_${index}">
+                                <option value="No formal qualification">No formal qualification</option>
+                                <option value="SPM / O-Level">SPM / O-Level</option>
+                                <option value="Certificate">Certificate</option>
+                                <option value="Diploma" selected>Diploma</option>
+                                <option value="Bachelor's Degree">Bachelor's Degree</option>
+                                <option value="Master's Degree">Master's Degree</option>
+                                <option value="Doctorate">Doctorate</option>
+                            </select>
+                        </label>
+                    </div>
+                    <div class="field-row">
+                        <label style="flex:1;">Programme / Major <input type="text" name="edu_major_${index}" placeholder="e.g., Graphic Design, Computer Science" maxlength="50"></label>
                     </div>
                     <div class="field-row">
                         <label>Start Date <input type="date" name="edu_start_${index}"></label>
@@ -245,7 +485,6 @@
         // ================================================================
         function applyFormData(data) {
             if (!data) {
-                // clear all
                 document.querySelectorAll('[name]').forEach(el => el.value = '');
                 document.getElementById('avatarPreview').src = defaultAvatar;
                 document.getElementById('avatarInput').value = '';
@@ -256,20 +495,17 @@
             }
 
             const profile = data.profile || {};
-            const personalNames = ['fullName','jobTitle','location','phone','birthday','website','about','skills','languages'];
+            const personalNames = ['fullName', 'jobTitle', 'location', 'phone', 'birthday', 'website', 'about', 'skills', 'languages'];
             personalNames.forEach(name => {
                 const el = document.querySelector(`[name="${name}"]`);
                 if (el) el.value = profile[name] || '';
             });
-            // email is at top level
             const emailEl = document.querySelector('[name="email"]');
             if (emailEl) emailEl.value = data.email || '';
 
-            // avatar
             document.getElementById('avatarPreview').src = profile.avatarSrc || defaultAvatar;
             document.getElementById('avatarInput').value = '';
 
-            // work
             const workContainer = document.getElementById('workEntries');
             workContainer.innerHTML = '';
             workCounter = 0;
@@ -293,18 +529,26 @@
                 `);
             });
 
-            // edu
             const eduContainer = document.getElementById('eduEntries');
             eduContainer.innerHTML = '';
             eduCounter = 0;
             (data.edu || []).forEach(item => {
                 const idx = ++eduCounter;
+                const level = item.level || item.educationLevel || 'Diploma';
                 eduContainer.insertAdjacentHTML('beforeend', `
                     <div class="entry-card" data-type="edu" data-index="${idx}">
                         <button type="button" class="delete-btn" onclick="deleteEntry(this)">✕</button>
                         <div class="field-row">
                             <label>school <input type="text" name="edu_school_${idx}" placeholder="School Name" maxlength="100" value="${escapeHtml(item.school || '')}"></label>
-                            <label>major <input type="text" name="edu_major_${idx}" placeholder="Major/Degree" maxlength="100" value="${escapeHtml(item.major || '')}"></label>
+                            <label>level
+                                <select name="edu_level_${idx}">
+                                    ${['No formal qualification', 'SPM / O-Level', 'Certificate', 'Diploma', "Bachelor's Degree", "Master's Degree", 'Doctorate']
+                        .map(lvl => `<option value="${lvl}" ${lvl === level ? 'selected' : ''}>${lvl}</option>`).join('')}
+                                </select>
+                            </label>
+                        </div>
+                        <div class="field-row">
+                            <label style="flex:1;">programme / major <input type="text" name="edu_major_${idx}" placeholder="e.g., Graphic Design, Computer Science" maxlength="100" value="${escapeHtml(item.major || '')}"></label>
                         </div>
                         <div class="field-row">
                             <label>start date <input type="date" name="edu_start_${idx}" value="${item.start || ''}"></label>
@@ -316,7 +560,6 @@
                     </div>
                 `);
             });
-
             clearValidationStyles();
         }
 
@@ -325,17 +568,15 @@
         // ================================================================
         function collectFormData() {
             const profile = {};
-            const personalNames = ['fullName','jobTitle','location','phone','birthday','website','about','skills','languages'];
+            const personalNames = ['fullName', 'jobTitle', 'location', 'phone', 'birthday', 'website', 'about', 'skills', 'languages'];
             personalNames.forEach(name => {
                 const el = document.querySelector(`[name="${name}"]`);
                 profile[name] = el ? el.value : '';
             });
             const emailEl = document.querySelector('[name="email"]');
             const email = emailEl ? emailEl.value : '';
-
             profile.avatarSrc = document.getElementById('avatarPreview').src;
 
-            // collect work
             const work = [];
             document.querySelectorAll('#workEntries .entry-card').forEach(card => {
                 work.push({
@@ -351,6 +592,7 @@
             document.querySelectorAll('#eduEntries .entry-card').forEach(card => {
                 edu.push({
                     school: card.querySelector('[name^="edu_school_"]')?.value || '',
+                    level: card.querySelector('[name^="edu_level_"]')?.value || 'Diploma',
                     major: card.querySelector('[name^="edu_major_"]')?.value || '',
                     start: card.querySelector('[name^="edu_start_"]')?.value || '',
                     end: card.querySelector('[name^="edu_end_"]')?.value || '',
@@ -358,16 +600,11 @@
                 });
             });
 
-            return {
-                email: email,
-                profile: profile,
-                work: work,
-                edu: edu
-            };
+            return { email, profile, work, edu };
         }
 
         // ================================================================
-        // 6. Validation (unchanged)
+        // 6. Validation
         // ================================================================
         function checkLength(value, max, fieldName) {
             if (value.length > max) {
@@ -392,65 +629,51 @@
         function validateForm() {
             const errors = [];
             const fullName = document.querySelector('[name="fullName"]')?.value.trim() || '';
-            if (!fullName) {
-                errors.push('name cannot be empty');
-                markError('[name="fullName"]');
-            } else {
-                const err = checkLength(fullName, 100, 'name');
-                if (err) { errors.push(err); markError('[name="fullName"]'); }
-            }
+            if (!fullName) { errors.push('name cannot be empty'); markError('[name="fullName"]'); }
+            else { const err = checkLength(fullName, 100, 'name'); if (err) { errors.push(err); markError('[name="fullName"]'); } }
+
             const email = document.querySelector('[name="email"]')?.value.trim() || '';
             if (!email) { errors.push('email cannot be empty'); markError('[name="email"]'); }
-            else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-                errors.push('email format is invalid');
-                markError('[name="email"]');
-            }
+            else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { errors.push('email format is invalid'); markError('[name="email"]'); }
+
             const phone = document.querySelector('[name="phone"]')?.value.trim() || '';
-            if (phone && !/^\+?[\d\s\-()]{7,20}$/.test(phone)) {
-                errors.push('phone number format is invalid');
-                markError('[name="phone"]');
-            }
+            if (phone && !/^\+?[\d\s\-()]{7,20}$/.test(phone)) { errors.push('phone number format is invalid'); markError('[name="phone"]'); }
+
             const website = document.querySelector('[name="website"]')?.value.trim() || '';
             if (website) {
                 const urlPattern = /^(https?:\/\/)[^\s$.?#].[^\s]*$/i;
-                if (!urlPattern.test(website)) {
-                    errors.push('website format is invalid, please start with http:// or https://');
-                    markError('[name="website"]');
-                }
-                const err = checkLength(website, 255, 'personal website');
-                if (err) { errors.push(err); markError('[name="website"]'); }
+                if (!urlPattern.test(website)) { errors.push('website format is invalid'); markError('[name="website"]'); }
+                const err = checkLength(website, 255, 'personal website'); if (err) { errors.push(err); markError('[name="website"]'); }
             }
+
             const jobTitle = document.querySelector('[name="jobTitle"]')?.value.trim() || '';
-            if (jobTitle) {
-                const err = checkLength(jobTitle, 100, 'job title');
-                if (err) { errors.push(err); markError('[name="jobTitle"]'); }
-            }
+            if (jobTitle) { const err = checkLength(jobTitle, 100, 'job title'); if (err) { errors.push(err); markError('[name="jobTitle"]'); } }
+
             const about = document.querySelector('[name="about"]')?.value || '';
-            const errAbout = checkLength(about, 500, 'about me');
-            if (errAbout) { errors.push(errAbout); markError('[name="about"]'); }
+            const errAbout = checkLength(about, 500, 'about me'); if (errAbout) { errors.push(errAbout); markError('[name="about"]'); }
+
             const skillsText = document.querySelector('[name="skills"]')?.value || '';
-            const errSkills = checkLength(skillsText, 500, 'skills');
-            if (errSkills) { errors.push(errSkills); markError('[name="skills"]'); }
+            const errSkills = checkLength(skillsText, 500, 'skills'); if (errSkills) { errors.push(errSkills); markError('[name="skills"]'); }
+
             const languages = document.querySelector('[name="languages"]')?.value || '';
-            const errLang = checkLength(languages, 200, 'languages');
-            if (errLang) { errors.push(errLang); markError('[name="languages"]'); }
+            const errLang = checkLength(languages, 200, 'languages'); if (errLang) { errors.push(errLang); markError('[name="languages"]'); }
 
             const workCards = document.querySelectorAll('#workEntries .entry-card');
             workCards.forEach((card, index) => {
                 const company = card.querySelector('[name^="work_company_"]')?.value.trim() || '';
                 const position = card.querySelector('[name^="work_position_"]')?.value.trim() || '';
                 const desc = card.querySelector('[name^="work_desc_"]')?.value || '';
-                if (!company) { errors.push(`work experience #${index+1}: company cannot be empty`); markError(card.querySelector('[name^="work_company_"]')); }
+                if (!company) { errors.push(`work experience #${index + 1}: company cannot be empty`); markError(card.querySelector('[name^="work_company_"]')); }
                 else {
-                    const err = checkLength(company, 200, `work experience #${index+1} company`);
+                    const err = checkLength(company, 200, `work experience #${index + 1} company`);
                     if (err) { errors.push(err); markError(card.querySelector('[name^="work_company_"]')); }
                 }
-                if (!position) { errors.push(`work experience #${index+1}: position cannot be empty`); markError(card.querySelector('[name^="work_position_"]')); }
+                if (!position) { errors.push(`work experience #${index + 1}: position cannot be empty`); markError(card.querySelector('[name^="work_position_"]')); }
                 else {
-                    const err = checkLength(position, 100, `work experience #${index+1} position`);
+                    const err = checkLength(position, 100, `work experience #${index + 1} position`);
                     if (err) { errors.push(err); markError(card.querySelector('[name^="work_position_"]')); }
                 }
-                const errDesc = checkLength(desc, 500, `work experience #${index+1} description`);
+                const errDesc = checkLength(desc, 500, `work experience #${index + 1} description`);
                 if (errDesc) { errors.push(errDesc); markError(card.querySelector('[name^="work_desc_"]')); }
             });
 
@@ -459,17 +682,17 @@
                 const school = card.querySelector('[name^="edu_school_"]')?.value.trim() || '';
                 const major = card.querySelector('[name^="edu_major_"]')?.value.trim() || '';
                 const notes = card.querySelector('[name^="edu_desc_"]')?.value || '';
-                if (!school) { errors.push(`education background #${index+1}: school cannot be empty`); markError(card.querySelector('[name^="edu_school_"]')); }
+                if (!school) { errors.push(`education background #${index + 1}: school cannot be empty`); markError(card.querySelector('[name^="edu_school_"]')); }
                 else {
-                    const err = checkLength(school, 200, `education background #${index+1} school`);
+                    const err = checkLength(school, 200, `education background #${index + 1} school`);
                     if (err) { errors.push(err); markError(card.querySelector('[name^="edu_school_"]')); }
                 }
-                if (!major) { errors.push(`education background #${index+1}: major cannot be empty`); markError(card.querySelector('[name^="edu_major_"]')); }
+                if (!major) { errors.push(`education background #${index + 1}: major cannot be empty`); markError(card.querySelector('[name^="edu_major_"]')); }
                 else {
-                    const err = checkLength(major, 200, `education background #${index+1} major`);
+                    const err = checkLength(major, 200, `education background #${index + 1} major`);
                     if (err) { errors.push(err); markError(card.querySelector('[name^="edu_major_"]')); }
                 }
-                const errNotes = checkLength(notes, 500, `education background #${index+1} notes`);
+                const errNotes = checkLength(notes, 500, `education background #${index + 1} notes`);
                 if (errNotes) { errors.push(errNotes); markError(card.querySelector('[name^="edu_desc_"]')); }
             });
 
@@ -490,12 +713,10 @@
                 if (firstError) firstError.scrollIntoView({ block: 'center', behavior: 'smooth' });
                 return;
             }
-
             const data = collectFormData();
             try {
                 const result = await saveUserData(data);
                 lastSavedData = JSON.parse(JSON.stringify(data));
-                console.log('✅ Saved:', result);
                 alert('✅ Changes saved successfully!');
             } catch (e) {
                 alert('❌ Save error: ' + e.message);
@@ -507,23 +728,144 @@
                 applyFormData(lastSavedData);
                 alert('🔄 Reset to last saved state');
             } else {
-                // load from server or clear
                 fetchUserData().then(data => {
-                    if (data) {
-                        applyFormData(data);
-                        lastSavedData = JSON.parse(JSON.stringify(data));
-                    } else {
-                        applyFormData(null);
-                    }
+                    if (data) { applyFormData(data); lastSavedData = JSON.parse(JSON.stringify(data)); }
+                    else { applyFormData(null); }
                 }).catch(() => applyFormData(null));
             }
             clearValidationStyles();
         }
 
         // ================================================================
-        // 8. Init
+        // 8. Send As PDF (简历格式)
         // ================================================================
-        window.onload = async function() {
+function sendAsPDF() {
+    // 收集数据
+    const data = collectFormData();
+    const profile = data.profile || {};
+    const fullName = profile.fullName || '';
+    const userEmail = data.email || '';
+
+    if (!fullName) {
+        alert('Please enter your full name first.');
+        return;
+    }
+
+    if (!userEmail) {
+        alert('Please save your profile first (email required).');
+        return;
+    }
+
+    // 构建预览 URL
+    const params = new URLSearchParams();
+    params.set('userId', currentUserId);
+    params.set('fullName', fullName);
+    params.set('jobTitle', profile.jobTitle || '');
+    params.set('email', userEmail);
+    params.set('phone', profile.phone || '');
+    params.set('location', profile.location || '');
+    params.set('about', profile.about || '');
+    params.set('skills', profile.skills || '');
+    params.set('languages', profile.languages || '');
+    params.set('work', encodeURIComponent(JSON.stringify(data.work || [])));
+    params.set('edu', encodeURIComponent(JSON.stringify(data.edu || [])));
+
+    const previewUrl = `/preview.html?${params.toString()}`;
+
+    // 在新窗口打开预览
+    const previewWindow = window.open(previewUrl, '_blank', 'width=1000,height=800');
+    if (!previewWindow) {
+        alert('Popup blocked. Please allow popups for this site.');
+    }
+}
+
+async function sendToInbox(receiverEmail) {
+    const data = collectFormData();
+    const profile = data.profile || {};
+    const fullName = profile.fullName || 'User';
+    const userEmail = data.email || '';
+
+    if (!userEmail) {
+        alert('Please save your profile first (email required).');
+        return;
+    }
+
+    if (!fullName || fullName === 'User') {
+        alert('Please enter your full name in the profile first.');
+        return;
+    }
+
+    try {
+        // 显示加载状态
+        const btn = document.querySelector('.btn-pdf');
+        const originalText = btn ? btn.textContent : '';
+        if (btn) btn.textContent = '⏳ Generating PDF...';
+
+        // 1. 生成 PDF 文件
+        const pdfResponse = await fetch('/api/generate-pdf', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                userId: currentUserId,
+                fullName: fullName,
+                jobTitle: profile.jobTitle || '',
+                email: userEmail,
+                phone: profile.phone || '',
+                location: profile.location || '',
+                about: profile.about || '',
+                skills: profile.skills || '',
+                languages: profile.languages || '',
+                work: data.work || [],
+                edu: data.edu || []
+            })
+        });
+        const pdfResult = await pdfResponse.json();
+
+        if (btn) btn.textContent = originalText;
+
+        if (!pdfResult.success) {
+            alert('❌ Failed to generate PDF: ' + pdfResult.error);
+            return;
+        }
+
+        // 2. 构建消息内容
+        const content =
+            `📋 Profile Shared\n\n` +
+            `Name: ${fullName}\n` +
+            `Position: ${profile.jobTitle || 'N/A'}\n` +
+            `Email: ${userEmail}\n` +
+            `Phone: ${profile.phone || 'N/A'}\n\n` +
+            `📄 PDF attached below. Click "Download PDF" to save.`;
+
+        // 3. 发送到 Inbox（带 PDF 附件链接）
+        const response = await fetch('/api/inbox/send', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                senderEmail: userEmail,
+                receiverEmail: receiverEmail,
+                subject: `${fullName} shared their profile with you (PDF)`,
+                content: content,
+                attachment: pdfResult.pdfUrl  // PDF 下载链接
+            })
+        });
+
+        const result = await response.json();
+        if (result.success) {
+            alert(`✅ PDF Profile sent to ${receiverEmail}'s inbox!`);
+        } else {
+            alert('❌ ' + result.error);
+        }
+    } catch (e) {
+        alert('❌ Network error. Please try again.');
+        console.error('Send to inbox error:', e);
+    }
+}
+
+        // ================================================================
+        // 9. Init
+        // ================================================================
+        window.onload = async function () {
             if (!currentUserId) {
                 document.body.innerHTML = `<h2 style="text-align:center;margin-top:50px;">Missing userId in URL. Please use ?userId=xxx</h2>`;
                 return;
@@ -544,4 +886,5 @@
     </script>
 
 </body>
+
 </html>

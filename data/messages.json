@@ -1,0 +1,13 @@
+[
+  {
+    "id": "msg_1786948171224",
+    "senderEmail": "Ali123@gmail.com",
+    "senderName": "Ali",
+    "receiverEmail": "Bli123@gmail.com",
+    "subject": "Ali shared their profile with you (PDF)",
+    "content": "📋 Profile Shared\n\nName: Ali\nPosition: Software enginner\nEmail: Ali123@gmail.com\nPhone: +60 001234 5678\n\n📄 PDF attached below. Click \"Download PDF\" to save.",
+    "attachment": "/uploads/profile_1785966009616_1786948171218.pdf",
+    "read": true,
+    "sentAt": "2026-08-17T06:29:31.224Z"
+  }
+]

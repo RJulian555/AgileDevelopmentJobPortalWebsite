@@ -146,16 +146,29 @@
         // ================================================================
         // 3. Preset skills list
         // ================================================================
-        const PRESET_SKILLS = [
-            'JavaScript', 'TypeScript', 'React', 'Vue', 'Angular',
-            'Node.js', 'Python', 'Java', 'C#', 'PHP',
-            'Docker', 'Kubernetes', 'AWS', 'Azure', 'GCP',
-            'MySQL', 'PostgreSQL', 'MongoDB', 'Redis', 'Elasticsearch',
-            'HTML', 'CSS', 'Sass', 'Tailwind', 'Bootstrap',
-            'Git', 'CI/CD', 'Agile', 'Scrum', 'Design Patterns',
-            'Figma', 'Sketch', 'Adobe XD', 'Photoshop', 'Illustrator',
-            'SEO', 'Analytics', 'A/B Testing', 'UX Research', 'Prototyping'
+        let PRESET_SKILLS = [
+            'Adobe Illustrator', 'Adobe Photoshop', 'Agile', 'Amazon Web Services (AWS)', 'Angular',
+            'AutoCAD', 'Bootstrap', 'C#', 'C++', 'Canva', 'CI/CD', 'Communication', 'CSS',
+            'Customer Service', 'Data Analysis', 'Docker', 'Excel', 'Figma', 'Flutter', 'GCP',
+            'Git', 'HTML', 'Java', 'JavaScript', 'Kotlin', 'Kubernetes', 'Leadership', 'Linux',
+            'MongoDB', 'MySQL', 'Node.js', 'PHP', 'PostgreSQL', 'Power BI', 'Project Management',
+            'Python', 'React', 'REST APIs', 'Ruby', 'SAP', 'SEO', 'SQL', 'Tableau', 'Tailwind',
+            'Teamwork', 'TypeScript', 'UI/UX Design', 'Vue'
         ];
+
+        async function loadPresetSkillsFromOptions() {
+            try {
+                const res = await fetch('/api/job-options');
+                if (res.ok) {
+                    const data = await res.json();
+                    if (Array.isArray(data.skills) && data.skills.length > 0) {
+                        PRESET_SKILLS = data.skills;
+                    }
+                }
+            } catch (e) {
+                console.warn('Using fallback preset skills:', e);
+            }
+        }
 
         // ================================================================
         // 4. State
@@ -342,6 +355,7 @@
                 document.querySelector('.container').innerHTML = '<h2 style="text-align:center;color:#c0392b;">Missing userId in URL. Please provide ?userId=xxx</h2>';
                 return;
             }
+            await loadPresetSkillsFromOptions();
             try {
                 const data = await fetchUserData();
                 if (data && Array.isArray(data.skills)) {

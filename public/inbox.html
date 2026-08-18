@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Inbox - JobWall</title>
+    <style>
+        * { box-sizing: border-box; font-family: 'Arial', sans-serif; margin: 0; padding: 0; }
+        body { background: #f4f7f6; min-height: 100vh; padding: 30px; }
+        .container { max-width: 900px; margin: 0 auto; }
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; flex-wrap: wrap; gap: 12px; }
+        .header h1 { color: #2c3e50; }
+        .header .badge { background: #2ecc71; color: #fff; padding: 4px 12px; border-radius: 20px; font-size: 14px; }
+        .back-link { color: #2ecc71; text-decoration: none; cursor: pointer; }
+        .back-link:hover { text-decoration: underline; }
+        .message-list { background: white; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); overflow: hidden; min-height: 200px; }
+        .message-item { padding: 16px 20px; border-bottom: 1px solid #ecf0f1; cursor: pointer; transition: 0.2s; }
+        .message-item:hover { background: #f8f9fa; }
+        .message-item.unread { border-left: 4px solid #2ecc71; background: #fafcfa; }
+        .message-item .top { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 6px; }
+        .message-item .from { font-weight: 600; color: #2c3e50; }
+        .message-item .subject { color: #34495e; margin: 4px 0; }
+        .message-item .date { font-size: 12px; color: #95a5a6; }
+        .message-item .status { font-size: 12px; color: #2ecc71; }
+        .empty { text-align: center; padding: 60px 20px; color: #95a5a6; font-size: 16px; }
+        .empty .icon { font-size: 48px; display: block; margin-bottom: 12px; }
+        .message-content { font-size: 13px; color: #34495e; margin-top: 6px; padding: 8px 12px; background: #f8f9fa; border-radius: 6px; white-space: pre-wrap; }
+        .loading { text-align: center; padding: 40px; color: #95a5a6; }
+        .loading .spinner { display: inline-block; width: 24px; height: 24px; border: 3px solid #ecf0f1; border-top: 3px solid #2ecc71; border-radius: 50%; animation: spin 0.8s linear infinite; margin-right: 10px; vertical-align: middle; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .attachment-link { display: inline-block; margin-top: 8px; background: #2ecc71; color: #fff; padding: 6px 16px; border-radius: 20px; text-decoration: none; font-size: 13px; transition: 0.2s; border: none; cursor: pointer; }
+        .attachment-link:hover { background: #27ae60; }
+        .attachment-link.download { background: #e74c3c; }
+        .attachment-link.download:hover { background: #c0392b; }
+        .attachment-link.preview { background: #3498db; }
+        .attachment-link.preview:hover { background: #2980b9; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div>
+                <h1>📬 My Inbox</h1>
+                <span class="badge" id="unreadBadge">0 unread</span>
+            </div>
+            <a class="back-link" onclick="history.back()">← Dashboard</a>
+        </div>
+
+        <div class="message-list" id="messageList">
+            <div class="loading"><span class="spinner"></span> Loading messages...</div>
+        </div>
+    </div>
+
+    <script>
+        // ================================================================
+        // 1. 获取用户 ID（从 URL 或 localStorage）
+        // ================================================================
+        function getUserId() {
+            const params = new URLSearchParams(window.location.search);
+            let userId = params.get('userId');
+            
+            if (userId) {
+                localStorage.setItem('currentUserId', userId);
+                return userId;
+            }
+            
+            userId = localStorage.getItem('currentUserId') || 
+                     localStorage.getItem('currentSeeker') || 
+                     sessionStorage.getItem('jobwallEmployerId');
+            
+            if (userId) {
+                return userId;
+            }
+            
+            return null;
+        }
+
+        // ================================================================
+        // 2. 加载收件箱（通过 userId）
+        // ================================================================
+        async function loadInbox() {
+            const userId = getUserId();
+            const params = new URLSearchParams(window.location.search);
+            const urlEmail = params.get('email');
+
+            if (!userId && !urlEmail) {
+                document.getElementById('messageList').innerHTML = `
+                    <div class="empty">
+                        <span class="icon">🔑</span>
+                        Please login first.<br>
+                        <a href="login.html" style="color:#2ecc71;text-decoration:underline;">Go to Login</a>
+                    </div>
+                `;
+                return;
+            }
+
+            try {
+                let apiUrl;
+                if (userId) {
+                    apiUrl = `/api/inbox/by-user?userId=${encodeURIComponent(userId)}`;
+                } else if (urlEmail) {
+                    apiUrl = `/api/inbox?email=${encodeURIComponent(urlEmail)}`;
+                }
+
+                const res = await fetch(apiUrl);
+                if (!res.ok) throw new Error('Failed to load inbox');
+                const data = await res.json();
+                
+                if (data.userEmail) {
+                    localStorage.setItem('userEmail', data.userEmail);
+                }
+
+                if (data.inbox && data.inbox.length > 0) {
+                    renderMessages(data.inbox, data.unreadCount);
+                } else {
+                    document.getElementById('messageList').innerHTML = `
+                        <div class="empty">
+                            <span class="icon">📭</span>
+                            No messages yet<br>
+                            <span style="font-size:13px;color:#bdc3c7;">When someone shares their profile with you, it will appear here.</span>
+                        </div>
+                    `;
+                    document.getElementById('unreadBadge').textContent = '0 unread';
+                }
+            } catch (e) {
+                document.getElementById('messageList').innerHTML = `
+                    <div class="empty">
+                        <span class="icon">❌</span>
+                        ${e.message}
+                    </div>
+                `;
+            }
+        }
+
+        // ================================================================
+        // 3. 渲染消息（支持 PDF 预览 + 下载）
+        // ================================================================
+        function renderMessages(messages, unreadCount) {
+            const container = document.getElementById('messageList');
+            document.getElementById('unreadBadge').textContent = `${unreadCount} unread`;
+
+            container.innerHTML = messages.map(msg => {
+                let attachmentHtml = '';
+                if (msg.attachment) {
+                    if (msg.attachment.endsWith('.pdf')) {
+                        // PDF 文件 → 预览 + 下载
+                        attachmentHtml = `
+                            <div style="margin-top:8px;display:flex;gap:10px;flex-wrap:wrap;">
+                                <a href="${escapeHtml(msg.attachment)}" download target="_blank" class="attachment-link download">
+                                    📥 Download PDF
+                                </a>
+                                <button onclick="previewPDF('${escapeHtml(msg.attachment)}')" class="attachment-link preview">
+                                    👁️ Preview
+                                </button>
+                            </div>
+                        `;
+                    } else if (msg.attachment.includes('profile.html')) {
+                        attachmentHtml = `
+                            <div style="margin-top:8px;">
+                                <a href="${escapeHtml(msg.attachment)}" target="_blank" class="attachment-link">
+                                    📄 View Profile
+                                </a>
+                            </div>
+                        `;
+                    } else {
+                        attachmentHtml = `
+                            <div style="margin-top:8px;">
+                                <a href="${escapeHtml(msg.attachment)}" target="_blank" class="attachment-link">
+                                    🔗 Open Link
+                                </a>
+                            </div>
+                        `;
+                    }
+                }
+
+                return `
+                    <div class="message-item ${msg.read ? '' : 'unread'}" onclick="markAsRead('${msg.id}')">
+                        <div class="top">
+                            <span class="from">📩 ${escapeHtml(msg.senderName)}</span>
+                            <span class="date">${formatDate(msg.sentAt)}</span>
+                        </div>
+                        <div class="subject"><strong>${escapeHtml(msg.subject)}</strong></div>
+                        <div class="message-content">${escapeHtml(msg.content)}</div>
+                        ${attachmentHtml}
+                        <div class="top" style="margin-top:6px;">
+                            <span></span>
+                            ${!msg.read ? '<span class="status">● New</span>' : '<span style="font-size:12px;color:#95a5a6;">✓ Read</span>'}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // ================================================================
+        // 4. 预览 PDF
+        // ================================================================
+        async function previewPDF(pdfUrl) {
+            try {
+                // 从 PDF URL 提取 userId
+                const match = pdfUrl.match(/profile_(\d+)_/);
+                if (!match) {
+                    alert('Cannot preview this PDF.');
+                    return;
+                }
+                const userId = match[1];
+
+                // 获取用户数据
+                const res = await fetch('/api/profile?userId=' + encodeURIComponent(userId));
+                if (!res.ok) throw new Error('Failed to load profile');
+                const data = await res.json();
+
+                const profile = data.profile || {};
+
+                // 构建预览 URL（只读模式）
+                const params = new URLSearchParams();
+                params.set('userId', userId);
+                params.set('fullName', profile.fullName || '');
+                params.set('jobTitle', profile.jobTitle || '');
+                params.set('email', data.email || '');
+                params.set('phone', profile.phone || '');
+                params.set('location', profile.location || '');
+                params.set('about', profile.about || '');
+                params.set('skills', profile.skills || '');
+                params.set('languages', profile.languages || '');
+                params.set('work', encodeURIComponent(JSON.stringify(data.work || [])));
+                params.set('edu', encodeURIComponent(JSON.stringify(data.edu || [])));
+                params.set('readonly', 'true');
+
+                const previewUrl = `/preview.html?${params.toString()}`;
+                window.open(previewUrl, '_blank', 'width=1000,height=800');
+            } catch (e) {
+                alert('Failed to load preview: ' + e.message);
+            }
+        }
+
+        // ================================================================
+        // 5. 标记为已读
+        // ================================================================
+        async function markAsRead(messageId) {
+            try {
+                await fetch(`/api/inbox/${messageId}/read`, { method: 'PATCH' });
+                loadInbox();
+                localStorage.setItem('inboxUpdated', Date.now());
+            } catch (e) {
+                console.error('Failed to mark as read', e);
+            }
+        }
+
+        // ================================================================
+        // 6. 工具函数
+        // ================================================================
+        function escapeHtml(str) {
+            if (!str) return '';
+            return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+        }
+
+        function formatDate(dateStr) {
+            const d = new Date(dateStr);
+            return d.toLocaleDateString('en-MY', { 
+                day: 'numeric', 
+                month: 'short', 
+                year: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+        }
+
+        // ================================================================
+        // 7. 初始化
+        // ================================================================
+        (async function init() {
+            await loadInbox();
+        })();
+
+        window.addEventListener('storage', function(e) {
+            if (e.key === 'inboxUpdated') {
+                loadInbox();
+            }
+        });
+    </script>
+</body>
+</html>
