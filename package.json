@@ -6,7 +6,7 @@
   "scripts": {
     "start": "node server.js",
     "test": "node --test test/company*.test.js test/employer*.test.js test/job*.test.js test/profile*.test.js test/website*.test.js",
-    "test:jest": "jest --forceExit"
+    "test:jest": "jest test/*.jest.test.js --forceExit"
   },
   "keywords": [],
   "author": "",
