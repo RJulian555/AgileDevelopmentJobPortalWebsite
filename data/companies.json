@@ -83,5 +83,18 @@
     "logoUrl": "",
     "createdAt": "2026-08-05T22:26:41.388Z",
     "updatedAt": "2026-08-05T22:26:41.388Z"
+  },
+  {
+    "id": "company-4d451e15-0b63-42e3-8e9e-a88511965390",
+    "name": "company",
+    "description": "",
+    "industry": "technology",
+    "address": "address",
+    "email": "comp@comp.comp",
+    "phone": "0123456789",
+    "website": "",
+    "logoUrl": "",
+    "createdAt": "2026-08-15T01:58:11.571Z",
+    "updatedAt": "2026-08-15T01:58:11.571Z"
   }
 ]

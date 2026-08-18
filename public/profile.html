@@ -1,63 +1,464 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Personal Information</title>
     <style>
-        * { box-sizing: border-box; font-family: 'Arial', sans-serif; margin: 0; padding: 0; }
-        html, body { height: 100%; overflow: hidden; }
-        body { background-color: #f4f7f6; display: flex; flex-direction: column; position: relative; }
-        .bg-animation-wrapper { position: fixed; top: 0; left: 0; width: 100%; height: 100%; overflow: hidden; z-index: 1; filter: blur(60px); pointer-events: none; }
-        .bg-shape { position: absolute; opacity: 0.4; animation: floatAround 20s infinite linear; }
-        .bg-shape.circle-1 { width: 180px; height: 180px; background-color: #2ecc71; border-radius: 50%; top: 15%; left: 10%; animation-duration: 25s; }
-        .bg-shape.square-1 { width: 220px; height: 220px; background-color: #27ae60; bottom: 10%; right: 15%; border-radius: 20px; animation-duration: 30s; }
-        .bg-shape.triangle-1 { width: 0; height: 0; border-left: 100px solid transparent; border-right: 100px solid transparent; border-bottom: 180px solid #a3e4d7; top: 50%; left: 70%; animation-duration: 22s; }
-        .bg-shape.circle-2 { width: 250px; height: 250px; background-color: #bdc3c7; border-radius: 50%; bottom: 40%; left: 25%; animation-duration: 35s; }
-        @keyframes floatAround { 0% { transform: translate(0,0) rotate(0deg); } 50% { transform: translate(80px,60px) rotate(180deg); } 100% { transform: translate(0,0) rotate(360deg); } }
-        .top-bar { position: relative; z-index: 20; display: flex; align-items: center; justify-content: space-between; padding: 15px 30px; background: rgba(255,255,255,0.7); backdrop-filter: blur(8px); border-bottom: 1px solid rgba(46,204,113,0.2); flex-shrink: 0; flex-wrap: wrap; gap: 10px; }
-        .top-bar .brand { font-size: 28px; font-weight: 900; color: #2ecc71; letter-spacing: -1px; user-select: none; }
-        .top-bar .actions { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; }
-        .top-bar .actions button { border-radius: 30px; border: none; padding: 8px 24px; font-weight: 700; font-size: 0.9rem; cursor: pointer; transition: 0.2s; }
-        .btn-save { background: #2ecc71; color: #fff; box-shadow: 0 4px 10px rgba(46,204,113,0.25); }
-        .btn-save:hover { background: #27ae60; transform: translateY(-2px); box-shadow: 0 6px 16px rgba(46,204,113,0.35); }
-        .btn-reset { background: transparent; color: #7f8c8d; border: 1px solid #bdc3c7 !important; }
-        .btn-reset:hover { border-color: #2ecc71 !important; color: #2ecc71; background: #f0faf4; }
-        .back-btn { background: transparent; border: 2px solid #2ecc71 !important; color: #2ecc71; width: 42px; height: 42px; border-radius: 50%; font-size: 20px; display: flex; align-items: center; justify-content: center; padding: 0; font-weight: bold; transition: 0.2s; cursor: pointer; }
-        .back-btn:hover { background: #2ecc71; color: #fff; }
-        form { flex: 1; display: flex; flex-direction: column; overflow: hidden; position: relative; z-index: 10; min-height: 0; }
-        .columns-container { flex: 1; display: flex; gap: 20px; padding: 20px 25px; overflow: hidden; min-height: 0; }
-        .column { flex: 1 1 0; min-height: 0; background: rgba(255,255,255,0.85); backdrop-filter: blur(4px); border-radius: 16px; box-shadow: 0 8px 24px rgba(0,0,0,0.06); padding: 20px 18px; overflow-y: auto; display: flex; flex-direction: column; border: 1px solid rgba(46,204,113,0.15); transition: border-color 0.2s; }
-        .column:hover { border-color: #2ecc71; }
-        .column h2 { font-size: 1.2rem; color: #2c3e50; border-bottom: 2px solid #2ecc71; padding-bottom: 8px; margin-bottom: 16px; flex-shrink: 0; display: flex; justify-content: space-between; align-items: center; }
-        .column h2 .add-btn { background: #2ecc71; color: #fff; border: none; border-radius: 20px; padding: 2px 14px; font-size: 0.8rem; font-weight: 600; cursor: pointer; transition: 0.2s; line-height: 1.8; }
-        .column h2 .add-btn:hover { background: #27ae60; transform: scale(1.05); }
-        .profile-field { display: flex; align-items: baseline; padding: 8px 0; border-bottom: 1px dashed #ecf0f1; font-size: 0.95rem; }
-        .profile-field .label { font-weight: 600; color: #2c3e50; width: 80px; flex-shrink: 0; }
-        .profile-field .value { flex: 1; color: #34495e; }
-        .profile-field .value input, .profile-field .value textarea { width: 100%; border: 1px solid transparent; background: transparent; padding: 4px 6px; border-radius: 6px; font-size: 0.95rem; transition: 0.2s; font-family: inherit; }
-        .profile-field .value input:focus, .profile-field .value textarea:focus { outline: none; background: #fff; border-color: #2ecc71; box-shadow: 0 2px 8px rgba(46,204,113,0.1); }
-        .profile-field .value textarea { resize: vertical; min-height: 50px; }
-        .profile-field.avatar-field .value { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
-        .profile-field.avatar-field .value img { width: 50px; height: 50px; border-radius: 50%; object-fit: cover; background: #bdc3c7; border: 1px solid #ddd; }
-        .profile-field.avatar-field input[type="file"] { font-size: 0.8rem; }
-        .entry-card { background: rgba(255,255,255,0.6); border-radius: 12px; padding: 14px 16px; margin-bottom: 14px; border: 1px solid #e8eeec; position: relative; transition: 0.2s; flex-shrink: 0; }
-        .entry-card:hover { border-color: #2ecc71; }
-        .entry-card .delete-btn { position: absolute; top: 8px; right: 12px; background: none; border: none; color: #e74c3c; font-size: 1.2rem; cursor: pointer; padding: 0 4px; transition: 0.2s; }
-        .entry-card .delete-btn:hover { transform: scale(1.3); }
-        .entry-card .field-row { display: flex; flex-wrap: wrap; gap: 8px 12px; margin-bottom: 6px; }
-        .entry-card .field-row label { display: flex; flex-direction: column; flex: 1 1 120px; font-size: 0.8rem; font-weight: 600; color: #2c3e50; }
-        .entry-card .field-row label input, .entry-card .field-row label textarea { background: #f2f5f3; border: 1px solid transparent; padding: 6px 10px; border-radius: 6px; font-size: 0.9rem; transition: 0.2s; font-family: inherit; width: 100%; }
-        .entry-card .field-row label input:focus, .entry-card .field-row label textarea:focus { outline: none; background: #fff; border-color: #2ecc71; box-shadow: 0 2px 8px rgba(46,204,113,0.1); }
-        .entry-card .field-row label textarea { resize: vertical; min-height: 40px; }
-        .column::-webkit-scrollbar { width: 5px; }
-        .column::-webkit-scrollbar-track { background: rgba(0,0,0,0.02); }
-        .column::-webkit-scrollbar-thumb { background: #bdc3c7; border-radius: 10px; }
-        .column::-webkit-scrollbar-thumb:hover { background: #95a5a6; }
-        @media (max-width: 820px) { .columns-container { flex-direction: column; overflow-y: auto; padding: 15px; gap: 16px; } .column { max-height: none; overflow-y: visible; flex: none; height: auto; } .top-bar { padding: 12px 20px; } .top-bar .brand { font-size: 22px; } }
-        .validation-error { border-color: #e74c3c !important; background-color: #fff5f5 !important; }
+        * {
+            box-sizing: border-box;
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+
+        html,
+        body {
+            height: 100%;
+            overflow: hidden;
+        }
+
+        body {
+            background-color: #f4f7f6;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+
+        .bg-animation-wrapper {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            z-index: 1;
+            filter: blur(60px);
+            pointer-events: none;
+        }
+
+        .bg-shape {
+            position: absolute;
+            opacity: 0.4;
+            animation: floatAround 20s infinite linear;
+        }
+
+        .bg-shape.circle-1 {
+            width: 180px;
+            height: 180px;
+            background-color: #2ecc71;
+            border-radius: 50%;
+            top: 15%;
+            left: 10%;
+            animation-duration: 25s;
+        }
+
+        .bg-shape.square-1 {
+            width: 220px;
+            height: 220px;
+            background-color: #27ae60;
+            bottom: 10%;
+            right: 15%;
+            border-radius: 20px;
+            animation-duration: 30s;
+        }
+
+        .bg-shape.triangle-1 {
+            width: 0;
+            height: 0;
+            border-left: 100px solid transparent;
+            border-right: 100px solid transparent;
+            border-bottom: 180px solid #a3e4d7;
+            top: 50%;
+            left: 70%;
+            animation-duration: 22s;
+        }
+
+        .bg-shape.circle-2 {
+            width: 250px;
+            height: 250px;
+            background-color: #bdc3c7;
+            border-radius: 50%;
+            bottom: 40%;
+            left: 25%;
+            animation-duration: 35s;
+        }
+
+        @keyframes floatAround {
+            0% {
+                transform: translate(0, 0) rotate(0deg);
+            }
+
+            50% {
+                transform: translate(80px, 60px) rotate(180deg);
+            }
+
+            100% {
+                transform: translate(0, 0) rotate(360deg);
+            }
+        }
+
+        .top-bar {
+            position: relative;
+            z-index: 20;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 15px 30px;
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(8px);
+            border-bottom: 1px solid rgba(46, 204, 113, 0.2);
+            flex-shrink: 0;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .top-bar .brand {
+            font-size: 28px;
+            font-weight: 900;
+            color: #2ecc71;
+            letter-spacing: -1px;
+            user-select: none;
+        }
+
+        .top-bar .actions {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .top-bar .actions button {
+            border-radius: 30px;
+            border: none;
+            padding: 8px 24px;
+            font-weight: 700;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .btn-save {
+            background: #2ecc71;
+            color: #fff;
+            box-shadow: 0 4px 10px rgba(46, 204, 113, 0.25);
+        }
+
+        .btn-save:hover {
+            background: #27ae60;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(46, 204, 113, 0.35);
+        }
+
+        .btn-reset {
+            background: transparent;
+            color: #7f8c8d;
+            border: 1px solid #bdc3c7 !important;
+        }
+
+        .btn-reset:hover {
+            border-color: #2ecc71 !important;
+            color: #2ecc71;
+            background: #f0faf4;
+        }
+
+        .back-btn {
+            background: transparent;
+            border: 2px solid #2ecc71 !important;
+            color: #2ecc71;
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+            font-size: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0;
+            font-weight: bold;
+            transition: 0.2s;
+            cursor: pointer;
+        }
+
+        .back-btn:hover {
+            background: #2ecc71;
+            color: #fff;
+        }
+
+        form {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            position: relative;
+            z-index: 10;
+            min-height: 0;
+        }
+
+        .columns-container {
+            flex: 1;
+            display: flex;
+            gap: 20px;
+            padding: 20px 25px;
+            overflow: hidden;
+            min-height: 0;
+        }
+
+        .column {
+            flex: 1 1 0;
+            min-height: 0;
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(4px);
+            border-radius: 16px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
+            padding: 20px 18px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            border: 1px solid rgba(46, 204, 113, 0.15);
+            transition: border-color 0.2s;
+        }
+
+        .column:hover {
+            border-color: #2ecc71;
+        }
+
+        .column h2 {
+            font-size: 1.2rem;
+            color: #2c3e50;
+            border-bottom: 2px solid #2ecc71;
+            padding-bottom: 8px;
+            margin-bottom: 16px;
+            flex-shrink: 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .column h2 .add-btn {
+            background: #2ecc71;
+            color: #fff;
+            border: none;
+            border-radius: 20px;
+            padding: 2px 14px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.2s;
+            line-height: 1.8;
+        }
+
+        .column h2 .add-btn:hover {
+            background: #27ae60;
+            transform: scale(1.05);
+        }
+
+        .profile-field {
+            display: flex;
+            align-items: baseline;
+            padding: 8px 0;
+            border-bottom: 1px dashed #ecf0f1;
+            font-size: 0.95rem;
+        }
+
+        .profile-field .label {
+            font-weight: 600;
+            color: #2c3e50;
+            width: 80px;
+            flex-shrink: 0;
+        }
+
+        .profile-field .value {
+            flex: 1;
+            color: #34495e;
+        }
+
+        .profile-field .value input,
+        .profile-field .value textarea {
+            width: 100%;
+            border: 1px solid transparent;
+            background: transparent;
+            padding: 4px 6px;
+            border-radius: 6px;
+            font-size: 0.95rem;
+            transition: 0.2s;
+            font-family: inherit;
+        }
+
+        .profile-field .value input:focus,
+        .profile-field .value textarea:focus {
+            outline: none;
+            background: #fff;
+            border-color: #2ecc71;
+            box-shadow: 0 2px 8px rgba(46, 204, 113, 0.1);
+        }
+
+        .profile-field .value textarea {
+            resize: vertical;
+            min-height: 50px;
+        }
+
+        .profile-field.avatar-field .value {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .profile-field.avatar-field .value img {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            object-fit: cover;
+            background: #bdc3c7;
+            border: 1px solid #ddd;
+        }
+
+        .profile-field.avatar-field input[type="file"] {
+            font-size: 0.8rem;
+        }
+
+        .entry-card {
+            background: rgba(255, 255, 255, 0.6);
+            border-radius: 12px;
+            padding: 14px 16px;
+            margin-bottom: 14px;
+            border: 1px solid #e8eeec;
+            position: relative;
+            transition: 0.2s;
+            flex-shrink: 0;
+        }
+
+        .entry-card:hover {
+            border-color: #2ecc71;
+        }
+
+        .entry-card .delete-btn {
+            position: absolute;
+            top: 8px;
+            right: 12px;
+            background: none;
+            border: none;
+            color: #e74c3c;
+            font-size: 1.2rem;
+            cursor: pointer;
+            padding: 0 4px;
+            transition: 0.2s;
+        }
+
+        .entry-card .delete-btn:hover {
+            transform: scale(1.3);
+        }
+
+        .entry-card .field-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px 12px;
+            margin-bottom: 6px;
+        }
+
+        .entry-card .field-row label {
+            display: flex;
+            flex-direction: column;
+            flex: 1 1 120px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        .entry-card .field-row label input,
+        .entry-card .field-row label select,
+        .entry-card .field-row label textarea {
+            background: #f2f5f3;
+            border: 1px solid transparent;
+            padding: 6px 10px;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            transition: 0.2s;
+            font-family: inherit;
+            width: 100%;
+            color: #2c3e50;
+        }
+
+        .entry-card .field-row label select {
+            appearance: none;
+            -webkit-appearance: none;
+            background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%232ecc71%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E");
+            background-repeat: no-repeat;
+            background-position: right 10px center;
+            background-size: 10px;
+            padding-right: 28px;
+            cursor: pointer;
+        }
+
+        .entry-card .field-row label select option {
+            background: #ffffff;
+            color: #2c3e50;
+            padding: 8px;
+        }
+
+        .entry-card .field-row label input:focus,
+        .entry-card .field-row label select:focus,
+        .entry-card .field-row label textarea:focus {
+            outline: none;
+            background: #fff;
+            border-color: #2ecc71;
+            box-shadow: 0 2px 8px rgba(46, 204, 113, 0.1);
+        }
+
+        .entry-card .field-row label textarea {
+            resize: vertical;
+            min-height: 40px;
+        }
+
+        .column::-webkit-scrollbar {
+            width: 5px;
+        }
+
+        .column::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.02);
+        }
+
+        .column::-webkit-scrollbar-thumb {
+            background: #bdc3c7;
+            border-radius: 10px;
+        }
+
+        .column::-webkit-scrollbar-thumb:hover {
+            background: #95a5a6;
+        }
+
+        @media (max-width: 820px) {
+            .columns-container {
+                flex-direction: column;
+                overflow-y: auto;
+                padding: 15px;
+                gap: 16px;
+            }
+
+            .column {
+                max-height: none;
+                overflow-y: visible;
+                flex: none;
+                height: auto;
+            }
+
+            .top-bar {
+                padding: 12px 20px;
+            }
+
+            .top-bar .brand {
+                font-size: 22px;
+            }
+        }
+
+        .validation-error {
+            border-color: #e74c3c !important;
+            background-color: #fff5f5 !important;
+        }
     </style>
 </head>
+
 <body>
 
     <!-- Background animation -->
@@ -90,25 +491,57 @@
                 <div class="profile-field avatar-field">
                     <span class="label">Avatar</span>
                     <div class="value">
-                        <img id="avatarPreview" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='50' height='50' viewBox='0 0 50 50'%3E%3Ccircle cx='25' cy='25' r='25' fill='%23bdc3c7'/%3E%3Ccircle cx='25' cy='18' r='8' fill='%2395a5a6'/%3E%3Cpath d='M12 38 Q25 45 38 38' stroke='%2395a5a6' stroke-width='4' fill='none' stroke-linecap='round'/%3E%3C/svg%3E" alt="avatar">
-                        <input type="file" id="avatarInput" name="avatar" accept="image/*" onchange="previewAvatar(event)">
+                        <img id="avatarPreview"
+                            src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='50' height='50' viewBox='0 0 50 50'%3E%3Ccircle cx='25' cy='25' r='25' fill='%23bdc3c7'/%3E%3Ccircle cx='25' cy='18' r='8' fill='%2395a5a6'/%3E%3Cpath d='M12 38 Q25 45 38 38' stroke='%2395a5a6' stroke-width='4' fill='none' stroke-linecap='round'/%3E%3C/svg%3E"
+                            alt="avatar">
+                        <input type="file" id="avatarInput" name="avatar" accept="image/*"
+                            onchange="previewAvatar(event)">
                     </div>
                 </div>
-                <div class="profile-field"><span class="label">Name</span><div class="value"><input type="text" name="fullName" placeholder="Please enter your name" maxlength="50" required></div></div>
-                <div class="profile-field"><span class="label">Position</span><div class="value"><input type="text" name="jobTitle" placeholder="Please enter your position" maxlength="50"></div></div>
-                <div class="profile-field"><span class="label">Location</span><div class="value"><input type="text" name="location" placeholder="City · Area" maxlength="50"></div></div>
-                <div class="profile-field"><span class="label">Email</span><div class="value"><input type="email" name="email" placeholder="example@email.com" required></div></div>
-                <div class="profile-field"><span class="label">Phone</span><div class="value"><input type="tel" name="phone" placeholder="+60 00000 88888" maxlength="20"></div></div>
-                <div class="profile-field"><span class="label">Birthday</span><div class="value"><input type="date" name="birthday"></div></div>
-                <div class="profile-field"><span class="label">Website</span><div class="value"><input type="url" name="website" placeholder="https://example.com" maxlength="200"></div></div>
-                <div class="profile-field"><span class="label">About Me</span><div class="value"><textarea name="about" rows="2" placeholder="Tell us a bit about yourself..." maxlength="100"></textarea></div></div>
-                <div class="profile-field"><span class="label">Skills</span><div class="value"><input type="text" name="skills" placeholder="Skills, separated by commas..." maxlength="50"></div></div>
-                <div class="profile-field"><span class="label">Languages</span><div class="value"><input type="text" name="languages" placeholder="Chinese (Native), English (Professional)..." maxlength="50"></div></div>
+                <div class="profile-field"><span class="label">Name</span>
+                    <div class="value"><input type="text" name="fullName" placeholder="Please enter your name"
+                            maxlength="50" required></div>
+                </div>
+                <div class="profile-field"><span class="label">Position</span>
+                    <div class="value"><input type="text" name="jobTitle" placeholder="Please enter your position"
+                            maxlength="50"></div>
+                </div>
+                <div class="profile-field"><span class="label">Location</span>
+                    <div class="value"><input type="text" name="location" placeholder="City · Area" maxlength="50">
+                    </div>
+                </div>
+                <div class="profile-field"><span class="label">Email</span>
+                    <div class="value"><input type="email" name="email" placeholder="example@email.com" required></div>
+                </div>
+                <div class="profile-field"><span class="label">Phone</span>
+                    <div class="value"><input type="tel" name="phone" placeholder="+60 00000 88888" maxlength="20">
+                    </div>
+                </div>
+                <div class="profile-field"><span class="label">Birthday</span>
+                    <div class="value"><input type="date" name="birthday"></div>
+                </div>
+                <div class="profile-field"><span class="label">Website</span>
+                    <div class="value"><input type="url" name="website" placeholder="https://example.com"
+                            maxlength="200"></div>
+                </div>
+                <div class="profile-field"><span class="label">About Me</span>
+                    <div class="value"><textarea name="about" rows="2" placeholder="Tell us a bit about yourself..."
+                            maxlength="100"></textarea></div>
+                </div>
+                <div class="profile-field"><span class="label">Skills</span>
+                    <div class="value"><input type="text" name="skills" placeholder="Skills, separated by commas..."
+                            maxlength="50"></div>
+                </div>
+                <div class="profile-field"><span class="label">Languages</span>
+                    <div class="value"><input type="text" name="languages"
+                            placeholder="Chinese (Native), English (Professional)..." maxlength="50"></div>
+                </div>
             </div>
 
             <!-- Mid：working experience -->
             <div class="column">
-                <h2>💼 working experience <button type="button" class="add-btn" onclick="addEntry('work')">+ add</button></h2>
+                <h2>💼 working experience <button type="button" class="add-btn" onclick="addEntry('work')">+
+                        add</button></h2>
                 <div id="workEntries"></div>
             </div>
 
@@ -201,7 +634,20 @@
                     <button type="button" class="delete-btn" onclick="deleteEntry(this)">✕</button>
                     <div class="field-row">
                         <label>School <input type="text" name="edu_school_${index}" placeholder="School Name" maxlength="50"></label>
-                        <label>Major <input type="text" name="edu_major_${index}" placeholder="Major/Degree" maxlength="50"></label>
+                        <label>Level 
+                            <select name="edu_level_${index}">
+                                <option value="No formal qualification">No formal qualification</option>
+                                <option value="SPM / O-Level">SPM / O-Level</option>
+                                <option value="Certificate">Certificate</option>
+                                <option value="Diploma" selected>Diploma</option>
+                                <option value="Bachelor's Degree">Bachelor's Degree</option>
+                                <option value="Master's Degree">Master's Degree</option>
+                                <option value="Doctorate">Doctorate</option>
+                            </select>
+                        </label>
+                    </div>
+                    <div class="field-row">
+                        <label style="flex:1;">Programme / Major <input type="text" name="edu_major_${index}" placeholder="e.g., Graphic Design, Computer Science" maxlength="50"></label>
                     </div>
                     <div class="field-row">
                         <label>Start Date <input type="date" name="edu_start_${index}"></label>
@@ -256,7 +702,7 @@
             }
 
             const profile = data.profile || {};
-            const personalNames = ['fullName','jobTitle','location','phone','birthday','website','about','skills','languages'];
+            const personalNames = ['fullName', 'jobTitle', 'location', 'phone', 'birthday', 'website', 'about', 'skills', 'languages'];
             personalNames.forEach(name => {
                 const el = document.querySelector(`[name="${name}"]`);
                 if (el) el.value = profile[name] || '';
@@ -299,12 +745,21 @@
             eduCounter = 0;
             (data.edu || []).forEach(item => {
                 const idx = ++eduCounter;
+                const level = item.level || item.educationLevel || 'Diploma';
                 eduContainer.insertAdjacentHTML('beforeend', `
                     <div class="entry-card" data-type="edu" data-index="${idx}">
                         <button type="button" class="delete-btn" onclick="deleteEntry(this)">✕</button>
                         <div class="field-row">
                             <label>school <input type="text" name="edu_school_${idx}" placeholder="School Name" maxlength="100" value="${escapeHtml(item.school || '')}"></label>
-                            <label>major <input type="text" name="edu_major_${idx}" placeholder="Major/Degree" maxlength="100" value="${escapeHtml(item.major || '')}"></label>
+                            <label>level 
+                                <select name="edu_level_${idx}">
+                                    ${['No formal qualification', 'SPM / O-Level', 'Certificate', 'Diploma', "Bachelor's Degree", "Master's Degree", 'Doctorate']
+                        .map(lvl => `<option value="${lvl}" ${lvl === level ? 'selected' : ''}>${lvl}</option>`).join('')}
+                                </select>
+                            </label>
+                        </div>
+                        <div class="field-row">
+                            <label style="flex:1;">programme / major <input type="text" name="edu_major_${idx}" placeholder="e.g., Graphic Design, Computer Science" maxlength="100" value="${escapeHtml(item.major || '')}"></label>
                         </div>
                         <div class="field-row">
                             <label>start date <input type="date" name="edu_start_${idx}" value="${item.start || ''}"></label>
@@ -325,7 +780,7 @@
         // ================================================================
         function collectFormData() {
             const profile = {};
-            const personalNames = ['fullName','jobTitle','location','phone','birthday','website','about','skills','languages'];
+            const personalNames = ['fullName', 'jobTitle', 'location', 'phone', 'birthday', 'website', 'about', 'skills', 'languages'];
             personalNames.forEach(name => {
                 const el = document.querySelector(`[name="${name}"]`);
                 profile[name] = el ? el.value : '';
@@ -351,6 +806,7 @@
             document.querySelectorAll('#eduEntries .entry-card').forEach(card => {
                 edu.push({
                     school: card.querySelector('[name^="edu_school_"]')?.value || '',
+                    level: card.querySelector('[name^="edu_level_"]')?.value || 'Diploma',
                     major: card.querySelector('[name^="edu_major_"]')?.value || '',
                     start: card.querySelector('[name^="edu_start_"]')?.value || '',
                     end: card.querySelector('[name^="edu_end_"]')?.value || '',
@@ -440,17 +896,17 @@
                 const company = card.querySelector('[name^="work_company_"]')?.value.trim() || '';
                 const position = card.querySelector('[name^="work_position_"]')?.value.trim() || '';
                 const desc = card.querySelector('[name^="work_desc_"]')?.value || '';
-                if (!company) { errors.push(`work experience #${index+1}: company cannot be empty`); markError(card.querySelector('[name^="work_company_"]')); }
+                if (!company) { errors.push(`work experience #${index + 1}: company cannot be empty`); markError(card.querySelector('[name^="work_company_"]')); }
                 else {
-                    const err = checkLength(company, 200, `work experience #${index+1} company`);
+                    const err = checkLength(company, 200, `work experience #${index + 1} company`);
                     if (err) { errors.push(err); markError(card.querySelector('[name^="work_company_"]')); }
                 }
-                if (!position) { errors.push(`work experience #${index+1}: position cannot be empty`); markError(card.querySelector('[name^="work_position_"]')); }
+                if (!position) { errors.push(`work experience #${index + 1}: position cannot be empty`); markError(card.querySelector('[name^="work_position_"]')); }
                 else {
-                    const err = checkLength(position, 100, `work experience #${index+1} position`);
+                    const err = checkLength(position, 100, `work experience #${index + 1} position`);
                     if (err) { errors.push(err); markError(card.querySelector('[name^="work_position_"]')); }
                 }
-                const errDesc = checkLength(desc, 500, `work experience #${index+1} description`);
+                const errDesc = checkLength(desc, 500, `work experience #${index + 1} description`);
                 if (errDesc) { errors.push(errDesc); markError(card.querySelector('[name^="work_desc_"]')); }
             });
 
@@ -459,17 +915,17 @@
                 const school = card.querySelector('[name^="edu_school_"]')?.value.trim() || '';
                 const major = card.querySelector('[name^="edu_major_"]')?.value.trim() || '';
                 const notes = card.querySelector('[name^="edu_desc_"]')?.value || '';
-                if (!school) { errors.push(`education background #${index+1}: school cannot be empty`); markError(card.querySelector('[name^="edu_school_"]')); }
+                if (!school) { errors.push(`education background #${index + 1}: school cannot be empty`); markError(card.querySelector('[name^="edu_school_"]')); }
                 else {
-                    const err = checkLength(school, 200, `education background #${index+1} school`);
+                    const err = checkLength(school, 200, `education background #${index + 1} school`);
                     if (err) { errors.push(err); markError(card.querySelector('[name^="edu_school_"]')); }
                 }
-                if (!major) { errors.push(`education background #${index+1}: major cannot be empty`); markError(card.querySelector('[name^="edu_major_"]')); }
+                if (!major) { errors.push(`education background #${index + 1}: major cannot be empty`); markError(card.querySelector('[name^="edu_major_"]')); }
                 else {
-                    const err = checkLength(major, 200, `education background #${index+1} major`);
+                    const err = checkLength(major, 200, `education background #${index + 1} major`);
                     if (err) { errors.push(err); markError(card.querySelector('[name^="edu_major_"]')); }
                 }
-                const errNotes = checkLength(notes, 500, `education background #${index+1} notes`);
+                const errNotes = checkLength(notes, 500, `education background #${index + 1} notes`);
                 if (errNotes) { errors.push(errNotes); markError(card.querySelector('[name^="edu_desc_"]')); }
             });
 
@@ -523,7 +979,7 @@
         // ================================================================
         // 8. Init
         // ================================================================
-        window.onload = async function() {
+        window.onload = async function () {
             if (!currentUserId) {
                 document.body.innerHTML = `<h2 style="text-align:center;margin-top:50px;">Missing userId in URL. Please use ?userId=xxx</h2>`;
                 return;
@@ -544,4 +1000,5 @@
     </script>
 
 </body>
+
 </html>

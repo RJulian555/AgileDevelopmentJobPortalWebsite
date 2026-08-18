@@ -364,5 +364,39 @@
       "Agile",
       "Angular"
     ]
+  },
+  {
+    "id": "job-3dd57089-d799-48ea-a9bb-93802cfba487",
+    "companyId": "company-001",
+    "company": "NexaByte Solutions",
+    "createdByEmployerId": 1783489528289,
+    "title": "UI/UX Designer",
+    "description": "test apply to this job, then i accept / reject you",
+    "salary": 1234,
+    "employmentType": "Internship",
+    "location": "Kuala Lumpur, Malaysia",
+    "skillsRequired": [
+      "Adobe Illustrator",
+      "Adobe Photoshop",
+      "Git",
+      "Graphic Design",
+      "UI/UX Design"
+    ],
+    "experienceRequired": "No experience required",
+    "educationLevel": "Diploma",
+    "closingDate": "2026-08-31",
+    "industry": "technology",
+    "postedAt": "2026-08-15",
+    "createdAt": "2026-08-15T03:12:20.332Z",
+    "jobType": "Internship",
+    "requirements": [
+      "No experience required",
+      "Diploma",
+      "Adobe Illustrator",
+      "Adobe Photoshop",
+      "Git",
+      "Graphic Design",
+      "UI/UX Design"
+    ]
   }
 ]

@@ -53,6 +53,9 @@ app.post('/api/login', (req, res) => {
         return res.redirect(`/dashboard.html?userId=${user.id}`);
     }
     if (user.role === 'Employer') {
+        if (user.companyId) {
+            return res.redirect(`/dashboard.html?employerId=${user.id}`);
+        }
         return res.redirect(`/company-profile.html?employerId=${user.id}`);
     }
     res.redirect('/dashboard.html');
