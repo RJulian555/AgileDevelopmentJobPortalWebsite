@@ -1,5 +1,6 @@
 const express = require('express');
 const { readCollection, writeCollection, ensureCollection } = require('../services/jsonDatabase');
+const { getApplicantForJob, listApplicantsForJob } = require('../services/applicantService');
 
 const router = express.Router();
 
@@ -187,6 +188,30 @@ function calculateRequirementsFit(seeker, job) {
         requiredSkills
     };
 }
+// Employer view: applicants are always scoped to one owned job opening.
+router.get('/api/jobs/:jobId/applicants', (req, res) => {
+    try {
+        return res.json(listApplicantsForJob(req.params.jobId, req.query.employerId));
+    } catch (error) {
+        return res.status(error.statusCode || 500).json({
+            error: error.message || 'Unable to retrieve applicants.'
+        });
+    }
+});
+
+router.get('/api/jobs/:jobId/applicants/:applicationId', (req, res) => {
+    try {
+        return res.json(getApplicantForJob(
+            req.params.jobId,
+            req.params.applicationId,
+            req.query.employerId
+        ));
+    } catch (error) {
+        return res.status(error.statusCode || 500).json({
+            error: error.message || 'Unable to retrieve the applicant.'
+        });
+    }
+});
 
 // GET /api/applications?seekerId=<id>
 // Returns array of jobIds the seeker has already applied to

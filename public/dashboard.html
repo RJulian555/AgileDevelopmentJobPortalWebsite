@@ -771,6 +771,23 @@
             box-shadow: none;
         }
 
+        .view-applicants-btn {
+            display: inline-block;
+            margin-top: 10px;
+            padding: 10px 18px;
+            border-radius: 8px;
+            background: #2ecc71;
+            color: #fff;
+            font-size: 14px;
+            font-weight: 700;
+            text-decoration: none;
+            white-space: nowrap;
+        }
+
+        .view-applicants-btn:hover {
+            background: #27ae60;
+        }
+
         .job-card-msg {
             font-size: 12px;
             margin-top: 6px;
@@ -1194,6 +1211,15 @@
                     return '<span class="skill-chip-card">' + escHtml(s) + '</span>';
                 }).join('');
 
+                var isOwnedJob = storedEmployerId
+                    && String(job.createdByEmployerId) === String(storedEmployerId);
+                var jobAction = isOwnedJob
+                    ? '<a class="view-applicants-btn" href="/applicants.html?jobId=' + encodeURIComponent(job.id) +
+                        '&amp;employerId=' + encodeURIComponent(storedEmployerId) + '">View Applicants</a>'
+                    : (!storedEmployerId
+                        ? '<button class="apply-btn" id="apply-btn-' + job.id + '" data-job-id="' + job.id + '" type="button">Apply</button>'
+                        : '');
+
                 card.innerHTML =
                     '<div class="job-card-top">' +
                     '<div class="job-card-logo" aria-hidden="true">' + initial + '</div>' +
@@ -1209,7 +1235,7 @@
                     '<div class="job-card-right">' +
                     '<div class="job-card-salary">' + escHtml(salary) + '</div>' +
                     '<div class="job-card-date">Posted ' + postedLabel + '</div>' +
-                    '<button class="apply-btn" id="apply-btn-' + job.id + '" data-job-id="' + job.id + '" type="button">Apply</button>' +
+                    jobAction +
                     '</div>' +
                     '</div>' +
                     '<div class="job-card-details">' +
