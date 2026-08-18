@@ -2,7 +2,6 @@ const express = require('express');
 const fs = require('fs');
 const path = require('path');
 const crypto = require('crypto');
-const puppeteer = require('puppeteer');
 
 const app = express();
 const PORT = 3000;
@@ -540,6 +539,8 @@ app.post('/api/generate-pdf', async (req, res) => {
     try {
         const html = buildResumeHTML({ fullName, jobTitle, email, phone, location, about, skills, languages, work, edu });
 
+        // Puppeteer is ESM-only, so load it lazily from this CommonJS server.
+        const { default: puppeteer } = await import('puppeteer');
         const browser = await puppeteer.launch({
             headless: true,
             args: ['--no-sandbox', '--disable-setuid-sandbox']
