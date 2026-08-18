@@ -10,7 +10,7 @@ const MESSAGES_FILE = path.join(__dirname, '..', 'data', 'messages.json');
 
 // 测试套件
 test('US-25: Export Profile to PDF', async (t) => {
-    // 准备测试数据
+    // prepare test data
     const testUsers = [
         {
             id: 1001,
@@ -49,24 +49,24 @@ test('US-25: Export Profile to PDF', async (t) => {
         }
     ];
 
-    // 备份原始数据
+    // backup original data
     let usersBackup = '';
     let messagesBackup = '';
     if (fs.existsSync(USERS_FILE)) usersBackup = fs.readFileSync(USERS_FILE, 'utf8');
     if (fs.existsSync(MESSAGES_FILE)) messagesBackup = fs.readFileSync(MESSAGES_FILE, 'utf8');
 
-    // 写入测试数据
+    // write test data
     fs.writeFileSync(USERS_FILE, JSON.stringify(testUsers, null, 2));
     fs.writeFileSync(MESSAGES_FILE, JSON.stringify([]));
 
-    // 测试结束后恢复
+    // restore original data after tests
     t.after(() => {
         if (usersBackup) fs.writeFileSync(USERS_FILE, usersBackup);
         if (messagesBackup) fs.writeFileSync(MESSAGES_FILE, messagesBackup);
     });
 
     // ================================================================
-    // SC1: 导出 PDF
+    // SC1: generate PDF
     // ================================================================
     await t.test('SC1: Should generate PDF successfully', async () => {
         const response = await request(app)
@@ -90,11 +90,11 @@ test('US-25: Export Profile to PDF', async (t) => {
         assert.ok(response.body.pdfUrl.startsWith('/uploads/profile_'));
         assert.ok(response.body.pdfUrl.endsWith('.pdf'));
 
-        // 验证 PDF 文件确实存在
+        // validate that the PDF file exists and has a reasonable size
         const pdfPath = path.join(__dirname, '..', 'public', response.body.pdfUrl);
         assert.ok(fs.existsSync(pdfPath));
         const stats = fs.statSync(pdfPath);
-        assert.ok(stats.size > 1000); // 至少 1KB
+        assert.ok(stats.size > 1000); // at least 1KB
     });
 
     await t.test('SC1: Should reject when fullName missing', async () => {
@@ -107,7 +107,7 @@ test('US-25: Export Profile to PDF', async (t) => {
     });
 
     // ================================================================
-    // SC2: 发送到 Gmail
+    // SC2: send to Gmail
     // ================================================================
     await t.test('SC2: Should send PDF to valid Gmail address', async () => {
         const response = await request(app)
@@ -141,10 +141,10 @@ test('US-25: Export Profile to PDF', async (t) => {
     });
 
     // ================================================================
-    // SC3: 接收者查看
+    // SC3: Recipient view
     // ================================================================
     await t.test('SC3: Recipient should see message in inbox', async () => {
-        // 先发送消息
+        // send a message first
         await request(app)
             .post('/api/inbox/send')
             .send({
@@ -170,7 +170,7 @@ test('US-25: Export Profile to PDF', async (t) => {
     });
 
     await t.test('SC3: Recipient can mark message as read', async () => {
-        // 发送消息
+        // send a message first
         const sendRes = await request(app)
             .post('/api/inbox/send')
             .send({
@@ -182,14 +182,14 @@ test('US-25: Export Profile to PDF', async (t) => {
             });
         const msgId = sendRes.body.data.id;
 
-        // 标记已读
+        // mark as read
         const readRes = await request(app)
             .patch(`/api/inbox/${msgId}/read`);
 
         assert.strictEqual(readRes.status, 200);
         assert.strictEqual(readRes.body.success, true);
 
-        // 验证已读
+        // validate that the message is marked as read
         const inboxRes = await request(app)
             .get('/api/inbox?email=bli123@gmail.com');
         const msg = inboxRes.body.inbox.find(m => m.id === msgId);
@@ -197,7 +197,7 @@ test('US-25: Export Profile to PDF', async (t) => {
     });
 
     // ================================================================
-    // 预览功能
+    // preview functionality
     // ================================================================
     await t.test('Preview: Should generate preview HTML', async () => {
         const response = await request(app)
