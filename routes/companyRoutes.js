@@ -1,6 +1,6 @@
 const express = require('express');
 const { ensureCollection, readCollection } = require('../services/jsonDatabase');
-const { createCompanyProfile, updateCompanyLogo } = require('../services/companyProfileService');
+const { createCompanyProfile, updateCompanyLogo, updateCompanyProfile } = require('../services/companyProfileService');
 
 const router = express.Router();
 
@@ -26,6 +26,18 @@ router.get('/api/companies/:id', (request, response) => {
         .map(user => ({ id: user.id, email: user.email }));
 
     return response.json({ ...company, employers });
+});
+
+router.get('/api/employers/:employerId/company', (request, response) => {
+    const employer = readCollection('users').find(user =>
+        String(user.id) === String(request.params.employerId) && user.role === 'Employer'
+    );
+    if (!employer) return response.status(404).json({ error: 'Employer not found.' });
+    if (!employer.companyId) return response.status(404).json({ error: 'No company profile exists for this employer.' });
+
+    const company = readCollection('companies').find(record => record.id === employer.companyId);
+    if (!company) return response.status(404).json({ error: 'Company not found.' });
+    return response.json(company);
 });
 
 router.post('/api/companies', (request, response) => {
@@ -60,6 +72,18 @@ router.patch('/api/companies/:id/logo', (request, response) => {
         });
 
         return response.json({ message: 'Company logo saved successfully.', company });
+    } catch (error) {
+        return response.status(error.statusCode || 400).json({ error: error.message });
+    }
+});
+
+router.put('/api/companies/:id', (request, response) => {
+    try {
+        const company = updateCompanyProfile({
+            ...request.body,
+            companyId: request.params.id
+        });
+        return response.json({ message: 'Company portfolio updated successfully.', company });
     } catch (error) {
         return response.status(error.statusCode || 400).json({ error: error.message });
     }
