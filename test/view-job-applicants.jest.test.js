@@ -1,10 +1,15 @@
-const { listApplicantsForJob } = require('../services/applicantService');
+const fs = require('fs');
+const path = require('path');
+const {
+    getApplicantForJob,
+    listApplicantsForJob
+} = require('../services/applicantService');
 
 describe('User Story: employer views all applicants for a job opening', () => {
     const employerId = 101;
     const jobId = 7;
 
-    function database() {
+    function database(overrides = {}) {
         const records = {
             jobs: [
                 {
@@ -78,7 +83,8 @@ describe('User Story: employer views all applicants for a job opening', () => {
             resumes: [
                 { userId: 201, resumeUrl: 'uploads/alex-resume.pdf' },
                 { userId: 202, resumeUrl: '/uploads/jamie-resume.pdf' }
-            ]
+            ],
+            ...overrides
         };
 
         return { readCollection: collection => records[collection] || [] };
@@ -119,8 +125,76 @@ describe('User Story: employer views all applicants for a job opening', () => {
     });
 
     test('prevents another employer from viewing the job applicants', () => {
-        expect(() => listApplicantsForJob(jobId, 999, database())).toThrow(
-            'You can only view applicants for your own job openings.'
+        expect.assertions(2);
+
+        try {
+            listApplicantsForJob(jobId, 999, database());
+        } catch (error) {
+            expect(error.statusCode).toBe(403);
+            expect(error.message).toBe(
+                'You can only view applicants for your own job openings.'
+            );
+        }
+    });
+
+    test('returns an empty list and provides a clear empty-state message when nobody has applied', () => {
+        const result = listApplicantsForJob(jobId, employerId, database({
+            applications: [
+                {
+                    id: 'application-other-job',
+                    jobId: 8,
+                    seekerId: 203
+                }
+            ]
+        }));
+        const applicantPage = fs.readFileSync(
+            path.join(__dirname, '../public/applicants.html'),
+            'utf8'
         );
+
+        expect(result.applicants).toEqual([]);
+        expect(applicantPage).toMatch(/No applicants yet/i);
+    });
+
+    test.each([
+        {
+            label: 'a missing employer ID',
+            requestedJobId: jobId,
+            requestedEmployerId: undefined,
+            statusCode: 400,
+            message: 'employerId is required.'
+        },
+        {
+            label: 'an unknown job ID',
+            requestedJobId: 999,
+            requestedEmployerId: employerId,
+            statusCode: 404,
+            message: 'Job opening not found.'
+        }
+    ])('rejects $label with a validation error', ({
+        requestedJobId,
+        requestedEmployerId,
+        statusCode,
+        message
+    }) => {
+        expect.assertions(2);
+
+        try {
+            listApplicantsForJob(requestedJobId, requestedEmployerId, database());
+        } catch (error) {
+            expect(error.statusCode).toBe(statusCode);
+            expect(error.message).toBe(message);
+        }
+    });
+
+    test('rejects an application ID that belongs to a different job opening', () => {
+        expect.assertions(2);
+
+        try {
+            getApplicantForJob(jobId, 'application-other-job', employerId, database());
+        } catch (error) {
+            expect(error.statusCode).toBe(404);
+            expect(error.message).toBe('Applicant not found for this job opening.');
+        }
     });
 });
