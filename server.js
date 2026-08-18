@@ -2,6 +2,7 @@ const express = require('express');
 const fs = require('fs');
 const path = require('path');
 const crypto = require('crypto');
+const nodemailer = require('nodemailer');
 
 const app = express();
 const PORT = 3000;
@@ -122,45 +123,6 @@ app.put('/api/profile', (req, res) => {
 });
 
 // =========================================================================
-// 3. ADDED HERE: US-04 Forgot Password Endpoint (Connected to users.json)
-// =========================================================================
-app.post('/api/auth/forgot-password', (req, res) => {
-    const { email } = req.body;
-
-    // Validation Check
-    if (!email) {
-        return res.status(400).json({ error: "Email address field is required." });
-    }
-
-    // Database Lookup from your real data/users.json file
-    const users = JSON.parse(fs.readFileSync(USERS_FILE, 'utf8'));
-    const user = users.find(u => u.email.toLowerCase() === email.toLowerCase());
-    
-    if (!user) {
-        return res.status(404).json({ error: "No account registered with that email address." });
-    }
-
-    // Generate Secure Token & Expiry (Valid for 15 minutes)
-    const secureToken = crypto.randomBytes(20).toString('hex');
-    const expiryTime = Date.now() + 900000; 
-
-    // Store token mapped directly to user email
-    resetTokensMemory[secureToken] = {
-        email: user.email,
-        expires: expiryTime
-    };
-
-    // Output Mock Email Link directly to your running terminal log
-    const mockResetLink = `http://localhost:3000/reset-password.html?token=${secureToken}`;
-    console.log("==========================================");
-    console.log(`MOCK EMAIL SENT TO: ${user.email}`);
-    console.log(`RESET URL LINK: ${mockResetLink}`);
-    console.log("==========================================");
-
-    return res.status(200).json({ message: "Secure recovery token generated successfully." });
-});
-
-// =========================================================================
 // UPDATED: US-04 Forgot Password Endpoint with REAL Email Delivery
 // =========================================================================
 app.post('/api/auth/forgot-password', async (req, res) => {
@@ -229,6 +191,33 @@ app.post('/api/auth/forgot-password', async (req, res) => {
         console.error("Email delivery failed:", emailError);
         return res.status(500).json({ error: "Failed to process email dispatch routing safely." });
     }
+});
+
+app.post('/api/auth/reset-password', (req, res) => {
+    const { token, newPassword } = req.body;
+    const tokenData = resetTokensMemory[token];
+
+    if (!tokenData || tokenData.expires < Date.now()) {
+        delete resetTokensMemory[token];
+        return res.status(400).json({ error: 'Reset token is invalid or expired.' });
+    }
+
+    if (!newPassword || newPassword.length < 6) {
+        return res.status(400).json({ error: 'Password must be at least 6 characters.' });
+    }
+
+    const users = JSON.parse(fs.readFileSync(USERS_FILE, 'utf8'));
+    const user = users.find(u => u.email === tokenData.email);
+
+    if (!user) {
+        return res.status(404).json({ error: 'User not found.' });
+    }
+
+    user.password = `hashed_${newPassword}`;
+    fs.writeFileSync(USERS_FILE, JSON.stringify(users, null, 2));
+    delete resetTokensMemory[token];
+
+    res.json({ message: 'Password updated successfully.' });
 });
 
 // ========== 外部业务路由（挂载在根路径，但已包含 /api/*） ==========
