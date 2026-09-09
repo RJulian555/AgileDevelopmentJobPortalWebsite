@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Job Portal - Create Company Profile</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background: linear-gradient(135deg, #f4f7f6 0%, #eaf7f0 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 24px;
+        }
+
+        .page-card {
+            background: #ffffff;
+            width: 100%;
+            max-width: 900px;
+            border-radius: 18px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.08);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #2ecc71 0%, #27ae60 100%);
+            color: #ffffff;
+            padding: 32px 36px;
+        }
+
+        .header h1 {
+            font-size: 28px;
+            margin-bottom: 8px;
+        }
+
+        .header p {
+            font-size: 15px;
+            opacity: 0.95;
+        }
+
+        .form-body {
+            padding: 32px 36px 36px;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 18px;
+        }
+
+        .full-width {
+            grid-column: 1 / -1;
+        }
+
+        label {
+            display: block;
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 7px;
+            font-size: 14px;
+        }
+
+        /* required-field marker */
+        label.required::after {
+            content: " *";
+            color: #e74c3c;
+            margin-left: 4px;
+            font-weight: 700;
+        }
+
+        input, textarea, select {
+            width: 100%;
+            padding: 13px 14px;
+            border: 1px solid #dfe6e1;
+            border-radius: 10px;
+            background: #f8fbf9;
+            font-size: 14px;
+            transition: 0.2s ease;
+        }
+
+        /* Select-specific fixes: remove native arrow, add custom caret and spacing */
+        select {
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
+            background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%232c3e50' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'></polyline></svg>");
+            background-repeat: no-repeat;
+            background-position: right 12px center;
+            background-size: 14px 14px;
+            padding-right: 44px; /* room for the caret */
+            min-width: 0; /* prevents grid overflow on narrow screens */
+        }
+
+        textarea {
+            min-height: 140px;
+            resize: vertical;
+            padding: 16px 18px;
+            line-height: 1.6;
+            font-size: 14px;
+            color: #233;
+            border-radius: 10px;
+        }
+
+        input:focus, textarea:focus, select:focus {
+            outline: none;
+            border-color: #2ecc71;
+            box-shadow: 0 0 0 3px rgba(46, 204, 113, 0.15);
+            background: #ffffff;
+        }
+
+        .file-input {
+            padding: 10px;
+            background: #ffffff;
+        }
+
+        .actions {
+            margin-top: 24px;
+            display: flex;
+            gap: 12px;
+            justify-content: flex-end;
+        }
+
+        .form-message {
+            display: none;
+            margin-bottom: 18px;
+            padding: 12px 14px;
+            border-radius: 10px;
+            font-size: 14px;
+        }
+
+        .form-message.error {
+            display: block;
+            color: #922b21;
+            background: #fdecea;
+        }
+
+        .form-message.success {
+            display: block;
+            color: #196f3d;
+            background: #eafaf1;
+        }
+
+        .logo-field {
+            display: flex;
+            align-items: center;
+            gap: 18px;
+        }
+
+        .logo-preview, .saved-company-logo {
+            width: 96px;
+            height: 96px;
+            border-radius: 14px;
+            border: 1px solid #dfe6e1;
+            object-fit: contain;
+            background: #ffffff;
+            padding: 6px;
+        }
+
+        .logo-help {
+            color: #66756d;
+            font-size: 13px;
+            margin-top: 7px;
+        }
+
+        .saved-company {
+            display: none;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .saved-company.visible {
+            display: block;
+        }
+
+        .saved-company h2 {
+            margin: 14px 0 6px;
+            color: #2c3e50;
+        }
+
+        .dashboard-link {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 12px 24px;
+            border-radius: 999px;
+            color: #ffffff;
+            background: #2ecc71;
+            text-decoration: none;
+            font-weight: 700;
+        }
+
+        .logo-update {
+            max-width: 420px;
+            margin: 22px auto 0;
+            padding-top: 20px;
+            border-top: 1px solid #e6ece8;
+        }
+
+        .logo-update button {
+            margin-top: 10px;
+            background: #2ecc71;
+            color: #ffffff;
+        }
+
+        button {
+            border: none;
+            border-radius: 999px;
+            padding: 12px 24px;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        button:hover {
+            transform: translateY(-1px);
+        }
+
+        .primary-btn {
+            background: #2ecc71;
+            color: #ffffff;
+            box-shadow: 0 6px 16px rgba(46, 204, 113, 0.22);
+        }
+
+        .secondary-btn {
+            background: #eef5f0;
+            color: #2c3e50;
+        }
+
+        @media (max-width: 900px) {
+            .form-grid {
+                grid-template-columns: 1fr;
+                gap: 14px;
+            }
+
+            .header, .form-body {
+                padding: 20px;
+            }
+
+            .page-card {
+                border-radius: 12px;
+                box-shadow: 0 10px 24px rgba(0,0,0,0.07);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="page-card">
+        <div class="header">
+            <h1>Create Company Profile</h1>
+            <p>Tell employers and job seekers more about your organization.</p>
+        </div>
+
+        <div class="form-body">
+            <div id="formMessage" class="form-message" role="alert" aria-live="polite"></div>
+            <section id="savedCompany" class="saved-company" aria-live="polite">
+                <img id="savedCompanyLogo" class="saved-company-logo" alt="" hidden>
+                <h2 id="savedCompanyName"></h2>
+                <p>Company profile saved successfully.</p>
+                <div id="logoUpdate" class="logo-update">
+                    <label for="replacementLogo">Upload or replace company logo</label>
+                    <input id="replacementLogo" class="file-input" type="file" accept="image/png,image/jpeg,image/webp">
+                    <button id="uploadLogoButton" type="button">Save Logo</button>
+                </div>
+                <a id="createJobLink" class="dashboard-link" href="/create-job.html">Create a Job Opening</a>
+                <a class="dashboard-link secondary-btn" href="/dashboard.html">Continue to Dashboard</a>
+            </section>
+            <form id="companyProfileForm" action="/api/companies" method="POST">
+                <input id="employerId" name="employerId" type="hidden">
+                <div class="form-grid">
+                    <div class="full-width">
+                        <label for="companyName" class="required">Company Name</label>
+                        <input id="companyName" name="companyName" type="text" placeholder="Enter company name" required>
+                    </div>
+
+                    <div class="full-width">
+                        <label for="description">Description</label>
+                        <textarea id="description" name="description" placeholder="Describe your company, mission, and values"></textarea>
+                    </div>
+
+                    <div class="full-width logo-field">
+                        <img id="logoPreview" class="logo-preview" alt="Company logo preview" hidden>
+                        <div>
+                            <label for="logo">Company Logo</label>
+                            <input id="logo" name="logo" class="file-input" type="file" accept="image/png,image/jpeg,image/webp">
+                            <p class="logo-help">PNG, JPEG, or WebP. Maximum file size: 2 MB.</p>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label for="industry" class="required">Industry</label>
+                        <select id="industry" name="industry" required>
+                            <option value="">Select industry</option>
+                            <option value="technology">Technology</option>
+                            <option value="healthcare">Healthcare</option>
+                            <option value="finance">Finance</option>
+                            <option value="education">Education</option>
+                            <option value="retail">Retail</option>
+                            <option value="manufacturing">Manufacturing</option>
+                            <option value="marketing">Marketing & Advertising</option>
+                            <option value="construction">Construction</option>
+                            <option value="transportation">Transportation & Logistics</option>
+                            <option value="energy">Energy & Utilities</option>
+                            <option value="realestate">Real Estate</option>
+                            <option value="hospitality">Hospitality & Tourism</option>
+                            <option value="legal">Legal</option>
+                            <option value="nonprofit">Non-profit / NGO</option>
+                            <option value="telecom">Telecommunications</option>
+                            <option value="agriculture">Agriculture</option>
+                            <option value="biotech">Biotechnology</option>
+                            <option value="automotive">Automotive</option>
+                            <option value="media">Media & Entertainment</option>
+                            <option value="government">Government</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label for="address" class="required">Address</label>
+                        <input id="address" name="address" type="text" placeholder="Company address" required>
+                    </div>
+
+                    <div>
+                        <label for="email" class="required">Email</label>
+                        <input id="email" name="email" type="email" placeholder="company@example.com" required>
+                    </div>
+
+                    <div>
+                        <label for="phone" class="required">Phone Number</label>
+                        <input id="phone" name="phone" type="tel" placeholder="e.g. +60 12 345 6789" required>
+                    </div>
+
+                    <div>
+                        <label for="website">Website</label>
+                        <input id="website" name="website" type="url" placeholder="https://yourcompany.com">
+                    </div>
+
+                    <div class="full-width actions">
+                        <button class="secondary-btn" type="button" onclick="window.location.href='/dashboard.html'">Cancel</button>
+                        <button class="primary-btn" type="submit">Save Profile</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+    <script>
+        const query = new URLSearchParams(window.location.search);
+        const employerId = query.get('employerId');
+        const companyId = query.get('companyId');
+        const form = document.getElementById('companyProfileForm');
+        const formMessage = document.getElementById('formMessage');
+        const submitButton = form.querySelector('[type="submit"]');
+        const logoInput = document.getElementById('logo');
+        const logoPreview = document.getElementById('logoPreview');
+        const replacementLogo = document.getElementById('replacementLogo');
+        const uploadLogoButton = document.getElementById('uploadLogoButton');
+        let activeCompanyId = companyId;
+        let activeEmployerId = employerId;
+
+        document.getElementById('employerId').value = employerId || '';
+        if (employerId) sessionStorage.setItem('jobwallEmployerId', employerId);
+
+        if (companyId) {
+            loadCompanyProfile(companyId);
+        } else if (!employerId) {
+            showMessage('Please register or sign in as an employer before creating a company profile.', 'error');
+            submitButton.disabled = true;
+        }
+
+        logoInput.addEventListener('change', () => {
+            const logo = logoInput.files[0];
+            if (!logo) {
+                logoPreview.hidden = true;
+                logoPreview.removeAttribute('src');
+                return;
+            }
+
+            if (logo.size > 2 * 1024 * 1024) {
+                logoInput.value = '';
+                logoPreview.hidden = true;
+                showMessage('Company logo must be no larger than 2 MB.', 'error');
+                return;
+            }
+
+            logoPreview.src = URL.createObjectURL(logo);
+            logoPreview.hidden = false;
+        });
+
+        uploadLogoButton.addEventListener('click', async () => {
+            const logo = replacementLogo.files[0];
+            if (!logo) return showMessage('Please select a company logo.', 'error');
+            if (logo.size > 2 * 1024 * 1024) {
+                return showMessage('Company logo must be no larger than 2 MB.', 'error');
+            }
+
+            uploadLogoButton.disabled = true;
+            uploadLogoButton.textContent = 'Saving...';
+
+            try {
+                const response = await fetch(`/api/companies/${encodeURIComponent(activeCompanyId)}/logo`, {
+                    method: 'PATCH',
+                    headers: {
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        employerId: activeEmployerId,
+                        logoData: await readFileAsDataUrl(logo)
+                    })
+                });
+                const result = await response.json();
+                if (!response.ok) throw new Error(result.error || 'Unable to save the company logo.');
+
+                showMessage(result.message, 'success');
+                displayCompanyProfile(result.company);
+                replacementLogo.value = '';
+            } catch (error) {
+                showMessage(error.message, 'error');
+            } finally {
+                uploadLogoButton.disabled = false;
+                uploadLogoButton.textContent = 'Save Logo';
+            }
+        });
+
+        form.addEventListener('submit', async event => {
+            event.preventDefault();
+            submitButton.disabled = true;
+            submitButton.textContent = 'Saving...';
+
+            try {
+                const formData = new FormData(form);
+                const logo = formData.get('logo');
+                formData.delete('logo');
+                const payload = Object.fromEntries(formData);
+                if (logo?.size) payload.logoData = await readFileAsDataUrl(logo);
+
+                const response = await fetch(form.action, {
+                    method: 'POST',
+                    headers: {
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(payload)
+                });
+                const result = await response.json();
+
+                if (!response.ok) throw new Error(result.error || 'Unable to create the company profile.');
+
+                showMessage(result.message, 'success');
+                window.history.replaceState({}, '', `/company-profile.html?companyId=${encodeURIComponent(result.company.id)}`);
+                displayCompanyProfile(result.company);
+            } catch (error) {
+                showMessage(error.message, 'error');
+                submitButton.disabled = false;
+                submitButton.textContent = 'Save Profile';
+            }
+        });
+
+        function showMessage(message, type) {
+            formMessage.textContent = message;
+            formMessage.className = `form-message ${type}`;
+        }
+
+        function readFileAsDataUrl(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = () => resolve(reader.result);
+                reader.onerror = () => reject(new Error('Unable to read the selected company logo.'));
+                reader.readAsDataURL(file);
+            });
+        }
+
+        async function loadCompanyProfile(id) {
+            try {
+                const response = await fetch(`/api/companies/${encodeURIComponent(id)}`);
+                const company = await response.json();
+                if (!response.ok) throw new Error(company.error || 'Company profile not found.');
+                displayCompanyProfile(company);
+            } catch (error) {
+                showMessage(error.message, 'error');
+            }
+        }
+
+        function displayCompanyProfile(company) {
+            const savedCompany = document.getElementById('savedCompany');
+            const savedLogo = document.getElementById('savedCompanyLogo');
+
+            form.hidden = true;
+            activeCompanyId = company.id;
+            activeEmployerId = activeEmployerId || company.employers?.[0]?.id;
+            if (activeEmployerId) {
+                sessionStorage.setItem('jobwallEmployerId', activeEmployerId);
+                document.getElementById('createJobLink').href =
+                    `/create-job.html?employerId=${encodeURIComponent(activeEmployerId)}`;
+            }
+            document.getElementById('savedCompanyName').textContent = company.name;
+            savedLogo.hidden = !company.logoUrl;
+            if (company.logoUrl) {
+                savedLogo.src = company.logoUrl;
+                savedLogo.alt = `${company.name} logo`;
+            }
+            savedCompany.classList.add('visible');
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,1512 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JobWall - Create Job Opening</title>
+    <meta name="description" content="Create a new company job opening on JobWall.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        :root {
+            --green-primary: #2ecc71;
+            --green-dark: #27ae60;
+            --green-soft: #eafaf1;
+            --text-dark: #1a2332;
+            --text-mid: #4a5568;
+            --text-muted: #718096;
+            --border: #dfe6e1;
+            --page: #f0f4f8;
+        }
+
+        body {
+            min-height: 100vh;
+            background:
+                radial-gradient(circle at 10% 0%, rgba(46, 204, 113, 0.13), transparent 30%),
+                linear-gradient(135deg, #f4f7f6 0%, #eaf7f0 100%);
+            color: var(--text-dark);
+            font-family: 'Inter', Arial, sans-serif;
+        }
+
+        .navbar {
+            height: 58px;
+            padding: 0 32px;
+            background: #fff;
+            border-bottom: 1px solid #e2e8f0;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+
+        .brand {
+            color: var(--green-primary);
+            font-size: 26px;
+            font-weight: 900;
+            letter-spacing: -1px;
+            text-decoration: none;
+        }
+
+        .back-link {
+            color: var(--text-mid);
+            font-size: 13px;
+            font-weight: 600;
+            text-decoration: none;
+        }
+
+        .back-link:hover {
+            color: var(--green-dark);
+        }
+
+        main {
+            width: min(940px, calc(100% - 32px));
+            margin: 34px auto;
+        }
+
+        .page-card {
+            overflow: hidden;
+            background: #fff;
+            border-radius: 18px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.08);
+        }
+
+        .header {
+            position: relative;
+            overflow: hidden;
+            padding: 32px 36px;
+            color: #fff;
+            background: linear-gradient(135deg, var(--green-primary), var(--green-dark));
+        }
+
+        .header::after {
+            content: '';
+            position: absolute;
+            width: 220px;
+            height: 220px;
+            right: -60px;
+            top: -100px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.09);
+        }
+
+        .eyebrow {
+            margin-bottom: 8px;
+            font-size: 12px;
+            font-weight: 700;
+            letter-spacing: 1.3px;
+            text-transform: uppercase;
+            opacity: 0.82;
+        }
+
+        .header h1 {
+            margin-bottom: 8px;
+            font-size: 29px;
+            letter-spacing: -0.6px;
+        }
+
+        .header p {
+            font-size: 14px;
+            opacity: 0.94;
+        }
+
+        .form-body {
+            padding: 32px 36px 36px;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 18px;
+        }
+
+        .full-width {
+            grid-column: 1 / -1;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 7px;
+            color: #2c3e50;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        label.required::after {
+            content: ' *';
+            color: #e74c3c;
+        }
+
+        input,
+        textarea,
+        select {
+            width: 100%;
+            padding: 13px 14px;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            outline: none;
+            color: var(--text-dark);
+            background: #f8fbf9;
+            font: inherit;
+            font-size: 14px;
+            transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
+        }
+
+        input:focus,
+        textarea:focus,
+        select:focus {
+            border-color: var(--green-primary);
+            background: #fff;
+            box-shadow: 0 0 0 3px rgba(46, 204, 113, 0.15);
+        }
+
+        textarea {
+            min-height: 135px;
+            resize: vertical;
+            line-height: 1.6;
+        }
+
+        select {
+            appearance: none;
+            padding-right: 42px;
+            background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%234a5568' stroke-width='2'><polyline points='6 9 12 15 18 9'/></svg>");
+            background-repeat: no-repeat;
+            background-position: right 13px center;
+        }
+
+        .field-help {
+            margin-top: 6px;
+            color: var(--text-muted);
+            font-size: 12px;
+            line-height: 1.45;
+        }
+
+        .salary-input {
+            position: relative;
+        }
+
+        .salary-prefix {
+            position: absolute;
+            top: 50%;
+            left: 14px;
+            color: var(--text-mid);
+            font-size: 13px;
+            font-weight: 700;
+            transform: translateY(-50%);
+        }
+
+        .salary-input input {
+            padding-left: 44px;
+        }
+
+        .search-select {
+            position: relative;
+        }
+
+        .dropdown-toggle {
+            position: absolute;
+            z-index: 2;
+            top: 1px;
+            right: 1px;
+            width: 44px;
+            height: 44px;
+            padding: 0;
+            border-radius: 0 10px 10px 0;
+            color: var(--text-muted);
+            background: transparent;
+            box-shadow: none;
+        }
+
+        .dropdown-toggle::after,
+        .select-display::after {
+            content: '';
+            display: block;
+            width: 7px;
+            height: 7px;
+            margin: -4px auto 0;
+            border-right: 2px solid currentColor;
+            border-bottom: 2px solid currentColor;
+            transform: rotate(45deg);
+            transition: transform 0.2s;
+        }
+
+        .search-select.open .dropdown-toggle::after,
+        .search-select.open .select-display::after {
+            margin-top: 4px;
+            transform: rotate(225deg);
+        }
+
+        .dropdown-toggle:hover,
+        .select-display:hover {
+            transform: none;
+        }
+
+        .search-select input {
+            padding-right: 44px;
+        }
+
+        .search-select.has-clear input {
+            padding-right: 82px;
+        }
+
+        .single-search-select input[type="search"]::-webkit-search-cancel-button {
+            -webkit-appearance: none;
+            appearance: none;
+        }
+
+        .clear-selection {
+            position: absolute;
+            z-index: 3;
+            top: 1px;
+            right: 43px;
+            width: 40px;
+            height: 44px;
+            padding: 0;
+            border-radius: 8px;
+            color: var(--green-dark);
+            background: transparent;
+            box-shadow: none;
+            font-size: 22px;
+            font-weight: 500;
+            line-height: 1;
+        }
+
+        .clear-selection:hover {
+            color: #196f3d;
+            background: transparent;
+            box-shadow: none;
+            transform: none;
+        }
+
+        .clear-selection[hidden] {
+            display: none;
+        }
+
+        .select-display {
+            display: flex;
+            width: 100%;
+            min-height: 46px;
+            align-items: center;
+            justify-content: space-between;
+            padding: 13px 14px;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            color: var(--text-dark);
+            background: #f8fbf9;
+            box-shadow: none;
+            font-size: 14px;
+            font-weight: 400;
+            text-align: left;
+        }
+
+        .select-display.placeholder {
+            color: var(--text-muted);
+        }
+
+        .select-display::after {
+            flex-shrink: 0;
+            margin-right: 3px;
+            color: var(--text-muted);
+        }
+
+        .search-select.open .select-display {
+            border-color: var(--green-primary);
+            background: #fff;
+            box-shadow: 0 0 0 3px rgba(46, 204, 113, 0.15);
+        }
+
+        .search-select.invalid input {
+            border-color: #e74c3c;
+            background: #fff8f7;
+            box-shadow: 0 0 0 3px rgba(231, 76, 60, 0.12);
+        }
+
+        .search-select.invalid .dropdown-toggle,
+        .search-select.invalid .clear-selection {
+            color: #c0392b;
+            background: transparent;
+        }
+
+        .search-select.invalid .dropdown-toggle:hover,
+        .search-select.invalid .clear-selection:hover {
+            color: #922b21;
+            background: transparent;
+        }
+
+        .search-select.invalid .dropdown-toggle:focus-visible,
+        .search-select.invalid .clear-selection:focus-visible {
+            outline: 2px solid rgba(192, 57, 43, 0.45);
+            outline-offset: -7px;
+        }
+
+        .field-error {
+            display: none;
+            margin-top: 7px;
+            color: #c0392b;
+            font-size: 12px;
+            font-weight: 600;
+            line-height: 1.4;
+        }
+
+        .field-error.visible {
+            display: block;
+        }
+
+        .options-dropdown {
+            display: none;
+            position: absolute;
+            z-index: 30;
+            top: calc(100% + 7px);
+            left: 0;
+            right: 0;
+            max-height: 230px;
+            overflow-y: auto;
+            padding: 7px;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            background: #fff;
+            box-shadow: 0 14px 30px rgba(26, 35, 50, 0.16);
+        }
+
+        .search-select.open .options-dropdown {
+            display: block;
+        }
+
+        .dropdown-option {
+            display: flex;
+            width: 100%;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px 12px;
+            border: 0;
+            border-radius: 8px;
+            color: var(--text-dark);
+            background: transparent;
+            font-size: 13px;
+            font-weight: 500;
+            text-align: left;
+        }
+
+        .dropdown-option:hover,
+        .dropdown-option.active {
+            color: #196f3d;
+            background: var(--green-soft);
+            transform: none;
+        }
+
+        .dropdown-option.selected {
+            color: #196f3d;
+            font-weight: 700;
+            background: var(--green-soft);
+        }
+
+        .option-check {
+            color: var(--green-dark);
+            font-size: 15px;
+            font-weight: 800;
+        }
+
+        .no-options {
+            padding: 14px 12px;
+            color: var(--text-muted);
+            font-size: 13px;
+            text-align: center;
+        }
+
+        .selected-skills {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            min-height: 26px;
+            margin-top: 10px;
+        }
+
+        .selected-skills:empty {
+            display: none;
+        }
+
+        .skill-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            padding: 6px 10px;
+            border-radius: 999px;
+            color: #196f3d;
+            background: var(--green-soft);
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .skill-chip button {
+            padding: 0;
+            color: #196f3d;
+            background: transparent;
+            font-size: 17px;
+            line-height: 1;
+        }
+
+        .form-message {
+            display: none;
+            margin-bottom: 20px;
+            padding: 13px 15px;
+            border-radius: 10px;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        .form-message.error {
+            display: block;
+            color: #922b21;
+            background: #fdecea;
+        }
+
+        .form-message.success {
+            display: block;
+            color: #196f3d;
+            background: var(--green-soft);
+        }
+
+        .company-context {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            margin-bottom: 24px;
+            padding: 14px 16px;
+            border: 1px solid #d8eee1;
+            border-radius: 12px;
+            background: linear-gradient(135deg, #f5fcf8, #edf9f2);
+        }
+
+        .company-context-logo,
+        .preview-logo {
+            display: grid;
+            flex-shrink: 0;
+            place-items: center;
+            object-fit: contain;
+            color: #196f3d;
+            background: #d5f5e3;
+            font-weight: 800;
+        }
+
+        .company-context-logo {
+            width: 48px;
+            height: 48px;
+            border-radius: 11px;
+            font-size: 18px;
+        }
+
+        img.company-context-logo,
+        img.preview-logo {
+            padding: 4px;
+            background: #fff;
+        }
+
+        .company-context-copy {
+            min-width: 0;
+        }
+
+        .company-context-label {
+            margin-bottom: 3px;
+            color: var(--text-muted);
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 0.8px;
+            text-transform: uppercase;
+        }
+
+        .company-context-name {
+            font-size: 15px;
+            font-weight: 800;
+        }
+
+        .company-context-meta {
+            margin-top: 2px;
+            color: var(--text-mid);
+            font-size: 12px;
+        }
+
+        .field-meta {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 16px;
+        }
+
+        .character-count {
+            flex-shrink: 0;
+            margin-top: 6px;
+            color: var(--text-muted);
+            font-size: 12px;
+        }
+
+        .preview-section {
+            padding-top: 6px;
+        }
+
+        .preview-heading {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+
+        .preview-heading h2 {
+            font-size: 14px;
+        }
+
+        .preview-heading span {
+            color: var(--text-muted);
+            font-size: 11px;
+        }
+
+        .job-preview {
+            display: flex;
+            align-items: flex-start;
+            gap: 15px;
+            padding: 18px;
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            background: #fff;
+            box-shadow: 0 6px 18px rgba(26, 35, 50, 0.06);
+        }
+
+        .preview-logo {
+            width: 44px;
+            height: 44px;
+            border-radius: 9px;
+            font-size: 18px;
+        }
+
+        .preview-body {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .preview-title {
+            margin-bottom: 3px;
+            font-size: 15px;
+            font-weight: 800;
+        }
+
+        .preview-company {
+            margin-bottom: 9px;
+            color: var(--text-mid);
+            font-size: 12px;
+        }
+
+        .preview-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+
+        .preview-tag {
+            padding: 4px 9px;
+            border-radius: 999px;
+            color: #196f3d;
+            background: var(--green-soft);
+            font-size: 10px;
+            font-weight: 600;
+        }
+
+        .preview-right {
+            flex-shrink: 0;
+            color: var(--green-dark);
+            font-size: 12px;
+            font-weight: 800;
+            text-align: right;
+        }
+
+        .actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+            position: sticky;
+            z-index: 25;
+            bottom: 0;
+            margin: 12px -4px -20px;
+            padding: 18px 4px 20px;
+            border-top: 1px solid #edf1ee;
+            background: rgba(255, 255, 255, 0.94);
+            backdrop-filter: blur(10px);
+        }
+
+        button,
+        .button {
+            border: 0;
+            border-radius: 999px;
+            padding: 12px 24px;
+            font: inherit;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            text-decoration: none;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        button:hover,
+        .button:hover {
+            transform: translateY(-1px);
+        }
+
+        button:disabled {
+            cursor: wait;
+            opacity: 0.65;
+            transform: none;
+        }
+
+        .secondary {
+            color: #2c3e50;
+            background: #eef5f0;
+        }
+
+        .primary {
+            color: #fff;
+            background: linear-gradient(135deg, var(--green-primary), var(--green-dark));
+            box-shadow: 0 6px 16px rgba(46, 204, 113, 0.25);
+        }
+
+        .success-panel {
+            display: none;
+            padding: 52px 30px;
+            text-align: center;
+        }
+
+        .success-panel.visible {
+            display: block;
+        }
+
+        .success-icon {
+            display: grid;
+            width: 62px;
+            height: 62px;
+            margin: 0 auto 18px;
+            place-items: center;
+            border-radius: 50%;
+            color: #fff;
+            background: var(--green-primary);
+            font-size: 30px;
+            font-weight: 800;
+        }
+
+        .success-panel h2 {
+            margin-bottom: 8px;
+            font-size: 24px;
+        }
+
+        .success-panel p {
+            margin-bottom: 24px;
+            color: var(--text-muted);
+        }
+
+        .success-actions {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        @media (max-width: 720px) {
+            .navbar {
+                padding: 0 18px;
+            }
+
+            main {
+                margin: 20px auto;
+            }
+
+            .form-grid {
+                grid-template-columns: 1fr;
+                gap: 15px;
+            }
+
+            .header,
+            .form-body {
+                padding: 24px 20px;
+            }
+
+            .full-width {
+                grid-column: auto;
+            }
+
+            .actions {
+                flex-direction: column-reverse;
+            }
+
+            .actions button,
+            .actions .button {
+                width: 100%;
+                text-align: center;
+            }
+
+            .job-preview {
+                flex-wrap: wrap;
+            }
+
+            .preview-right {
+                width: 100%;
+                padding-left: 59px;
+                text-align: left;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <a class="brand" href="/dashboard.html">JobWall</a>
+        <a class="back-link" href="/dashboard.html">&larr; Back to job listings</a>
+    </nav>
+
+    <main>
+        <article class="page-card">
+            <header class="header">
+                <div class="eyebrow">Employer workspace</div>
+                <h1>Create a Job Opening</h1>
+                <p>Share the role details candidates need before they apply.</p>
+            </header>
+
+            <div class="form-body">
+                <div id="formMessage" class="form-message" role="alert" aria-live="polite"></div>
+
+                <section id="companyContext" class="company-context" aria-live="polite">
+                    <span id="companyContextInitial" class="company-context-logo" aria-hidden="true">...</span>
+                    <img id="companyContextLogo" class="company-context-logo" alt="" hidden>
+                    <div class="company-context-copy">
+                        <div class="company-context-label">Publishing for</div>
+                        <div id="companyContextName" class="company-context-name">Loading company...</div>
+                        <div id="companyContextMeta" class="company-context-meta">Confirming employer access</div>
+                    </div>
+                </section>
+
+                <form id="jobForm" action="/api/jobs" method="POST">
+                    <input id="employerId" name="employerId" type="hidden">
+                    <div class="form-grid">
+                        <div class="full-width">
+                            <label class="required" for="title">Job Title</label>
+                            <div id="titleSelect" class="search-select single-search-select">
+                                <input id="title" name="title" type="search" autocomplete="off" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="jobTitleOptions" placeholder="Search and select a job title" required>
+                                <button class="clear-selection" type="button" aria-label="Clear selected job title" hidden>&times;</button>
+                                <button class="dropdown-toggle" type="button" aria-label="Toggle job title options"></button>
+                                <div id="jobTitleOptions" class="options-dropdown" role="listbox"></div>
+                            </div>
+                            <p class="field-help">Start typing to filter the available job titles.</p>
+                            <p id="titleError" class="field-error" role="alert" aria-live="polite"></p>
+                        </div>
+
+                        <div class="full-width">
+                            <label class="required" for="description">Job Description</label>
+                            <textarea id="description" name="description" maxlength="5000" placeholder="Describe the responsibilities, impact, and day-to-day work for this role." required></textarea>
+                            <div class="field-meta">
+                                <p class="field-help">Include key responsibilities, requirements, benefits, and what success looks like.</p>
+                                <span id="descriptionCount" class="character-count">0 / 5,000</span>
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="required" for="salary">Monthly Salary</label>
+                            <div class="salary-input">
+                                <span class="salary-prefix">RM</span>
+                                <input id="salary" name="salary" type="number" min="0" step="0.01" inputmode="decimal" placeholder="6500" required>
+                            </div>
+                            <p class="field-help">Enter one monthly salary amount in Malaysian Ringgit.</p>
+                        </div>
+
+                        <div>
+                            <label class="required" for="employmentType">Employment Type</label>
+                            <div id="employmentTypeSelect" class="search-select">
+                                <input id="employmentType" name="employmentType" type="hidden">
+                                <button class="select-display placeholder" type="button" aria-expanded="false" aria-controls="employmentTypeOptions">Select employment type</button>
+                                <div id="employmentTypeOptions" class="options-dropdown" role="listbox"></div>
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="required" for="location">State / Federal Territory</label>
+                            <div id="locationSelect" class="search-select single-search-select">
+                                <input id="location" name="location" type="search" autocomplete="off" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="locationOptions" placeholder="Search and select a state" required>
+                                <button class="clear-selection" type="button" aria-label="Clear selected state" hidden>&times;</button>
+                                <button class="dropdown-toggle" type="button" aria-label="Toggle state options"></button>
+                                <div id="locationOptions" class="options-dropdown" role="listbox"></div>
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="required" for="experienceRequired">Experience Required</label>
+                            <div id="experienceSelect" class="search-select">
+                                <input id="experienceRequired" name="experienceRequired" type="hidden">
+                                <button class="select-display placeholder" type="button" aria-expanded="false" aria-controls="experienceOptions">Select experience level</button>
+                                <div id="experienceOptions" class="options-dropdown" role="listbox"></div>
+                            </div>
+                        </div>
+
+                        <div class="full-width">
+                            <label class="required" for="skillSearch">Skills Required</label>
+                            <div id="skillSelect" class="search-select">
+                                <input id="skillSearch" type="search" autocomplete="off" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="skillOptions" placeholder="Search and select skills">
+                                <button class="dropdown-toggle" type="button" aria-label="Toggle skill options"></button>
+                                <div id="skillOptions" class="options-dropdown" role="listbox" aria-multiselectable="true"></div>
+                            </div>
+                            <input id="skillsRequired" name="skillsRequired" type="hidden">
+                            <div id="selectedSkills" class="selected-skills" aria-live="polite"></div>
+                            <p class="field-help">Select one or more skills. Selected skills appear below.</p>
+                        </div>
+
+                        <div>
+                            <label class="required" for="educationLevel">Education Level</label>
+                            <div id="educationSelect" class="search-select">
+                                <input id="educationLevel" name="educationLevel" type="hidden">
+                                <button class="select-display placeholder" type="button" aria-expanded="false" aria-controls="educationOptions">Select education level</button>
+                                <div id="educationOptions" class="options-dropdown" role="listbox"></div>
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="required" for="closingDate">Closing Date</label>
+                            <input id="closingDate" name="closingDate" type="date" required>
+                            <p class="field-help">The closing date must be after today.</p>
+                        </div>
+
+                        <section class="full-width preview-section" aria-labelledby="previewHeading">
+                            <div class="preview-heading">
+                                <h2 id="previewHeading">Job listing preview</h2>
+                                <span>Updates as you complete the form</span>
+                            </div>
+                            <div class="job-preview">
+                                <span id="previewInitial" class="preview-logo" aria-hidden="true">C</span>
+                                <img id="previewLogo" class="preview-logo" alt="" hidden>
+                                <div class="preview-body">
+                                    <div id="previewTitle" class="preview-title">Job title</div>
+                                    <div id="previewCompany" class="preview-company">Your company · State, Malaysia</div>
+                                    <div id="previewTags" class="preview-tags">
+                                        <span class="preview-tag">Employment type</span>
+                                        <span class="preview-tag">Selected skills</span>
+                                    </div>
+                                </div>
+                                <div id="previewSalary" class="preview-right">Monthly salary</div>
+                            </div>
+                        </section>
+
+                        <div class="full-width actions">
+                            <a class="button secondary" href="/dashboard.html">Cancel</a>
+                            <button id="submitButton" class="primary" type="submit">Create Job Opening</button>
+                        </div>
+                    </div>
+                </form>
+
+                <section id="successPanel" class="success-panel" aria-live="polite">
+                    <div class="success-icon" aria-hidden="true">&#10003;</div>
+                    <h2>Job opening published</h2>
+                    <p id="successText">Candidates can now find this role on JobWall.</p>
+                    <div class="success-actions">
+                        <a class="button secondary" href="/dashboard.html">View Job Listings</a>
+                        <button id="createAnotherButton" class="primary" type="button">Create Another Job</button>
+                    </div>
+                </section>
+            </div>
+        </article>
+    </main>
+
+    <script>
+        const query = new URLSearchParams(window.location.search);
+        const employerId = query.get('employerId') || sessionStorage.getItem('jobwallEmployerId');
+        const form = document.getElementById('jobForm');
+        const message = document.getElementById('formMessage');
+        const submitButton = document.getElementById('submitButton');
+        const closingDate = document.getElementById('closingDate');
+        const descriptionInput = document.getElementById('description');
+        const salaryInput = document.getElementById('salary');
+        const titleInput = document.getElementById('title');
+        const titleError = document.getElementById('titleError');
+        const locationInput = document.getElementById('location');
+        const skillSearch = document.getElementById('skillSearch');
+        const skillsInput = document.getElementById('skillsRequired');
+        const selectedSkillsContainer = document.getElementById('selectedSkills');
+        const titleSelect = document.getElementById('titleSelect');
+        const locationSelect = document.getElementById('locationSelect');
+        const skillSelect = document.getElementById('skillSelect');
+        const employmentTypeSelect = document.getElementById('employmentTypeSelect');
+        const experienceSelect = document.getElementById('experienceSelect');
+        const educationSelect = document.getElementById('educationSelect');
+        const dropdownWrappers = [
+            titleSelect,
+            locationSelect,
+            skillSelect,
+            employmentTypeSelect,
+            experienceSelect,
+            educationSelect
+        ];
+        let availableOptions;
+        let selectedSkills = [];
+        let activeCompany;
+        let optionsLoaded = false;
+        let contextLoaded = false;
+        let existingJobTitles = [];
+        let hasDuplicateTitle = false;
+
+        document.getElementById('employerId').value = employerId || '';
+        closingDate.min = dateAfterToday();
+        submitButton.disabled = true;
+
+        if (employerId) {
+            sessionStorage.setItem('jobwallEmployerId', employerId);
+            loadJobOptions();
+            loadCompanyContext();
+        } else {
+            showMessage('An employer account is required. Open this page from your company profile or sign in first.', 'error');
+        }
+
+        [titleInput, locationInput, salaryInput].forEach(input => {
+            input.addEventListener('input', updatePreview);
+        });
+        titleInput.addEventListener('input', validateDuplicateTitle);
+        descriptionInput.addEventListener('input', updateDescriptionCount);
+        updateDescriptionCount();
+        updatePreview();
+
+        document.addEventListener('click', event => {
+            dropdownWrappers.forEach(select => {
+                if (!select.contains(event.target)) closeDropdown(select);
+            });
+        });
+
+        form.addEventListener('submit', async event => {
+            event.preventDefault();
+            message.className = 'form-message';
+            message.textContent = '';
+
+            const selectedTitle = findOption(titleInput.value, availableOptions?.jobTitles || []);
+            if (!selectedTitle) {
+                showMessage('Select a job title from the available options.', 'error');
+                titleInput.focus();
+                return;
+            }
+            titleInput.value = selectedTitle;
+            if (!validateDuplicateTitle()) {
+                showMessage(titleError.textContent, 'error');
+                titleInput.focus();
+                return;
+            }
+
+            const selectedLocation = findOption(locationInput.value, availableOptions?.locations || []);
+            if (!selectedLocation) {
+                showMessage('Select a Malaysian location from the available options.', 'error');
+                locationInput.focus();
+                return;
+            }
+            locationInput.value = selectedLocation;
+
+            if (selectedSkills.length === 0) {
+                showMessage('Select at least one required skill.', 'error');
+                skillSearch.focus();
+                return;
+            }
+
+            const requiredSelections = [
+                ['employmentType', 'an employment type', employmentTypeSelect],
+                ['experienceRequired', 'an experience level', experienceSelect],
+                ['educationLevel', 'an education level', educationSelect]
+            ];
+            const missingSelection = requiredSelections.find(([id]) => !document.getElementById(id).value);
+            if (missingSelection) {
+                showMessage(`Select ${missingSelection[1]}.`, 'error');
+                missingSelection[2].querySelector('.select-display').click();
+                return;
+            }
+
+            if (closingDate.value < closingDate.min) {
+                showMessage('Closing date must be after today.', 'error');
+                closingDate.focus();
+                return;
+            }
+
+            submitButton.disabled = true;
+            submitButton.textContent = 'Publishing...';
+
+            try {
+                const response = await fetch(form.action, {
+                    method: 'POST',
+                    headers: {
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(Object.fromEntries(new FormData(form)))
+                });
+                const result = await readJsonResponse(
+                    response,
+                    'Unable to create the job opening.'
+                );
+                if (!response.ok) throw new Error(result.error || 'Unable to create the job opening.');
+
+                document.getElementById('successText').textContent =
+                    `${result.job.title} at ${result.job.company} is now visible to job seekers.`;
+                existingJobTitles.push(result.job.title);
+                form.hidden = true;
+                message.className = 'form-message';
+                document.getElementById('successPanel').classList.add('visible');
+            } catch (error) {
+                showMessage(error.message, 'error');
+            } finally {
+                updateSubmitAvailability();
+                submitButton.textContent = 'Create Job Opening';
+            }
+        });
+
+        document.getElementById('createAnotherButton').addEventListener('click', () => {
+            form.reset();
+            selectedSkills = [];
+            renderSelectedSkills();
+            resetSearchSelections();
+            resetFixedSelects();
+            dropdownWrappers.forEach(closeDropdown);
+            document.getElementById('employerId').value = employerId;
+            closingDate.min = dateAfterToday();
+            updateDescriptionCount();
+            validateDuplicateTitle();
+            updatePreview();
+            document.getElementById('successPanel').classList.remove('visible');
+            form.hidden = false;
+            document.getElementById('title').focus();
+        });
+
+        async function loadJobOptions() {
+            try {
+                const response = await fetch('/api/job-options');
+                const result = await readJsonResponse(response, 'Unable to load job options.');
+                if (!response.ok) throw new Error(result.error || 'Unable to load job options.');
+                availableOptions = result;
+
+                setupSingleSelect(
+                    titleSelect,
+                    titleInput,
+                    document.getElementById('jobTitleOptions'),
+                    availableOptions.jobTitles
+                );
+                setupSingleSelect(
+                    locationSelect,
+                    locationInput,
+                    document.getElementById('locationOptions'),
+                    availableOptions.locations
+                );
+                setupSkillSelect();
+                setupFixedSelect(
+                    employmentTypeSelect,
+                    'employmentType',
+                    availableOptions.employmentTypes
+                );
+                setupFixedSelect(
+                    experienceSelect,
+                    'experienceRequired',
+                    availableOptions.experienceLevels
+                );
+                setupFixedSelect(
+                    educationSelect,
+                    'educationLevel',
+                    availableOptions.educationLevels
+                );
+                optionsLoaded = true;
+                updateSubmitAvailability();
+            } catch (error) {
+                showMessage(`${error.message} Please refresh the page and try again.`, 'error');
+            }
+        }
+
+        async function loadCompanyContext() {
+            try {
+                const response = await fetch(
+                    `/api/employers/${encodeURIComponent(employerId)}/job-context`
+                );
+                const result = await readJsonResponse(
+                    response,
+                    'Unable to load the employer company.'
+                );
+                if (!response.ok) throw new Error(result.error || 'Unable to load the employer company.');
+
+                activeCompany = result.company;
+                existingJobTitles = result.existingJobTitles || [];
+                document.getElementById('companyContextName').textContent = result.company.name;
+                document.getElementById('companyContextMeta').textContent =
+                    `${formatLabel(result.company.industry)} · ${result.employer.email}`;
+
+                const contextLogo = document.getElementById('companyContextLogo');
+                const contextInitial = document.getElementById('companyContextInitial');
+                contextInitial.textContent = result.company.name.charAt(0).toUpperCase();
+                contextInitial.hidden = Boolean(result.company.logoUrl);
+                contextLogo.hidden = !result.company.logoUrl;
+                if (result.company.logoUrl) {
+                    contextLogo.src = result.company.logoUrl;
+                    contextLogo.alt = `${result.company.name} logo`;
+                }
+
+                contextLoaded = true;
+                validateDuplicateTitle();
+                updatePreview();
+                updateSubmitAvailability();
+            } catch (error) {
+                document.getElementById('companyContext').hidden = true;
+                showMessage(error.message, 'error');
+            }
+        }
+
+        async function readJsonResponse(response, fallbackMessage) {
+            const contentType = response.headers.get('content-type') || '';
+            if (!contentType.toLowerCase().includes('application/json')) {
+                await response.text();
+                throw new Error(
+                    `${fallbackMessage} The website API returned an HTML page instead of JSON. ` +
+                    'Run the website through the Node server with "npm start" and use http://localhost:3000.'
+                );
+            }
+
+            try {
+                return await response.json();
+            } catch {
+                throw new Error(`${fallbackMessage} The server returned invalid JSON.`);
+            }
+        }
+
+        function setupSingleSelect(wrapper, input, dropdown, options) {
+            const toggle = wrapper.querySelector('.dropdown-toggle');
+            const clear = wrapper.querySelector('.clear-selection');
+            const updateClearButton = () => {
+                const hasValue = input.value.trim().length > 0;
+                clear.hidden = !hasValue;
+                wrapper.classList.toggle('has-clear', hasValue);
+            };
+            const refresh = () => renderOptions(
+                dropdown,
+                options,
+                input.value,
+                option => {
+                    input.value = option;
+                    updateClearButton();
+                    closeDropdown(wrapper);
+                    if (input === titleInput) validateDuplicateTitle();
+                    updatePreview();
+                }
+            );
+
+            input.addEventListener('focus', () => {
+                openDropdown(wrapper);
+                refresh();
+            });
+            input.addEventListener('input', () => {
+                updateClearButton();
+                openDropdown(wrapper);
+                refresh();
+            });
+            input.addEventListener('keydown', event => {
+                handleDropdownKeys(event, wrapper, dropdown);
+            });
+            toggle.addEventListener('click', event => {
+                event.stopPropagation();
+                if (wrapper.classList.contains('open')) {
+                    closeDropdown(wrapper);
+                    return;
+                }
+                input.focus();
+                openDropdown(wrapper);
+                refresh();
+            });
+            clear.addEventListener('click', event => {
+                event.stopPropagation();
+                input.value = '';
+                updateClearButton();
+                input.focus();
+                if (input === titleInput) validateDuplicateTitle();
+                updatePreview();
+            });
+            updateClearButton();
+        }
+
+        function setupSkillSelect() {
+            const dropdown = document.getElementById('skillOptions');
+            const toggle = skillSelect.querySelector('.dropdown-toggle');
+            skillSearch.addEventListener('focus', () => {
+                openDropdown(skillSelect);
+                renderSkillOptions();
+            });
+            skillSearch.addEventListener('input', () => {
+                openDropdown(skillSelect);
+                renderSkillOptions();
+            });
+            skillSearch.addEventListener('keydown', event => {
+                handleDropdownKeys(event, skillSelect, dropdown);
+            });
+            toggle.addEventListener('click', event => {
+                event.stopPropagation();
+                if (skillSelect.classList.contains('open')) {
+                    closeDropdown(skillSelect);
+                    return;
+                }
+                skillSearch.focus();
+                openDropdown(skillSelect);
+                renderSkillOptions();
+            });
+        }
+
+        function setupFixedSelect(wrapper, inputId, options, formatter = value => value) {
+            const input = document.getElementById(inputId);
+            const display = wrapper.querySelector('.select-display');
+            const dropdown = wrapper.querySelector('.options-dropdown');
+            display.dataset.placeholder = display.textContent;
+
+            const refresh = () => renderOptions(
+                dropdown,
+                options,
+                '',
+                option => {
+                    input.value = String(option);
+                    display.textContent = formatter(option);
+                    display.classList.remove('placeholder');
+                    closeDropdown(wrapper);
+                    display.focus();
+                    updatePreview();
+                },
+                input.value ? [input.value] : [],
+                formatter
+            );
+
+            display.addEventListener('click', event => {
+                event.stopPropagation();
+                if (wrapper.classList.contains('open')) {
+                    closeDropdown(wrapper);
+                    return;
+                }
+                openDropdown(wrapper);
+                refresh();
+            });
+            display.addEventListener('keydown', event => {
+                handleDropdownKeys(event, wrapper, dropdown);
+            });
+        }
+
+        function renderSkillOptions() {
+            renderOptions(
+                document.getElementById('skillOptions'),
+                availableOptions?.skills || [],
+                skillSearch.value,
+                skill => {
+                    selectedSkills = selectedSkills.includes(skill)
+                        ? selectedSkills.filter(value => value !== skill)
+                        : [...selectedSkills, skill];
+                    skillSearch.value = '';
+                    renderSelectedSkills();
+                    renderSkillOptions();
+                    skillSearch.focus();
+                },
+                selectedSkills
+            );
+        }
+
+        function renderOptions(
+            dropdown,
+            options,
+            search,
+            onSelect,
+            selected = [],
+            formatter = value => value
+        ) {
+            const query = String(search || '').trim().toLowerCase();
+            const filtered = options.filter(option =>
+                String(formatter(option)).toLowerCase().includes(query)
+            );
+
+            if (filtered.length === 0) {
+                const empty = document.createElement('div');
+                empty.className = 'no-options';
+                empty.textContent = 'No matching options';
+                dropdown.replaceChildren(empty);
+                return;
+            }
+
+            dropdown.replaceChildren(...filtered.map(option => {
+                const button = document.createElement('button');
+                button.type = 'button';
+                const isSelected = selected.map(String).includes(String(option));
+                button.className = `dropdown-option${isSelected ? ' selected' : ''}`;
+                button.setAttribute('role', 'option');
+                button.setAttribute('aria-selected', String(isSelected));
+                button.append(document.createTextNode(formatter(option)));
+
+                if (isSelected) {
+                    const check = document.createElement('span');
+                    check.className = 'option-check';
+                    check.textContent = '\u2713';
+                    button.append(check);
+                }
+
+                button.addEventListener('click', event => {
+                    event.stopPropagation();
+                    onSelect(option);
+                });
+                return button;
+            }));
+        }
+
+        function openDropdown(wrapper) {
+            dropdownWrappers.forEach(select => {
+                if (select !== wrapper) closeDropdown(select);
+            });
+            wrapper.classList.add('open');
+            wrapper.querySelector('[aria-expanded]')?.setAttribute('aria-expanded', 'true');
+        }
+
+        function closeDropdown(wrapper) {
+            wrapper.classList.remove('open');
+            wrapper.querySelector('[aria-expanded]')?.setAttribute('aria-expanded', 'false');
+        }
+
+        function handleDropdownKeys(event, wrapper, dropdown) {
+            if (event.key === 'Escape') {
+                closeDropdown(wrapper);
+                return;
+            }
+
+            if (event.key === 'ArrowDown') {
+                event.preventDefault();
+                openDropdown(wrapper);
+                dropdown.querySelector('.dropdown-option')?.focus();
+            }
+        }
+
+        function resetFixedSelects() {
+            document.querySelectorAll('.select-display').forEach(display => {
+                display.textContent = display.dataset.placeholder;
+                display.classList.add('placeholder');
+            });
+        }
+
+        function resetSearchSelections() {
+            [titleSelect, locationSelect].forEach(wrapper => {
+                wrapper.classList.remove('has-clear');
+                wrapper.querySelector('.clear-selection').hidden = true;
+            });
+        }
+
+        function renderSelectedSkills() {
+            skillsInput.value = selectedSkills.join(',');
+            selectedSkillsContainer.replaceChildren(
+                ...selectedSkills.map(skill => {
+                    const chip = document.createElement('span');
+                    chip.className = 'skill-chip';
+                    chip.append(document.createTextNode(skill));
+
+                    const remove = document.createElement('button');
+                    remove.type = 'button';
+                    remove.setAttribute('aria-label', `Remove ${skill}`);
+                    remove.textContent = '×';
+                    remove.addEventListener('click', () => {
+                        selectedSkills = selectedSkills.filter(value => value !== skill);
+                        renderSelectedSkills();
+                        if (skillSelect.classList.contains('open')) renderSkillOptions();
+                    });
+                    chip.append(remove);
+                    return chip;
+                })
+            );
+            updatePreview();
+        }
+
+        function findOption(value, options) {
+            const wanted = String(value || '').trim().toLowerCase();
+            return options.find(option => option.toLowerCase() === wanted);
+        }
+
+        function updateDescriptionCount() {
+            document.getElementById('descriptionCount').textContent =
+                `${descriptionInput.value.length.toLocaleString('en-MY')} / 5,000`;
+        }
+
+        function updatePreview() {
+            const companyName = activeCompany?.name || 'Your company';
+            const location = locationInput.value.trim() || 'State, Malaysia';
+            const employmentType = document.getElementById('employmentType').value;
+            const salary = Number(salaryInput.value);
+            const previewInitial = document.getElementById('previewInitial');
+            const previewLogo = document.getElementById('previewLogo');
+
+            document.getElementById('previewTitle').textContent =
+                titleInput.value.trim() || 'Job title';
+            document.getElementById('previewCompany').textContent =
+                `${companyName} · ${location}`;
+            document.getElementById('previewSalary').textContent =
+                salaryInput.value && Number.isFinite(salary)
+                    ? `RM ${salary.toLocaleString('en-MY')} / month`
+                    : 'Monthly salary';
+
+            previewInitial.textContent = companyName.charAt(0).toUpperCase();
+            previewInitial.hidden = Boolean(activeCompany?.logoUrl);
+            previewLogo.hidden = !activeCompany?.logoUrl;
+            if (activeCompany?.logoUrl) {
+                previewLogo.src = activeCompany.logoUrl;
+                previewLogo.alt = `${companyName} logo`;
+            }
+
+            const tags = [];
+            if (employmentType) tags.push(employmentType);
+            tags.push(...selectedSkills.slice(0, 3));
+            if (selectedSkills.length > 3) tags.push(`+${selectedSkills.length - 3} more`);
+            if (tags.length === 0) tags.push('Employment type', 'Selected skills');
+
+            document.getElementById('previewTags').replaceChildren(
+                ...tags.map(value => {
+                    const tag = document.createElement('span');
+                    tag.className = 'preview-tag';
+                    tag.textContent = value;
+                    return tag;
+                })
+            );
+        }
+
+        function updateSubmitAvailability() {
+            submitButton.disabled = !(optionsLoaded && contextLoaded) || hasDuplicateTitle;
+        }
+
+        function validateDuplicateTitle() {
+            const normalisedTitle = normaliseTitle(titleInput.value);
+            hasDuplicateTitle = Boolean(normalisedTitle)
+                && existingJobTitles.some(title => normaliseTitle(title) === normalisedTitle);
+
+            titleSelect.classList.toggle('invalid', hasDuplicateTitle);
+            titleInput.setAttribute('aria-invalid', String(hasDuplicateTitle));
+            titleError.classList.toggle('visible', hasDuplicateTitle);
+            titleError.textContent = hasDuplicateTitle
+                ? `${activeCompany?.name || 'Your company'} already has a ${titleInput.value.trim()} job opening. Choose another title.`
+                : '';
+            updateSubmitAvailability();
+            return !hasDuplicateTitle;
+        }
+
+        function normaliseTitle(value) {
+            return String(value || '').trim().toLowerCase().replace(/\s+/g, ' ');
+        }
+
+        function formatLabel(value) {
+            return String(value || 'Company')
+                .replace(/([a-z])([A-Z])/g, '$1 $2')
+                .replace(/\b\w/g, character => character.toUpperCase());
+        }
+
+        function dateAfterToday() {
+            const tomorrow = new Date();
+            tomorrow.setDate(tomorrow.getDate() + 1);
+            const year = tomorrow.getFullYear();
+            const month = String(tomorrow.getMonth() + 1).padStart(2, '0');
+            const day = String(tomorrow.getDate()).padStart(2, '0');
+            return `${year}-${month}-${day}`;
+        }
+
+        function showMessage(text, type) {
+            message.textContent = text;
+            message.className = `form-message ${type}`;
+            message.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+    </script>
+</body>
+</html>

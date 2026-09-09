@@ -1,0 +1,65 @@
+{
+  "version": 1,
+  "collections": {
+    "users": {
+      "primaryKey": "id",
+      "fields": {
+        "id": "number|required|unique",
+        "email": "string|required|unique",
+        "password": "string|required",
+        "role": "enum:Job Seeker,Employer|required",
+        "companyId": "string|null|foreignKey:companies.id"
+      }
+    },
+    "companies": {
+      "primaryKey": "id",
+      "fields": {
+        "id": "string|required|unique",
+        "name": "string|required",
+        "description": "string",
+        "industry": "string|required",
+        "address": "string|required",
+        "email": "string|required|unique",
+        "phone": "string|required",
+        "website": "string",
+        "logoUrl": "string",
+        "createdAt": "ISO-8601|required",
+        "updatedAt": "ISO-8601|required"
+      }
+    },
+    "jobs": {
+      "primaryKey": "id",
+      "fields": {
+        "id": "string|required|unique",
+        "companyId": "string|required|foreignKey:companies.id",
+        "createdByEmployerId": "number|required|foreignKey:users.id",
+        "title": "string|required",
+        "description": "string|required",
+        "salary": "number|required",
+        "employmentType": "string|required",
+        "location": "string|required",
+        "skillsRequired": "array:string|required",
+        "experienceRequired": "string|required",
+        "educationLevel": "string|required",
+        "closingDate": "date|required|after:today",
+        "postedAt": "date|required",
+        "createdAt": "ISO-8601|required"
+      }
+    }
+  },
+  "relationships": [
+    {
+      "from": "users.companyId",
+      "to": "companies.id",
+      "name": "Company has many Employers; Employer belongs to zero or one Company",
+      "appliesWhen": "users.role equals Employer",
+      "onDelete": "restrict"
+    },
+    {
+      "from": "jobs.companyId",
+      "to": "companies.id",
+      "name": "Company has many Jobs; Job belongs to one Company",
+      "onDelete": "restrict"
+    }
+  ]
+}

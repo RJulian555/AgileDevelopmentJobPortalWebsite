@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Job Portal - Login</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: #0d1117;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            overflow: hidden;
+            position: relative;
+            color: #c9d1d9;
+        }
+
+        /* --- AMBIENT GLOW BACKGROUND --- */
+        .bg-glow-wrapper {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        .glow-orb {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(90px);
+            opacity: 0.25;
+            animation: pulseGlow 12s ease-in-out infinite alternate;
+        }
+
+        .glow-orb.orb-1 {
+            width: 350px;
+            height: 350px;
+            background: #2ecc71;
+            top: 10%;
+            left: 15%;
+        }
+
+        .glow-orb.orb-2 {
+            width: 400px;
+            height: 400px;
+            background: #10b981;
+            bottom: 10%;
+            right: 15%;
+            animation-delay: -6s;
+        }
+
+        @keyframes pulseGlow {
+            0% { transform: scale(1) translate(0, 0); opacity: 0.2; }
+            100% { transform: scale(1.15) translate(30px, -20px); opacity: 0.35; }
+        }
+
+        /* --- BACK ARROW BUTTON --- */
+        .back-btn-container {
+            position: absolute;
+            top: 25px;
+            left: 25px;
+            z-index: 999;
+        }
+
+        .back-arrow {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 46px;
+            height: 46px;
+            background-color: #161b22;
+            border: 1px solid #30363d;
+            border-radius: 12px;
+            cursor: pointer;
+            text-decoration: none;
+            color: #2ecc71;
+            font-size: 22px;
+            font-weight: bold;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+            transition: all 0.2s ease;
+        }
+
+        .back-arrow:hover {
+            border-color: #2ecc71;
+            background-color: #2ecc71;
+            color: #ffffff;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(46, 204, 113, 0.3);
+        }
+
+        /* --- BRAND TITLE --- */
+        .brand-title {
+            font-size: 38px;
+            font-weight: 800;
+            color: #ffffff;
+            letter-spacing: -0.5px;
+            margin-bottom: 20px;
+            z-index: 20;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .brand-title span {
+            color: #2ecc71;
+        }
+
+        /* --- SINGLE CENTERED CARD CONTAINER --- */
+        .login-card {
+            background-color: #161b22;
+            border: 1px solid #30363d;
+            border-radius: 20px;
+            width: 420px;
+            max-width: 90%;
+            padding: 36px 32px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
+            z-index: 10;
+            backdrop-filter: blur(10px);
+        }
+
+        .card-header {
+            text-align: center;
+            margin-bottom: 24px;
+        }
+
+        .welcome-badge {
+            display: inline-block;
+            font-size: 11px;
+            font-weight: 700;
+            color: #2ecc71;
+            background: rgba(46, 204, 113, 0.1);
+            border: 1px solid rgba(46, 204, 113, 0.2);
+            padding: 4px 12px;
+            border-radius: 20px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 10px;
+        }
+
+        .card-header h2 {
+            font-size: 24px;
+            font-weight: 700;
+            color: #ffffff;
+            margin-bottom: 6px;
+        }
+
+        .card-header p {
+            font-size: 13px;
+            color: #8b949e;
+        }
+
+        /* --- ROLE SWITCHER TABS --- */
+        .tab-switcher {
+            display: flex;
+            background-color: #0d1117;
+            border: 1px solid #21262d;
+            border-radius: 12px;
+            padding: 4px;
+            margin-bottom: 24px;
+        }
+
+        .tab-btn {
+            flex: 1;
+            padding: 10px;
+            font-size: 13px;
+            font-weight: 600;
+            color: #8b949e;
+            background: transparent;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            box-shadow: none;
+            margin-top: 0;
+            text-transform: none;
+            letter-spacing: 0;
+        }
+
+        .tab-btn.active {
+            background-color: #21262d;
+            color: #2ecc71;
+            border: 1px solid rgba(46, 204, 113, 0.3);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+        }
+
+        /* --- FORM ELEMENTS --- */
+        .form-section {
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .form-section.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(6px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .input-group {
+            margin-bottom: 16px;
+            text-align: left;
+        }
+
+        .input-group label {
+            display: block;
+            font-size: 12px;
+            font-weight: 600;
+            color: #8b949e;
+            margin-bottom: 6px;
+        }
+
+        input {
+            background-color: #0d1117;
+            border: 1px solid #30363d;
+            padding: 12px 14px;
+            width: 100%;
+            border-radius: 10px;
+            font-size: 14px;
+            color: #ffffff;
+            transition: all 0.2s;
+        }
+
+        input::placeholder {
+            color: #484f58;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: #2ecc71;
+            box-shadow: 0 0 0 3px rgba(46, 204, 113, 0.15);
+        }
+
+        .form-options {
+            display: flex;
+            justify-content: flex-end;
+            margin-bottom: 20px;
+        }
+
+        .forgot-link {
+            font-size: 12px;
+            color: #2ecc71;
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+
+        .forgot-link:hover {
+            text-decoration: underline;
+        }
+
+        button.submit-btn {
+            width: 100%;
+            border-radius: 10px;
+            border: none;
+            background-color: #2ecc71;
+            color: #0d1117;
+            font-size: 14px;
+            font-weight: 700;
+            padding: 12px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 14px rgba(46, 204, 113, 0.25);
+        }
+
+        button.submit-btn:hover {
+            background-color: #27ae60;
+            box-shadow: 0 6px 20px rgba(46, 204, 113, 0.4);
+            transform: translateY(-1px);
+        }
+
+        button.submit-btn:active {
+            transform: translateY(0);
+        }
+
+        /* --- FOOTER REGISTRATION PROMPT --- */
+        .card-footer {
+            margin-top: 24px;
+            text-align: center;
+            font-size: 13px;
+            color: #8b949e;
+            border-top: 1px solid #21262d;
+            padding-top: 18px;
+        }
+
+        .card-footer a {
+            color: #2ecc71;
+            font-weight: 600;
+            text-decoration: none;
+        }
+
+        .card-footer a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Ambient Glowing Orbs -->
+    <div class="bg-glow-wrapper">
+        <div class="glow-orb orb-1"></div>
+        <div class="glow-orb orb-2"></div>
+    </div>
+
+    <!-- Back Button -->
+    <div class="back-btn-container">
+        <a href="dashboard.html" class="back-arrow" title="Go back to Dashboard">&#8592;</a>
+    </div>
+
+    <!-- Brand Header -->
+    <div class="brand-title">Job<span>Wall</span></div>
+
+    <!-- Main Centered Card -->
+    <div class="login-card">
+        
+        <div class="card-header">
+            <span class="welcome-badge">Welcome Back</span>
+            <h2 id="headerTitle">Job Seeker Login</h2>
+            <p id="headerDesc">Access your portal to view saved jobs and applications</p>
+        </div>
+
+        <!-- Role Toggle Tabs -->
+        <div class="tab-switcher">
+            <button class="tab-btn active" id="tabJobSeeker">Job Seeker</button>
+            <button class="tab-btn" id="tabEmployer">Employer</button>
+        </div>
+
+        <!-- Job Seeker Form -->
+        <div class="form-section active" id="jobseekerForm">
+            <!-- Login error message (shown when redirected back with ?error=) -->
+            <div id="login-error-banner" style="
+                display:none;
+                background:#fff0f0;
+                color:#c0392b;
+                border:1px solid #f5c6cb;
+                border-radius:8px;
+                padding:10px 14px;
+                font-size:13px;
+                margin-bottom:14px;
+                font-weight:500;
+            "></div>
+            <form action="/api/login" method="POST">
+                <input type="hidden" name="role" value="Job Seeker">
+                
+                <div class="input-group">
+                    <label for="js-email">Email Address</label>
+                    <input type="email" id="js-email" name="email" placeholder="name@example.com" required />
+                </div>
+                
+                <div class="input-group">
+                    <label for="js-password">Password</label>
+                    <input type="password" id="js-password" name="password" placeholder="••••••••" required />
+                </div>
+
+                <div class="form-options">
+                    <a href="#" class="forgot-link">Forgot password?</a>
+                </div>
+
+                <button type="submit" class="submit-btn">Sign In as Job Seeker</button>
+            </form>
+        </div>
+
+        <!-- Employer Form -->
+        <div class="form-section" id="employerForm">
+            <form action="/api/login" method="POST">
+                <input type="hidden" name="role" value="Employer">
+                
+                <div class="input-group">
+                    <label for="emp-email">Corporate Email</label>
+                    <input type="email" id="emp-email" name="email" placeholder="hr@company.com" required />
+                </div>
+                
+                <div class="input-group">
+                    <label for="emp-password">Password</label>
+                    <input type="password" id="emp-password" name="password" placeholder="••••••••" required />
+                </div>
+
+                <div class="form-options">
+                    <a href="#" class="forgot-link">Forgot password?</a>
+                </div>
+
+                <button type="submit" class="submit-btn">Sign In as Employer</button>
+            </form>
+        </div>
+
+        <div class="card-footer">
+            Don't have an account? <a href="register.html">Create account</a>
+        </div>
+
+    </div>
+
+    <script>
+        const tabJobSeeker = document.getElementById('tabJobSeeker');
+        const tabEmployer = document.getElementById('tabEmployer');
+        const jobseekerForm = document.getElementById('jobseekerForm');
+        const employerForm = document.getElementById('employerForm');
+        const headerTitle = document.getElementById('headerTitle');
+        const headerDesc = document.getElementById('headerDesc');
+
+        tabJobSeeker.addEventListener('click', () => {
+            tabJobSeeker.classList.add('active');
+            tabEmployer.classList.remove('active');
+            
+            jobseekerForm.classList.add('active');
+            employerForm.classList.remove('active');
+
+            headerTitle.textContent = 'Job Seeker Login';
+            headerDesc.textContent = 'Access your portal to view saved jobs and applications';
+        });
+
+        tabEmployer.addEventListener('click', () => {
+            tabEmployer.classList.add('active');
+            tabJobSeeker.classList.remove('active');
+            
+            employerForm.classList.add('active');
+            jobseekerForm.classList.remove('active');
+
+            headerTitle.textContent = 'Employer Login';
+            headerDesc.textContent = 'Manage company listings and track candidate applications';
+        });
+
+        // Show error message from URL param (e.g. ?error=Invalid+email)
+        (function () {
+            var params = new URLSearchParams(window.location.search);
+            var errMsg = params.get('error');
+            if (errMsg) {
+                var banner = document.getElementById('login-error-banner');
+                if (banner) {
+                    banner.textContent = errMsg;
+                    banner.style.display = 'block';
+                }
+                // Remove ?error from URL without reload
+                var url = new URL(window.location.href);
+                url.searchParams.delete('error');
+                window.history.replaceState({}, '', url.toString());
+            }
+        })();
+    </script>
+</body>
+</html>
